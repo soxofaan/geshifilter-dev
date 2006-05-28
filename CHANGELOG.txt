@@ -1,0 +1,6 @@
+GeSHiFilter CHANGELOG
+
+
+2006-05-28
+
+- first release of geshifilter module
