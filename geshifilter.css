@@ -1,0 +1,22 @@
+.geshifilter-code {
+	font-size:1em;
+	padding:0.5em;
+	margin:0.5em;
+  border: 1px solid #CCC;
+  background-color: #FFFFFF;
+}
+
+
+.geshifilter-code pre {
+	border:none;
+	padding:0;
+	margin:0;
+  background-color: transparent;
+}
+
+.geshifilter-code div {
+	border:none;
+	padding:0;
+	margin:0;
+  background-color: transparent;
+}
