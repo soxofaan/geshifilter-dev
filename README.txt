@@ -1,14 +1,22 @@
 GeSHi Filter Module
+Authors:  Vincent Filby <vfilby at gmail dot com>
+          Michael Hutchinson (http://compsoc.dur.ac.uk/~mjh/contact)
+          Damien Pitard <dpdev00 at gmail dot com>
 
-Authors:	Vincent Filby <vfilby at gmail dot com>
-					Michael Hutchinson (http://compsoc.dur.ac.uk/~mjh/contact)
-					Damien Pitard <dpdev00 at gmail dot com>
-					
+GeSHi - Generic Syntax Highlighter
+Author:   Nigel McNie <nigel at geshi dot org>
+
+See the GeSHi homepage at:
+
+	http://qbnz.com/highlighter
+
+A big part of this README is quoted from the GeSHi documentation written
+by Nigel McNie.
 
 DESCRIPTION
 -----------
-The GeShiFilter Module provides tags for syntax-highlighting code
-automatically.
+The GeShiFilter Module provides <code [type="language"]>...</code> tags
+to syntax-highlight code automatically.
 
 SETTINGS
 --------
@@ -95,7 +103,7 @@ the <ol> tag.
 Customize here some in-line styles.
 If you have not enabled in-line styles, this will have no effect.
 
-USE
+USAGE
 ---
 To post pieces of highlighted code, surround them with
 <code [type="language"] [start="startLineNumber"]>...</code>.

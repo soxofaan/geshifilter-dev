@@ -6,10 +6,10 @@ GeShiFilter Module
 Name: GeShiFilter module
 
 Maintainers:  Damien Pitard <dpdev00 AT gmail DOT com>
-           
-         
+
 Dependancies:
-  This module requires the third-party GeShi Syntax Highlighter.
+  This module requires the third-party php application GeSHi - Generic
+  Syntax Highlighter by Nigel McNie <nigel at geshi dot org>.
 
 INSTALLATION:
 ********************************************************************
