@@ -1,8 +1,10 @@
 <?php // $Id$ //
 
-require_once (variable_get('geshifilter_geshi_dir', drupal_get_path('module', 'geshifilter').'/geshi').'/geshi.php');
+require_once(variable_get('geshifilter_geshi_dir', drupal_get_path('module', 'geshifilter').'/geshi').'/geshi.php');
 theme_add_style(drupal_get_path('module', 'geshifilter') . '/geshifilter.css');
 theme_add_style(drupal_get_path('module', 'geshifilter') . '/geshi.css');
+
+
 
 /**
  * Implementation of hook_help()
@@ -19,20 +21,28 @@ function geshifilter_help($section) {
  */
 function geshifilter_filter_tips($delta, $format, $long = false) {
 
-	$default_type=variable_get('geshifilter_default_type_'.$format, 0);
+	$default_type = variable_get('geshifilter_default_type_'.$format, 0);
 	$types = variable_get('geshifilter_types_'.$format, array());
 	$start_param = variable_get('geshifilter_start_param', FALSE);
 	$line_numbers = variable_get('geshifilter_line_numbers', GESHI_NO_LINE_NUMBERS);
+	$inline_code=variable_get('geshifilter_inline_code_'.$format, FALSE);
 	
   if ($long) {
-  
+		
 		$text=t('<h3>Code:</h3>');
 		
 		//some language are allowed, type param is supported
-		if (!$types[0]) {	
-			$text .= t('<p>To post pieces of highlighted code, surround them with &lt;code &#91;type=&quot;<em>language</em>&quot;&#93;&gt;...&lt;/code&gt tags. See the languages you can use highlight bellow.</p>
-<p>E.g. highlight actionscript code:
-<pre>&lt;code type=&quot;<em>actionscript</em>&quot;&gt;<br />...<br />&lt;/code&gt;</pre></p>');
+		if (!$types[0]) {
+		
+			$text .= t('<p>To post highlighted code, surround it code with &lt;blockcode &#91;type=&quot;<em>language</em>&quot;&#93;&gt;...&lt;/blockcode&gt tags.</p>
+<p>E.g. actionscript block code:
+<pre>&lt;blockcode type=&quot;<em>actionscript</em>&quot;&gt;<br />...<br />&lt;/blockcode&gt;</pre></p>');
+			
+			if ($inline_code) {
+				$text .= t('<p>You may also post highlighted inline code surrounding it with &lt;code &#91;type=&quot;<em>language</em>&quot;&#93;&gt;...&lt;/code&gt tags.</p>
+<p>E.g. highlight actionscript inline code:
+<pre>&lt;code type=&quot;<em>actionscript</em>&quot;&gt;...&lt;/code&gt;</pre></p>');
+			}			
 
 			if ($default_type) {
 				$text .= t('<p>If you don\'t use <em>type=&quot;language&quot;</em> param or specify an unsupported language, the code will be highlighted as %default-code code.</p>', array('%default-code' => theme('placeholder', $default_language)));
@@ -41,18 +51,24 @@ function geshifilter_filter_tips($delta, $format, $long = false) {
 			$text .= t('<p>If you don\'t use <em>type=&quot;language&quot;</em> param or specify an unsupported language, the code will not be highlighted.</p>');
 			} 
 			
-			$supported_types = array_keys ($types, TRUE);
+			$supported_types = array_keys($types, TRUE);
 			
 			$text .= t('<p>The following languages are supported for highlight:<br />%type_list.</p>', array('%type_list' => theme('item_list', $supported_types)));
 		
 		}
 		//no languages allowed, type param is not supported
 		else {	
-		
-			$text.= t('<p>To post pieces of code, surround them with &lt;code&gt;...&lt;/code&gt tags.</p>
+			
+			$text.= t('<p>To post code, surround it with &lt;blockcode&gt;...&lt;/blockcode&gt tags.</p>
 <p>E.g. :
-<pre>&lt;code&gt;<br />...<br />&lt;/code&gt;</pre></p>');
-
+<pre>&lt;blockcode&gt;<br />...<br />&lt;/blockcode&gt;</pre></p>');
+			
+			if ($inline_code) {
+				$text.= t('<p>You may also post inline code surrounding it with &lt;code&gt;...&lt;/code&gt tags.</p>
+<p>E.g. :
+<pre>&lt;code&gt;...&lt;/code&gt;</pre></p>');
+			}
+			
 			if ($default_type) {
 				$text .= t('<p>By default, the code will be highlighted as %default-code code.</p>', array('%default-code' => theme('placeholder', $default_type)));
 			}
@@ -65,7 +81,7 @@ function geshifilter_filter_tips($delta, $format, $long = false) {
 			if ($start_param) {
 				$text .= ' '.t('<p>The code will be numbered. You can make the line numbers start at any number using <em>start=number</em> param
 <p>E.g. highlight actionscript code and start line number at 5:
-<pre>&lt;code type=&quot;<em>actionscript</em>&quot; start=&quot;<em>5</em>&quot;&gt;<br />...<br />&lt;/code&gt;</pre></p>');
+<pre>&lt;blockcode type=&quot;<em>actionscript</em>&quot; start=&quot;<em>5</em>&quot;&gt;<br />...<br />&lt;/blockcode&gt;</pre></p>');
 			}
 			else {
 				$text .= ' '.t('<p>The code will be numbered.</p>');
@@ -75,14 +91,27 @@ function geshifilter_filter_tips($delta, $format, $long = false) {
 		return $text;
   }
   else {
+		$text='';
 		//some language are allowed, type param is supported
-		if (!$types[0]) {  	
-			return t('You may post code using &lt;code &#91;type=&quot;<em>language</em>&quot;&#93;&gt;...&lt;/code&gt; tags.');
+		if (!$types[0]) {
+
+			$text .= t('You may post block code using &lt;blockcode &#91;type=&quot;<em>language</em>&quot;&#93;&gt;...&lt;/blockcode&gt; tags. ');
+			
+			if ($inline_code) {
+				$text .= t('You may also post inline code using &lt;code &#91;type=&quot;<em>language</em>&quot;&#93;&gt;...&lt;/code&gt; tags.');
+			}
 		}
 		//no languages allowed, type param is not supported
-		else {	
-			return t('You may post code using &lt;code&gt;...&lt;/code&gt; tags.');
+		else {
+		
+			$text .= t('You may post block code using &lt;blockcode&gt;...&lt;/blockcode&gt; tags. ');
+			
+			if ($inline_code) {
+				$text .= t('You may also post inline code using &lt;code&gt;...&lt;/code&gt; tags.');
+			}
 		}
+		
+		return $text;
   }
 }
 
@@ -225,7 +254,7 @@ function geshifilter_settings() {
 /*
  * Validate the settings form
  */
-function geshifilter_settings_form_validate ($form_id, $form_values) {
+function geshifilter_settings_form_validate($form_id, $form_values) {
 
 	$form_values['geshifilter_geshi_dir'] = rtrim($form_values['geshifilter_geshi_dir'], '/\\');
 	$form_values['geshifilter_lang_dir'] = rtrim($form_values['geshifilter_lang_dir'], '/\\');
@@ -250,8 +279,6 @@ function geshifilter_settings_form_validate ($form_id, $form_values) {
 	if (count($files) == 0) {
 		drupal_set_message(t('No language pattern files found. Are you sure to have correctly installed the GeShi package?'));
 	}
-	
-	
 }
 
 /**
@@ -260,7 +287,10 @@ function geshifilter_settings_form_validate ($form_id, $form_values) {
 function geshifilter_filter($op, $delta = 0, $format = -1, $text = '') {
 	
 	//disable cache for developpement cause nocache doesn't work
-	//db_query('DELETE from cache');
+  $debug = variable_get('geshifilter_debug', FALSE);
+	if ($debug) {
+		db_query('DELETE from cache');
+	}
   
   switch ($op) {
       
@@ -268,7 +298,7 @@ function geshifilter_filter($op, $delta = 0, $format = -1, $text = '') {
       return array(0 => t('GeSHi filter'));
 
     case 'description':
-      return t('Allows users to post hightlighted code verbatim using &lt;code type=&quot;<em>language</em>&quot;&gt; tag.');
+      return t('Allows users to post hightlighted code verbatim using &lt;blockcode type=&quot;<em>language</em>&quot;&gt; tag.');
     
     case 'settings':
 			$lang_dir = variable_get('geshifilter_lang_dir', drupal_get_path('module', 'geshifilter').'/geshi/geshi');
@@ -287,6 +317,13 @@ function geshifilter_filter($op, $delta = 0, $format = -1, $text = '') {
 				'#title' => t('GeSHi filter'),
 				'#collapsible' => true,
 				'#collapsed' => true,
+			);
+			
+			$form['geshifilter']['geshifilter_inline_code_'.$format] = array(
+				'#type' => 'checkbox',
+				'#title' => t('Highlight inline code'),
+				'#default_value' => variable_get('geshifilter_inline_code_'.$format, FALSE),
+				'#description' => t('Enable highligthing for code surrounded by &lt;code&gt;...&lt;/code&gt; tags.'),
 			);
 
       $form['geshifilter']['geshifilter_default_type_'.$format] = array(
@@ -335,26 +372,27 @@ function _geshifilter_process_code($format, $text, $flags = '') {
 	$line_numbers = variable_get('geshifilter_line_numbers', GESHI_NO_LINE_NUMBERS);
 	$fancy_number = variable_get('geshifilter_fancy_number', 5);
   $start_param = variable_get('geshifilter_start_param', FALSE);
-  //in-line style
   $overall_style = variable_get('geshifilter_overall_style', '');
 	$number_style = variable_get('geshifilter_number_style', '');
 	$fancy_number_style = variable_get('geshifilter_fancy_number_style', 'font-weight: bold;');
 	$code_style = variable_get('geshifilter_code_style', 'font-weight: normal;');
-		
+  $inline_code = variable_get('geshifilter_inline_code_'.$format, FALSE);  
   $debug = variable_get('geshifilter_debug', FALSE);
   
-	if (preg_match_all('/<code((?:\s(?:.|\s|\z)*?)*)\s*>((?:.|\s|\z)*?)<\/code\s*>/i', $text, $match)) {
-		// $match[0][xx] .... fully matched string <code type="language">...</code>
-		// $match[1][xx] .... full params string type="language"...
-		// $match[2][xx] .... code to highlight
+  $tags='blockcode'.($inline_code?'|code':'');
+	if (preg_match_all('/<('.$tags.')((?:\s(?:.|\s|\z)*?)*)\s*>((?:.|\s|\z)*?)<\/\1\s*>/i', $text, $match)) {
+		// $match[0][xx] .... fully matched string <blockcode type="language">...</blockcode>
+		// $match[1][xx] .... tag
+		// $match[2][xx] .... full params string type="language"...
+		// $match[3][xx] .... code to highlight
 
-		foreach ($match[2] as $key => $value) {
+		foreach ($match[3] as $key => $value) {
 				
 			if ($debug) {
-				drupal_set_message('&lt;code&gt;...&lt;/code&gt tags found');
+				drupal_set_message('&lt;'.$match[1][$key].'&gt;...&lt;/'.$match[1][$key].'&gt; tags found');
 			}
 			
-			preg_match_all('/(type|lang|language|start)\s*=\s*[\"]((?:.|\s|\z)*?)[\"]/i', $match[1][$key], $param);			//let lang and language tags for backward compatibility
+			preg_match_all('/(type|start)\s*=\s*[\"]((?:.|\s|\z)*?)[\"]/i', $match[2][$key], $param);			//let lang and language tags for backward compatibility
 		  // $param[0][xx] .... fully matched string type="language"
 			// $param[1][xx] .... param name
 			// $param[2][xx] .... param value
@@ -366,11 +404,11 @@ function _geshifilter_process_code($format, $text, $flags = '') {
 			foreach ($param[2] as $p_key => $p_value) {
 					
 					if ($debug) {
-						drupal_set_message($param[1][$p_key].'=&quot;'.$p_value.'&quot param found');
+						drupal_set_message($param[1][$p_key].'=&quot;'.$p_value.'&quot; param found');
 					}
 			
 				//if lang is known, allowed and found
-				if (($param[1][$p_key] == 'type' || $param[1][$p_key] == 'lang' || $param[1][$p_key] == 'language') && in_array($p_value, $types)	&& $types[$p_value]) {
+				if ($param[1][$p_key] == 'type' && in_array($p_value, $types)	&& $types[$p_value]) {
 					$lang = $p_value;
 				} 
 				
@@ -393,37 +431,47 @@ function _geshifilter_process_code($format, $text, $flags = '') {
 				drupal_set_message('start param: '.$start);
 			}
 			
-			//hightlight
-			if ($lang) { 
+			// geshi will reencode these
+			$matched = decode_entities($value);
+
+			// undo nl and p formatting
+			$matched = preg_replace("@<br />@", "", $matched);
+			$matched = preg_replace("@<p>|</p>@", "", $matched);
+
+			$geshi = new GeSHi($matched, $lang, $lang_dir);
 			
-				// geshi will reencode these
-				$matched = decode_entities($value);
-
-				// undo nl and p formatting
-				$matched = preg_replace("@<br />@", "", $matched);
-				$matched = preg_replace("@<p>|</p>@", "", $matched);
-
-				$geshi = new GeSHi($matched, $lang, $lang_dir);
-				
-				$geshi->enable_classes($css_classes);
-				
+			$geshi->enable_classes($css_classes);
+			
+			if ($match[1][$key] =='code') {
+				$geshi->set_header_type(GESHI_HEADER_NONE);
+			}
+			else {
 				$geshi->set_header_type($code_container);
-				
+			}
+			
+			if ($match[1][$key] != 'code') {
+				$geshi->set_overall_class('geshifilter');
+			}
+			
+			//line numbers
+			if ($line_numbers != GESHI_NO_LINE_NUMBERS && $match[1][$key] != 'code') {
 				$geshi->enable_line_numbers($line_numbers, ($line_numbers == GESHI_FANCY_LINE_NUMBERS)?$fancy_number:null);
-				if (($line_numbers == GESHI_NORMAL_LINE_NUMBERS ||$line_numbers == GESHI_FANCY_LINE_NUMBERS) && $start_param) {
+				
+				if ($start_param) {
 					$geshi->start_line_numbers_at($start);
 				}
-				//styles
-				$geshi->set_overall_style($overall_style) ;
-				$geshi->set_line_style($number_style, $fancy_number_style);
-				$geshi->set_code_style($code_style);
-				
-				
-				$text = str_replace($match[0][$key], '<div class="geshifilter-code">'.$geshi->parse_code().'</div>', $text);
 			}
-			//no highlight
-			else {	
-				$text = str_replace($match[0][$key], '<div class="geshifilter-code">'.$value.'</div>', $text);
+			
+			//styles
+			$geshi->set_overall_style($overall_style) ;
+			$geshi->set_line_style($number_style, $fancy_number_style);
+			$geshi->set_code_style($code_style);
+			
+			if ($match[1][$key] == 'code') {
+				$text = str_replace($match[0][$key], '<code class="geshifilter'.($lang?' '.$lang:'').'">'.$geshi->parse_code().'</code>', $text);
+			}
+			else {
+				$text = str_replace($match[0][$key], $geshi->parse_code(), $text);
 			}
 		}	
 	}

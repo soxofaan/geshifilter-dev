@@ -106,13 +106,21 @@ If you have not enabled in-line styles, this will have no effect.
 USAGE
 ---
 To post pieces of highlighted code, surround them with
-<code [type="language"] [start="startLineNumber"]>...</code>.
+<blockcode [type="language"] [start="startLineNumber"]>...</blockcode>.
 
 E.g. highlight actionscript code:
 
-<code type="actionscript">
+<blockcode type="actionscript">
 ...
-</code>
+</blockcode>
+
+if inline code is allowed in input format settings, you may also post
+highlighted inline code surrounding it with <code [type="language"]>...
+</code> tags.
+
+E.g. highlight actionscript inline code:
+
+<code type="actionscript">...</code>
 
 If you don't use type="language" param or specify an unsupported
 language, the code will be highlighted according to the default language
