@@ -57,6 +57,8 @@ in modules/geshifilter/geshi
    You need to configure specific format settings (default language,
     languages allowed...) in the "configure" tab of your input format).
 
+	 If HTML filter is enable, don't forget to add <blockcode> tag in 
+	 "Allowed HTML tags" textfield of HTML filter settings.
 
    
 Create new content and see GeShi in action!
