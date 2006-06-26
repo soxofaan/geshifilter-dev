@@ -45,7 +45,7 @@ function geshifilter_filter_tips($delta, $format, $long = false) {
 			}			
 
 			if ($default_type) {
-				$text .= t('<p>If you don\'t use <em>type=&quot;language&quot;</em> param or specify an unsupported language, the code will be highlighted as %default-code code.</p>', array('%default-code' => theme('placeholder', $default_language)));
+				$text .= t('<p>If you don\'t use <em>type=&quot;language&quot;</em> param or specify an unsupported language, the code will be highlighted as %default-code code.</p>', array('%default-code' => theme('placeholder', $default_type)));
 			}
 			else {
 			$text .= t('<p>If you don\'t use <em>type=&quot;language&quot;</em> param or specify an unsupported language, the code will not be highlighted.</p>');
