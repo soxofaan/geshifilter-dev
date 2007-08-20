@@ -1,7 +1,0 @@
-GeSHi Filter Module TODO's list
--------------------------------
-
-- tag param to disable default hightlighting
-- fix tab issue
-- Setting for Keyword in-line styles, comment in-line styles, Other in-line styles
-- POT file and french.PO
