@@ -1,0 +1,5 @@
+; $Id$
+name = "GeSHi Filter"
+description = "Code syntax highlighting filter using GeSHi."
+package = "Filters"
+version = "$Name$"
