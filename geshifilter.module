@@ -193,6 +193,33 @@ function geshifilter_filter($op, $delta = 0, $format = -1, $text = '') {
 }
 
 /**
+ * Helper function for some settings form fields usable as general and specific settings
+ */
+function _geshifilter_tag_and_attribute_settings($format) {
+  $form = array();
+  $f = ($format === NULL) ? '' : "_$format";
+  $form["geshifilter_tags$f"] = array(
+    '#type' => 'textfield',
+    '#title' => t('Syntax highlighting tags'),
+    '#default_value' => geshifilter_tags($format),
+    '#description' => t('Tags that should activate the GeSHi syntax highlighting. Specify a space-separated list of tagnames. Don\'t include &lt; and &gt; in the tagnames.')
+  );
+  $form["geshifilter_attributes$f"] = array(
+    '#type' => 'textfield',
+    '#title' => t('Language attributes'),
+    '#default_value' => geshifilter_attributes($format),
+    '#description' => t('Space separated list of attribute names for specifying the language syntax.')
+  );
+  $form["geshifilter_linenumber_attributes$f"] = array(
+    '#type' => 'textfield',
+    '#title' => t('Line numbers attributes'),
+    '#default_value' => geshifilter_linenumber_attributes($format),
+    '#description' => t('Space separated list of attribute names for enabling line numbering and specifying the number of the first line.')
+  );
+  return $form;
+}
+
+/**
  * Form (items) for filter settings.
  */
 function geshifilter_filter_settings($format) {
@@ -202,45 +229,20 @@ function geshifilter_filter_settings($format) {
     '#title' => t('GeSHi filter'),
     '#collapsible' => TRUE,
   );
-
-  if (geshifilter_use_format_specific_options() || $format === NULL) {
-    $form['geshifilter']['geshifilter_tags_'.$format] = array(
-      '#type' => 'textfield',
-      '#title' => t('Syntax highlighting tags'),
-      '#default_value' => geshifilter_tags($format),
-      '#description' => t('Tags that should activate the GeSHi syntax highlighting. Specify a space-separated list of tagnames. Don\'t include &lt; and &gt; in the tagnames.')
+  if (geshifilter_use_format_specific_options()) {
+    // tags and attributes
+    $form['geshifilter']['tags_and_attributes'] = _geshifilter_tag_and_attribute_settings($format);
+    // per language tags
+    $form['geshifilter']['per_language_settings'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Per language tags'),
+      '#collapsible' => TRUE,
+      'table' => geshifilter_per_language_settings($format, 'enabled', FALSE, TRUE, FALSE),
     );
-    $form['geshifilter']['geshifilter_attributes_'.$format] = array(
-      '#type' => 'textfield',
-      '#title' => t('Language attributes'),
-      '#default_value' => geshifilter_attributes($format),
-      '#description' => t('Space separated list of attribute names for specifying the language syntax.')
-    );
-    $form['geshifilter']['geshifilter_linenumber_attributes_'.$format] = array(
-      '#type' => 'textfield',
-      '#title' => t('Line numbers attributes'),
-      '#default_value' => geshifilter_linenumber_attributes($format),
-      '#description' => t('Space separated list of attribute names for enabling line numbering and specifying the number of the first line.')
-    );
-    if ($format !== NULL) {
-      $add_checkbox = ($format === NULL);
-      $add_tag_option = TRUE;
-      $add_theme_options = ($format === NULL && geshifilter_version() == GESHI_VERSION_1_1_x);
-      $form['geshifilter']['per_language_settings'] = array(
-        '#type' => 'fieldset',
-        '#title' => t('Per language tags'),
-        '#collapsible' => TRUE,
-        'table' => geshifilter_per_language_settings($format, 'enabled', $add_checkbox, TRUE, $add_theme_options),
-      );
-    }
   } else {
     $form['geshifilter']['info'] = array(
-      '#value' => '<p>'.t('The <a href="!geshi_admin_url">general settings</a> are used. If you want special settings per input format, you first have to enable this option in the <a href="!geshi_admin_url">general settings</a>.', array('!geshi_admin_url' => url('admin/settings/geshifilter'))).'</p>'
+      '#value' => '<p>'.t('The <a href="!geshi_admin_url">general settings</a> are used for the GeSHi filter . If you want specific settings per input format, you first have to enable this option in the <a href="!geshi_admin_url">general settings</a>.', array('!geshi_admin_url' => url('admin/settings/geshifilter'))).'</p>'
     );
-  }
-  if ($format == 0) {
-    // strip fieldset
-    $form = $form['geshifilter'];
   }
   return $form;
 }
@@ -356,14 +358,14 @@ function geshifilter_admin_general_settings() {
   $form['geshi_library']['geshifilter_detected_version'] = array(
     '#value' => '<p'.($version ? '' : ' class="error"').'>'.t('Detected version: ').'<strong>'.($version ? $version : t('GeSHi not detected in specified path.')).'</strong></p>',
   );
-
+  // format specific options
   $form['geshifilter_format_specific_options'] = array(
     '#type' => 'checkbox',
     '#title' => t('Seperate settings per input format'),
     '#default_value' => geshifilter_use_format_specific_options(),
     '#description' => t('Enable seperate configuration of the GeSHi filter for each <a href="!input_formats">input format</a>.', array('!input_formats' => url('admin/settings/filters'))),
   );
-
+  // CSS mode
   $form['geshifilter_css_mode'] = array(
     '#type' => 'radios',
     '#title' => t('CSS mode for syntax highlighting'),
@@ -373,7 +375,6 @@ function geshifilter_admin_general_settings() {
       GESHIFILTER_CSS_CLASSES => t('CSS classes and external stylesheet.'),
     ),
   );
-
   // default language
   $languages = geshifilter_available_languages();
   $form['geshifilter']['geshifilter_default_language'] = array(
@@ -383,11 +384,10 @@ function geshifilter_admin_general_settings() {
     '#options' => array_merge(array('<no highlighting>'), $languages),
     '#description' => t('Select the default language syntax to use. This setting can be overwritten with a language attribute in the tag.')
   );
-
+  // tag and attributes
   if (!geshifilter_use_format_specific_options()) {
-    $form = array_merge($form, geshifilter_filter_settings(NULL));
+    $form['geshifilter']['tags_and_attributes'] = _geshifilter_tag_and_attribute_settings($format);
   }
-
   return system_settings_form($form);
 }
 
