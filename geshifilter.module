@@ -223,7 +223,15 @@ function geshifilter_filter_settings($format) {
       '#description' => t('Space separated list of attribute names for enabling line numbering and specifying the number of the first line.')
     );
     if ($format !== NULL) {
-      $form['geshifilter']['per_language_settings'] = geshifilter_per_language_settings($format, TRUE, 'enabled');
+      $add_checkbox = ($format === NULL);
+      $add_tag_option = TRUE;
+      $add_theme_options = ($format === NULL && geshifilter_version() == GESHI_VERSION_1_1_x);
+      $form['geshifilter']['per_language_settings'] = array(
+        '#type' => 'fieldset',
+        '#title' => t('Per language tags'),
+        '#collapsible' => TRUE,
+        'table' => geshifilter_per_language_settings($format, 'enabled', $add_checkbox, TRUE, $add_theme_options),
+      );
     }
   } else {
     $form['geshifilter']['info'] = array(
@@ -240,30 +248,15 @@ function geshifilter_filter_settings($format) {
 /**
  * function for generating a form table for per language settings
  */
-function geshifilter_per_language_settings($format, $as_fieldset, $view) {
-  if ($as_fieldset) {
-    $form = array(
-      '#type' => 'fieldset',
-      '#title' => t('Per language settings'),
-      '#collapsible' => TRUE,
-      '#theme' => 'geshifilter_per_language_settings',
-    );
-  }
-  else {
-    $form = array(
-      '#type' => 'markup',
-      '#theme' => 'geshifilter_per_language_settings',
-    );
-  }
+function geshifilter_per_language_settings($format, $view, $add_checkbox, $add_tag_option, $add_theme_options) {
+  $form = array(
+    '#theme' => 'geshifilter_per_language_settings',
+  );
   // store the format as value in the form (needed by theme_geshifilter_per_language_settings)
   $form['format'] = array(
     '#type' => 'value',
     '#value' => $format,
   );
-  //
-  $add_checkbox = ($format === NULL);
-  $add_theme_options = ($format === NULL && geshifilter_version() == GESHI_VERSION_1_1_x);
-  $add_tag_option = (($format === NULL && !geshifilter_use_format_specific_options()) || ($format !== NULL && geshifilter_use_format_specific_options()));
   // table header
   $form['header'] = array(
     '#type' => 'value',
@@ -392,7 +385,7 @@ function geshifilter_admin_general_settings() {
   );
 
   if (!geshifilter_use_format_specific_options()) {
-    $form = array_merge($form, geshifilter_filter_settings(0));
+    $form = array_merge($form, geshifilter_filter_settings(NULL));
   }
 
   return system_settings_form($form);
@@ -402,9 +395,12 @@ function geshifilter_admin_general_settings() {
 /**
  * Menu callback for per language settings
  */
-function geshifilter_admin_per_language_settings($view='all') {
+function geshifilter_admin_per_language_settings($view = 'all') {
   $form = array();
-  $form['language_settings'] = geshifilter_per_language_settings(NULL, FALSE, $view);
+  $add_checkbox = TRUE;
+  $add_tag_option = (!geshifilter_use_format_specific_options());
+  $add_theme_options = (geshifilter_version() == GESHI_VERSION_1_1_x);
+  $form['language_settings'] = geshifilter_per_language_settings(NULL, $view, $add_checkbox, $add_tag_option, $add_theme_options);
   return system_settings_form($form);
 }
 
