@@ -102,7 +102,7 @@ function geshifilter_menu($may_cache) {
  */
 function geshifilter_filter_tips($delta, $format, $long = false) {
   $default_tags = _geshifilter_whitespace_explode(geshifilter_tags($format));
-  $languages = geshifilter_active_languages();
+  $languages = geshifilter_enabled_languages();
   $tag_to_lang = array();
   $special_tags = array();
   foreach ($languages as $language) {
@@ -256,11 +256,6 @@ function geshifilter_per_language_settings($format, $view, $add_checkbox, $add_t
   $form = array(
     '#theme' => 'geshifilter_per_language_settings',
   );
-  // store the format as value in the form (needed by theme_geshifilter_per_language_settings)
-  $form['format'] = array(
-    '#type' => 'value',
-    '#value' => $format,
-  );
   // table header
   $form['header'] = array(
     '#type' => 'value',
@@ -295,7 +290,8 @@ function geshifilter_per_language_settings($format, $view, $add_checkbox, $add_t
     }
     // add a textfield for tags
     if ($add_tag_option) {
-      $form['languages'][$language]["geshifilter_language_tags_{$language}_{$format}"] = array(
+      $f = ($format === NULL) ? '' : "_$format";
+      $form['languages'][$language]["geshifilter_language_tags_{$language}{$f}"] = array(
         '#type' => 'textfield',
         '#default_value' => geshifilter_language_tags($language, $format),
       );
@@ -325,7 +321,6 @@ function geshifilter_per_language_settings($format, $view, $add_checkbox, $add_t
  * theming function for the per language settings table
  */
 function theme_geshifilter_per_language_settings($form) {
-  $format = $form['format']['#value'];
   $version = geshifilter_version();
   $rows = array();
   foreach (element_children($form['languages']) as $language) {
@@ -412,41 +407,60 @@ function geshifilter_admin_per_language_settings($view = 'all') {
  * Menu callback for filter conflicts page
  */
 function geshifilter_admin_filter_conflicts() {
-  $alerts = array();
-  // Check the order of the GeSHi filter with some other known filters
+  $output = '';
+  // some known filters that should come before GeSHi filter
   $conflicting_after_filters = array('filter/0', 'pearwiki_filter/0');
-  foreach (filter_formats() as $ifid => $input_format) {
+  foreach (filter_formats() as $format => $input_format) {
     // Get the filters in this input format
-    $filters = filter_list_format($ifid);
+    $filters = filter_list_format($format);
     // look if GeSHi is enabled in this input format
     if (isset($filters['geshifilter/0'])) {
       $geshifilter = $filters['geshifilter/0'];
-      // look if possibly conflicting filters are also present in input format
+      $output .= '<h3>'. t('Input format !input_format', array('!input_format' => l(t($input_format->name), "/admin/settings/filters/$format"))) . '</h3>';
+      $alerts = array();
+      // Check if possibly conflicting filters are also present in input format
       foreach ($conflicting_after_filters as $key) {
         if (array_key_exists($key, $filters)) {
           $cfilter = $filters[$key];
           if ($cfilter->weight >= $geshifilter->weight) {
             $alerts[] = array(
-              l(t($input_format->name), "/admin/settings/filters/$ifid"),
+              $cfilter->name,
               t('%geshifilter should come after %cfilter', array('%cfilter' => $cfilter->name, '%geshifilter' => $geshifilter->name)),
-              implode(', ', array(
-                l(t('rearrange filters'), "/admin/settings/filters/$ifid/order", array(), drupal_get_destination()),
-                l(t('disable one of these filters'), "/admin/settings/filters/$ifid", array(), drupal_get_destination()),
-              ))
+              l(t('Rearrange filters'), "/admin/settings/filters/$format/order", array(), drupal_get_destination()),
             );
           }
         }
       }
+      // check HTML filter allowed tags
+      if (isset($filters['filter/0'])) {
+        $cfilter = $filters['filter/0'];
+        $html_filter_allowed_tags = preg_split('/\s+|<|>/', variable_get("allowed_html_$format", '<a> <em> <strong> <cite> <code> <ul> <ol> <li> <dl> <dt> <dd>'), -1, PREG_SPLIT_NO_EMPTY);
+        // collect all geshifilter tags
+        $geshifilter_tags = preg_split('/\s+|<|>/', geshifilter_tags($format), -1, PREG_SPLIT_NO_EMPTY);
+        foreach (geshifilter_enabled_languages() as $language) {
+          $geshifilter_tags = array_merge($geshifilter_tags, preg_split('/\s+|<|>/', geshifilter_language_tags($language, $format), -1, PREG_SPLIT_NO_EMPTY));
+        }
+        foreach ($geshifilter_tags as $tag) {
+          if (!in_array($tag, $html_filter_allowed_tags)) {
+            $alerts[] = array(
+              $cfilter->name,
+              t('%cfilter will remove %tag tags', array('%cfilter' => $cfilter->name, '%tag' => "<$tag>")),
+              l(t('Add tag %tag to "%allowed_html_tags" of %cfilter', array(
+                '%allowed_html_tags' => t('Allowed HTML tags'),
+                '%tag' => "<$tag>",
+                '%cfilter' => $cfilter->name,
+              )), "/admin/settings/filters/$format/configure", array(), drupal_get_destination(), NULL, FALSE, TRUE),
+            );
+          }
+        }
+      }
+      // show alerts
+      if (count($alerts) == 0) {
+        $alerts[] = array(array('data' => t('No known conflicts were detected.'), 'colspan' => 4));
+      }
+      $header = array(t('Filter'), t('Conflict description'), t('Possible solutions'));
+      $output .= theme('table', $header, $alerts);
     }
-  }
-  // show alerts
-  if ($alerts) {
-    $output = '<p>'. t('The following known conflicts were detected.') .'</p>';
-    $header = array(t('Input format'), t('Conflict'), t('Possible solutions'));
-    $output .= theme('table', $header, $alerts);
-  }
-  else {
-    $output = '<p>'. t('No known conflicts were detected.') .'</p>';
   }
   return $output;
 }
@@ -464,29 +478,37 @@ function _geshifilter_whitespace_explode($string) {
 function geshifilter_use_format_specific_options() {
   return variable_get('geshifilter_format_specific_options', FALSE);
 }
+
 // Format specific settings
 function geshifilter_geshi_path() {
   return variable_get('geshifilter_geshi_path', getcwd() .'/'. drupal_get_path('module', 'geshifilter') .'/geshi');
 }
+
 function geshifilter_tags($format = 0) {
-  if (!geshifilter_use_format_specific_options() || $format==0)
-    return variable_get('geshifilter_tags_0', 'code');
-  return variable_get('geshifilter_tags_'. $format, geshifilter_tags());
+  if (!geshifilter_use_format_specific_options() || $format==0) {
+    return variable_get('geshifilter_tags', 'code');
+  }
+  return variable_get("geshifilter_tags_{$format}", geshifilter_tags());
 }
-function geshifilter_attributes($format = 0) {
-  if (!geshifilter_use_format_specific_options() || $format==0)
-    return variable_get('geshifilter_attributes_0', 'type lang');
-  return variable_get('geshifilter_attributes_'. $format, geshifilter_attributes());
+
+function geshifilter_attributes($format = NULL) {
+  if (!geshifilter_use_format_specific_options() || $format==0) {
+    return variable_get('geshifilter_attributes', 'type lang');
+  }
+  return variable_get("geshifilter_attributes_{$format}", geshifilter_attributes());
 }
-function geshifilter_linenumber_attributes($format = 0) {
-  if (!geshifilter_use_format_specific_options() || $format==0)
-    return variable_get('geshifilter_linenumber_attributes_0', 'start');
-  return variable_get('geshifilter_linenumber_attributes_'. $format, geshifilter_linenumber_attributes());
+
+function geshifilter_linenumber_attributes($format = NULL) {
+  if (!geshifilter_use_format_specific_options() || $format==0) {
+    return variable_get('geshifilter_linenumber_attributes', 'start');
+  }
+  return variable_get("geshifilter_linenumber_attributes_{$format}", geshifilter_linenumber_attributes());
 }
-function geshifilter_language_tags($language, $format = 0) {
-  if (!geshifilter_use_format_specific_options() || $format==0)
-    return variable_get('geshifilter_language_tags_'. $language .'_0', '');
-  return variable_get('geshifilter_language_tags_'. $language .'_'. $format, geshifilter_language_tags($language));
+
+function geshifilter_language_tags($language, $format = NULL) {
+  if (!geshifilter_use_format_specific_options() || $format == NULL)
+    return variable_get("geshifilter_language_tags_{$language}", '');
+  return variable_get("geshifilter_language_tags_{$language}_{$format}", geshifilter_language_tags($language));
 }
 
 /**
@@ -525,7 +547,7 @@ function geshifilter_available_languages() {
 /**
  * List of languages which are activated.
  */
-function geshifilter_active_languages() {
+function geshifilter_enabled_languages() {
   $result = array();
   $languages = geshifilter_available_languages();
   foreach ($languages as $key => $language) {
@@ -604,7 +626,7 @@ function geshifilter_process($format, $text) {
   $default_tags = _geshifilter_whitespace_explode(geshifilter_tags($format));
   $special_tags = array();
   $tag_to_lang = array();
-  $languages = geshifilter_active_languages();
+  $languages = geshifilter_enabled_languages();
   foreach ($languages as $language) {
     $lang_tags = _geshifilter_whitespace_explode(geshifilter_language_tags($language, $format));
     foreach ($lang_tags as $lang_tag) {
