@@ -101,19 +101,11 @@ function geshifilter_menu($may_cache) {
  * Implementation of hook_filter_tips().
  */
 function geshifilter_filter_tips($delta, $format, $long = false) {
-  $default_tags = _geshifilter_tag_split(geshifilter_tags($format));
-  $languages = geshifilter_enabled_languages();
-  $tag_to_lang = array();
-  $special_tags = array();
-  foreach ($languages as $language) {
-    $lang_tags = _geshifilter_tag_split(geshifilter_language_tags($language, $format));
-    foreach ($lang_tags as $lang_tag) {
-      if ($lang_tag) {
-        $special_tags[] = $lang_tag;
-        $tag_to_lang[$lang_tag] = $language;
-      }
-    }
-  }
+  // get the available tags
+  list($generic_code_tags, $language_tags, $tag_to_lang) = _geshifilter_get_tags($format);
+  // get the available languages
+  $languages = geshifilter_get_enabled_languages();
+
   $default_lang = variable_get('geshifilter_default_language', '');
   if (!$default_lang) {
     $default_lang = 'no highlighting';
@@ -121,10 +113,10 @@ function geshifilter_filter_tips($delta, $format, $long = false) {
   if ($long) {
     $output = '<p>'. t('Code highlighting can be done with the following tags:') .'</p>';
     $items = array();
-    foreach ($default_tags as $tag) {
+    foreach ($generic_code_tags as $tag) {
       $items[] = '&lt;'. $tag .'&gt; - '. t('default codeblock or specify highlighting type with %param parameters', array('%param' => implode(', ', _geshifilter_whitespace_explode(geshifilter_attributes($format)))));
     }
-    foreach ($special_tags as $tag) {
+    foreach ($language_tags as $tag) {
       $items[] .= '&lt;'. $tag .'&gt; - '. t('highlight %lang', array('%lang' => $tag_to_lang[$tag]));
     }
     $output .= theme('item_list', $items);
@@ -137,7 +129,7 @@ function geshifilter_filter_tips($delta, $format, $long = false) {
     $output .= '<p>'. t('Examples:') .'</p>';
     $header = array(t('Language'), t('Inline'), t('Block'));
     $rows = array();
-    foreach ($default_tags as $tag) {
+    foreach ($generic_code_tags as $tag) {
       if ($default_lang == 'no highlighting') {
         $rows[] = array(
           $default_lang,
@@ -153,7 +145,7 @@ function geshifilter_filter_tips($delta, $format, $long = false) {
         );
       }
     }
-    foreach ($special_tags as $tag) {
+    foreach ($language_tags as $tag) {
       $rows[] = array(
         $tag_to_lang[$tag],
         '&lt;'. $tag .'&gt;'. t('inline code for %lang', array('%lang' => $tag_to_lang[$tag])) .'&lt;/'. $tag .'&gt',
@@ -164,7 +156,7 @@ function geshifilter_filter_tips($delta, $format, $long = false) {
     return $output;
   }
   else {
-    return t('You can highlight code with any of the following tags: %tags', array('%tags' => '<'. implode('>, <', array_merge($default_tags, $special_tags)) .'>'));
+    return t('You can highlight code with any of the following tags: %tags', array('%tags' => '<'. implode('>, <', array_merge($generic_code_tags, $language_tags)) .'>'));
   }
 }
 
@@ -321,7 +313,6 @@ function geshifilter_per_language_settings($format, $view, $add_checkbox, $add_t
  * theming function for the per language settings table
  */
 function theme_geshifilter_per_language_settings($form) {
-  $version = geshifilter_version();
   $rows = array();
   foreach (element_children($form['languages']) as $language) {
     $row = array();
@@ -435,11 +426,9 @@ function geshifilter_admin_filter_conflicts() {
       if (isset($filters['filter/0'])) {
         $cfilter = $filters['filter/0'];
         $html_filter_allowed_tags = preg_split('/\s+|<|>/', variable_get("allowed_html_$format", '<a> <em> <strong> <cite> <code> <ul> <ol> <li> <dl> <dt> <dd>'), -1, PREG_SPLIT_NO_EMPTY);
-        // collect all geshifilter tags
-        $geshifilter_tags = preg_split('/\s+|<|>/', geshifilter_tags($format), -1, PREG_SPLIT_NO_EMPTY);
-        foreach (geshifilter_enabled_languages() as $language) {
-          $geshifilter_tags = array_merge($geshifilter_tags, preg_split('/\s+|<|>/', geshifilter_language_tags($language, $format), -1, PREG_SPLIT_NO_EMPTY));
-        }
+        // collect geshifilter tags
+        list($generic_code_tags, $language_tags, $tag_to_lang) = _geshifilter_get_tags($format);
+        $geshifilter_tags = array_merge($generic_code_tags, $language_tags);
         foreach ($geshifilter_tags as $tag) {
           if (!in_array($tag, $html_filter_allowed_tags)) {
             $alerts[] = array(
@@ -552,15 +541,18 @@ function geshifilter_available_languages() {
 /**
  * List of languages which are activated.
  */
-function geshifilter_enabled_languages() {
-  $result = array();
-  $languages = geshifilter_available_languages();
-  foreach ($languages as $key => $language) {
-    if (variable_get("geshifilter_language_enabled_{$language}", TRUE)) {
-      $result[$key] = $language;
+function geshifilter_get_enabled_languages() {
+  static $enabled_languages = NULL;
+  if ($enabled_languages == NULL) {
+    $enabled_languages = array();
+    $languages = geshifilter_available_languages();
+    foreach ($languages as $key => $language) {
+      if (variable_get("geshifilter_language_enabled_{$language}", TRUE)) {
+        $enabled_languages[$key] = $language;
+      }
     }
   }
-  return $result;
+  return $enabled_languages;
 }
 
 /**
@@ -571,7 +563,6 @@ function geshifilter_available_themes($language) {
   static $themes = array();
   if (!$themes_loaded) {
     $themes_loaded = true;
-
     $themes_dir = realpath(geshifilter_geshi_path()) .'/geshi/themes';
     if (is_dir($themes_dir)) {
       $handle = opendir($themes_dir);
@@ -620,6 +611,24 @@ function geshifilter_version() {
 }
 
 /**
+ * Helper function for gettings the tags
+ */
+function _geshifilter_get_tags($format) {
+  $generic_code_tags = _geshifilter_tag_split(geshifilter_tags($format));
+  $language_tags = array();
+  $tag_to_lang = array();
+  $enabled_languages = geshifilter_get_enabled_languages();
+  foreach ($enabled_languages as $language) {
+    $lang_tags = _geshifilter_tag_split(geshifilter_language_tags($language, $format));
+    foreach ($lang_tags as $lang_tag) {
+      $language_tags[] = $lang_tag;
+      $tag_to_lang[$lang_tag] = $language;
+    }
+  }
+  return array($generic_code_tags, $language_tags, $tag_to_lang);
+}
+
+/**
  * Callback for processing input text.
  */
 function geshifilter_process($format, $text) {
@@ -628,21 +637,13 @@ function geshifilter_process($format, $text) {
     drupal_set_message(t('GeSHi installation not found. See <a href="!url">configuration of the filter</a>.', array('!url' => url('admin/settings/filters/'. $format .'/configure'))), 'error');
     return $text;
   }
-  $default_tags = _geshifilter_tag_split(geshifilter_tags($format));
-  $special_tags = array();
-  $tag_to_lang = array();
-  $languages = geshifilter_enabled_languages();
-  foreach ($languages as $language) {
-    $lang_tags = _geshifilter_tag_split(geshifilter_language_tags($language, $format));
-    foreach ($lang_tags as $lang_tag) {
-      if ($lang_tag) {
-        $special_tags[] = $lang_tag;
-        $tag_to_lang[$lang_tag] = $language;
-      }
-    }
-  }
+  // get the available tags
+  list($generic_code_tags, $language_tags, $tag_to_lang) = _geshifilter_get_tags($format);
+  // get the available languages
+  $enabled_languages = geshifilter_get_enabled_languages();
 
-  $tags = array_merge($default_tags, $special_tags);
+
+  $tags = array_merge($generic_code_tags, $language_tags);
   $tags_string = implode('|', $tags);
   $lang_attributes = _geshifilter_whitespace_explode(geshifilter_attributes($format));
   $linenumber_attributes = _geshifilter_whitespace_explode(geshifilter_linenumber_attributes($format));
@@ -669,7 +670,7 @@ function geshifilter_process($format, $text) {
       foreach ($param[1] as $p_key => $p_name) {
         $p_value = $param[2][$p_key];
         if (in_array($p_name, $lang_attributes)) {
-          if (in_array($p_value, $languages)) {
+          if (in_array($p_value, $enabled_languages)) {
             $lang = $p_value;
           }
         }
