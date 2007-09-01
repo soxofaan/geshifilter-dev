@@ -101,12 +101,12 @@ function geshifilter_menu($may_cache) {
  * Implementation of hook_filter_tips().
  */
 function geshifilter_filter_tips($delta, $format, $long = false) {
-  $default_tags = _geshifilter_whitespace_explode(geshifilter_tags($format));
+  $default_tags = _geshifilter_tag_split(geshifilter_tags($format));
   $languages = geshifilter_enabled_languages();
   $tag_to_lang = array();
   $special_tags = array();
   foreach ($languages as $language) {
-    $lang_tags = _geshifilter_whitespace_explode(geshifilter_language_tags($language, $format));
+    $lang_tags = _geshifilter_tag_split(geshifilter_language_tags($language, $format));
     foreach ($lang_tags as $lang_tag) {
       if ($lang_tag) {
         $special_tags[] = $lang_tag;
@@ -203,7 +203,7 @@ function _geshifilter_tag_and_attribute_settings($format) {
     '#type' => 'textfield',
     '#title' => t('Syntax highlighting tags'),
     '#default_value' => geshifilter_tags($format),
-    '#description' => t('Tags that should activate the GeSHi syntax highlighting. Specify a space-separated list of tagnames. Don\'t include &lt; and &gt; in the tagnames.')
+    '#description' => t('Tags that should activate the GeSHi syntax highlighting. Specify a space-separated list of tagnames.')
   );
   $form["geshifilter_attributes$f"] = array(
     '#type' => 'textfield',
@@ -474,6 +474,11 @@ function _geshifilter_whitespace_explode($string) {
   return preg_split('/\s+/', $string, -1, PREG_SPLIT_NO_EMPTY);
 }
 
+function _geshifilter_tag_split($string) {
+  return preg_split('/\s+|<|>/', $string, -1, PREG_SPLIT_NO_EMPTY);
+}
+
+
 // General settings
 function geshifilter_use_format_specific_options() {
   return variable_get('geshifilter_format_specific_options', FALSE);
@@ -486,7 +491,7 @@ function geshifilter_geshi_path() {
 
 function geshifilter_tags($format = 0) {
   if (!geshifilter_use_format_specific_options() || $format==0) {
-    return variable_get('geshifilter_tags', 'code');
+    return variable_get('geshifilter_tags', '<code> <blockcode>');
   }
   return variable_get("geshifilter_tags_{$format}", geshifilter_tags());
 }
@@ -623,12 +628,12 @@ function geshifilter_process($format, $text) {
     drupal_set_message(t('GeSHi installation not found. See <a href="!url">configuration of the filter</a>.', array('!url' => url('admin/settings/filters/'. $format .'/configure'))), 'error');
     return $text;
   }
-  $default_tags = _geshifilter_whitespace_explode(geshifilter_tags($format));
+  $default_tags = _geshifilter_tag_split(geshifilter_tags($format));
   $special_tags = array();
   $tag_to_lang = array();
   $languages = geshifilter_enabled_languages();
   foreach ($languages as $language) {
-    $lang_tags = _geshifilter_whitespace_explode(geshifilter_language_tags($language, $format));
+    $lang_tags = _geshifilter_tag_split(geshifilter_language_tags($language, $format));
     foreach ($lang_tags as $lang_tag) {
       if ($lang_tag) {
         $special_tags[] = $lang_tag;
