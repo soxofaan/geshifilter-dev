@@ -68,20 +68,23 @@ function geshifilter_menu($may_cache) {
       'type' => MENU_LOCAL_TASK,
     );
     $items[] = array(
-      'path' => 'admin/settings/geshifilter/languages/all',
-      'title' => t('All'),
+      'path' => 'admin/settings/geshifilter/languages/enabled',
+      'title' => t('Enabled'),
+      'description' => t('Show the enabled languages'),
       'weight' => 0,
       'type' => MENU_DEFAULT_LOCAL_TASK,
     );
     $items[] = array(
-      'path' => 'admin/settings/geshifilter/languages/enabled',
-      'title' => t('Enabled'),
+      'path' => 'admin/settings/geshifilter/languages/all',
+      'title' => t('All'),
+      'description' => t('Show all the available languages'),
       'weight' => 2,
       'type' => MENU_LOCAL_TASK,
     );
     $items[] = array(
       'path' => 'admin/settings/geshifilter/languages/disabled',
       'title' => t('Disabled'),
+      'description' => t('Show the disabled languages'),
       'weight' => 4,
       'type' => MENU_LOCAL_TASK,
     );
@@ -489,7 +492,7 @@ function geshifilter_admin_general_settings_validate($form_id, $form_values) {
 /**
  * Menu callback for per language settings
  */
-function geshifilter_admin_per_language_settings($view = 'all') {
+function geshifilter_admin_per_language_settings($view = 'enabled') {
   $form = array();
   // check GeSHi library
   list($geshi_branch, $errmsg) = _geshifilter_geshi_library();
