@@ -4,22 +4,22 @@
  */
 
 code.geshifilter {
-  display:inline;
-  padding:0;
-  margin:0;
+  display: inline;
+  padding: 0;
+  margin: 0;
   border: none;
 }
 
 pre.geshifilter, div.geshifilter {
-  display:block;
-  padding:0.5em;
-  margin:0.5em;
+  display: block;
+  padding: 0.5em;
+  margin: 0.5em;
   border: 1px solid #ccc;
   background-color: #ffe;
 }
 
-div.geshifilter ol {
-  margin: 0px;
+.geshifilter ol {
+  margin: 0;
 }
 
 /**

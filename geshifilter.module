@@ -804,6 +804,10 @@ function geshifilter_process_zero($format, $text, $lang, $is_block = true, $line
     $geshi->enable_classes(TRUE);
   }
 
+  // override the some default GeSHI styles (e.g. GeSHi uses Courier by default, which is ugly)
+  $geshi->set_code_style('font-family: monospace; font-weight: normal;');
+  $geshi->set_line_style('font-family: monospace; font-weight: normal;');
+
   // setup geshi
   if ($is_block) {
     $geshi->set_header_type((int)variable_get('geshifilter_code_container', GESHI_HEADER_PRE));
