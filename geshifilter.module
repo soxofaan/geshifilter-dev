@@ -186,6 +186,22 @@ function geshifilter_filter($op, $delta = 0, $format = -1, $text = '') {
 }
 
 /**
+ * Helper function for loading the GeSHi library
+ */
+function _geshifilter_load_geshi() {
+  $geshi_lib = variable_get('geshifilter_geshi_dir', drupal_get_path('module', 'geshifilter') .'/geshi') .'/geshi.php';
+  if (file_exists($geshi_lib)) {
+    require_once($geshi_lib);
+    return TRUE;
+  }
+  else {
+    drupal_set_message(t('GeSHi library not found'), 'error');
+    return FALSE;
+  }
+}
+
+
+/**
  * Helper function for some settings form fields usable as general and specific settings
  */
 function _geshifilter_tag_and_attribute_settings($format) {
@@ -332,7 +348,7 @@ function theme_geshifilter_per_language_settings($form) {
  */
 function geshifilter_admin_general_settings() {
   $form = array();
-
+  // GeSHi library settings
   $form['geshi_library'] = array(
     '#type' => 'fieldset',
     '#title' => t('GeSHi library'),
@@ -347,35 +363,65 @@ function geshifilter_admin_general_settings() {
   $form['geshi_library']['geshifilter_detected_version'] = array(
     '#value' => '<p'. ($version ? '' : ' class="error"') .'>'. t('Detected version: ') .'<strong>'. ($version ? $version : t('GeSHi not detected in specified path.')) .'</strong></p>',
   );
-  // format specific options
-  $form['geshifilter_format_specific_options'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Seperate settings per input format'),
-    '#default_value' => geshifilter_use_format_specific_options(),
-    '#description' => t('Enable seperate configuration of the GeSHi filter for each <a href="!input_formats">input format</a>.', array('!input_formats' => url('admin/settings/filters'))),
-  );
-  // CSS mode
-  $form['geshifilter_css_mode'] = array(
-    '#type' => 'radios',
-    '#title' => t('CSS mode for syntax highlighting'),
-    '#default_value' => variable_get('geshifilter_css_mode', GESHIFILTER_CSS_INLINE),
-    '#options' => array(
-      GESHIFILTER_CSS_INLINE => t('Inline CSS style attributes.'),
-      GESHIFILTER_CSS_CLASSES => t('CSS classes and external stylesheet.'),
-    ),
-  );
-  // default language
-  $languages = geshifilter_available_languages();
-  $form['geshifilter']['geshifilter_default_language'] = array(
-    '#type' => 'select',
-    '#title' => t('Default language syntax'),
-    '#default_value' => variable_get('geshifilter_default_language', ''),
-    '#options' => array_merge(array('<no highlighting>'), $languages),
-    '#description' => t('Select the default language syntax to use. This setting can be overwritten with a language attribute in the tag.')
-  );
-  // tag and attributes
-  if (!geshifilter_use_format_specific_options()) {
-    $form['geshifilter']['tags_and_attributes'] = _geshifilter_tag_and_attribute_settings($format);
+  // load GeSHi library for defined constants and present the
+  // GeSHi filter settings if successful
+  if (_geshifilter_load_geshi()) {
+    // format specific options
+    $form['geshifilter_format_specific_options'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Seperate settings per input format'),
+      '#default_value' => geshifilter_use_format_specific_options(),
+      '#description' => t('Enable seperate configuration of the GeSHi filter for each <a href="!input_formats">input format</a>.', array('!input_formats' => url('admin/settings/filters'))),
+    );
+    //
+    $form['geshifilter_styling'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Styling, layout and CSS'),
+    );
+    // CSS mode
+    $form['geshifilter_styling']['geshifilter_css_mode'] = array(
+      '#type' => 'radios',
+      '#title' => t('CSS mode for syntax highlighting'),
+      '#description' => t('Inline CSS is easier to set up, does not depend on an external style sheets and is consequently more robust to copy/past operations like content aggregation. However, usage of CSS classes is generally considered to be the better way of styling and requires much less HTML code and bandwith. (GeSHi documentation: !link).',
+        array('!link' => l('Using CSS Classes', 'http://qbnz.com/highlighter/geshi-doc.html#using-css-classes'))),
+
+      '#default_value' => variable_get('geshifilter_css_mode', GESHIFILTER_CSS_INLINE),
+      '#options' => array(
+        GESHIFILTER_CSS_INLINE => t('Inline CSS style attributes.'),
+        GESHIFILTER_CSS_CLASSES => t('CSS classes and external CSS style sheet.'),
+      ),
+    );
+    // Code container
+    $form['geshifilter_styling']['geshifilter_code_container'] = array(
+      '#type' => 'radios',
+      '#title' => t('Code container'),
+      '#description' => t('Define the container element to use for code blocks. (GeSHi documentation: !link).',
+        array('!link' => l('The Code Container', 'http://qbnz.com/highlighter/geshi-doc.html#the-code-container'))
+      ),
+      '#options' => array(
+        GESHI_HEADER_PRE => t('Use @cnt container', array('@cnt' => '<pre>')),
+        GESHI_HEADER_DIV => t('Use @cnt container', array('@cnt' => '<div>')),
+        GESHI_HEADER_NONE => t('Use no container'),
+      ),
+      '#default_value' => variable_get('geshifilter_code_container', GESHI_HEADER_PRE),
+    );
+
+    // default language
+    $languages = geshifilter_available_languages();
+    $form['geshifilter']['geshifilter_default_language'] = array(
+      '#type' => 'select',
+      '#title' => t('Default language syntax'),
+      '#default_value' => variable_get('geshifilter_default_language', ''),
+      '#options' => array_merge(array('<no highlighting>'), $languages),
+      '#description' => t('Select the default language syntax to use. This setting can be overwritten with a language attribute in the tag.')
+    );
+    // tag and attributes
+    if (!geshifilter_use_format_specific_options()) {
+      $form['geshifilter']['tags_and_attributes'] = array_merge(array(
+        '#type' => 'fieldset',
+        '#title' => t('Generic tags and attributes'),
+      ), _geshifilter_tag_and_attribute_settings($format));
+    }
   }
   return system_settings_form($form);
 }
@@ -760,9 +806,8 @@ function geshifilter_process_zero($format, $text, $lang, $is_block = true, $line
 
   // setup geshi
   if ($is_block) {
-    $geshi->set_header_type(GESHI_HEADER_DIV);
+    $geshi->set_header_type((int)variable_get('geshifilter_code_container', GESHI_HEADER_PRE));
     if ($linenumbers_start) {
-      $geshi->set_header_type(GESHI_HEADER_DIV);
       $geshi->enable_line_numbers(GESHI_NORMAL_LINE_NUMBERS);
       $geshi->start_line_numbers_at($linenumbers_start);
     }
