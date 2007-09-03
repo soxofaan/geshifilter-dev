@@ -670,38 +670,7 @@ function geshifilter_get_enabled_languages() {
  * List of available themes for the given language.
  */
 function geshifilter_available_themes($language) {
-  static $themes_loaded = false;
-  static $themes = array();
-  if (!$themes_loaded) {
-    $themes_loaded = true;
-    $themes_dir = realpath(_geshifilter_get_geshi_dir()) .'/geshi/themes';
-    if (is_dir($themes_dir)) {
-      $handle = opendir($themes_dir);
-      while ($file = readdir($handle)) {
-        if ($file != '.' && $file != '..' && is_dir($themes_dir .'/'. $file)) {
-          if (is_file($themes_dir .'/'. $file .'/themeinfo.php')) {
-            $human_name = false;
-            $languages = array();
-            @include_once($themes_dir .'/'. $file .'/themeinfo.php');
-            if ($human_name) {
-              $themes[$file] = array(
-                'human_name' => $human_name,
-                'languages' => array_keys($languages)
-              );
-            }
-          }
-        }
-      }
-    }
-  }
-  $result = array();
-  $result['default'] = 'Default';
-  foreach ($themes as $theme_name => $theme) {
-    if ($theme_name != 'default' && in_array($language, $theme['languages'])) {
-      $result[$theme_name] = $theme['human_name'];
-    }
-  }
-  return $result;
+  return GeSHi::themesSupportedBy($language, TRUE);
 }
 
 /**
