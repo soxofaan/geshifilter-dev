@@ -205,7 +205,11 @@ function _geshifilter_geshi_library($use_cache=TRUE, $geshi_dir=NULL, $load_when
     if ($geshi_dir === NULL) {
       $geshi_dir = _geshifilter_get_geshi_dir();
     }
-    if (is_file($geshi_dir .'/geshi.php')) {
+    if (!is_dir($geshi_dir)) {
+      $errmsg = t('%dir is not a directory.', array('%dir' => $geshi_dir));
+      $geshi_branch = FALSE;
+    }
+    elseif (is_file($geshi_dir .'/geshi.php')) {
       // GeSHi 1.0.x
       if ($load_when_found) {
         require_once($geshi_dir .'/geshi.php');
@@ -627,31 +631,21 @@ function geshifilter_language_tags($language, $format = NULL) {
 function geshifilter_available_languages() {
   $available_languages = array();
   $geshi_dirname = _geshifilter_get_geshi_dir();
-  if (is_dir($geshi_dirname)) {
-    list($geshi_branch, $errmsg) = _geshifilter_geshi_library();
-    switch ($geshi_branch) {
-      case GESHIFILTER_GESHI_BRANCH_1_0_x:
-        $handle = opendir($geshi_dirname .'/geshi/');
-        while ($file = readdir($handle)) {
-          $lang = basename($file, '.php');
-          if ($lang != $file) {
-            $available_languages[$lang] = $lang;
-          }
-        }
-        break;
-      case GESHIFILTER_GESHI_BRANCH_1_1_x:
-        $handle = opendir($geshi_dirname .'/geshi/languages/');
-        while ($file = readdir($handle)) {
-          $lang_dirname = $geshi_dirname .'/geshi/languages/'. $file;
-          if ($file != '.' && $file != '..' && is_dir($lang_dirname) && is_file($lang_dirname .'/'. $file .'.php')) {
-            $available_languages[$file] = $file;
-          }
-        }
-        closedir($handle);
-        break;
-    }
-    ksort($available_languages);
+  list($geshi_branch, $errmsg) = _geshifilter_geshi_library();
+  switch ($geshi_branch) {
+    case GESHIFILTER_GESHI_BRANCH_1_0_x:
+      foreach (file_scan_directory($geshi_dirname .'/geshi/', '\.[pP][hH][pP]$') as $filename => $fileinfo) {
+        $available_languages[$fileinfo->name] = $fileinfo->name;
+      }
+      break;
+    case GESHIFILTER_GESHI_BRANCH_1_1_x:
+      foreach (GeSHi::getSupportedLanguages() as $lang) {
+        list($dir, $file) = explode('/', $lang);
+        $available_languages[$file] = $file;
+      }
+      break;
   }
+  ksort($available_languages);
   return $available_languages;
 }
 
