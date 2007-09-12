@@ -16,15 +16,25 @@ define('GESHIFILTER_CSS_CLASSES', 2);
  * Implementation of hook_help().
  */
 function geshifilter_help($section) {
-  $output = '';
   switch ($section) {
     case 'admin/settings/geshifilter':
     case 'admin/help#geshifilter':
-      $output = '<p>'. t('The GeSHi filter does syntax highlighting using <a href="http://geshi.org/">GeSHi (Generic Syntax Highlighter)</a>.') .'</p>';
-      $output .= '<p>'. t('This filter supports version 1.0.x and the developement version 1.1.x of GeSHi, but it is recommended to use version 1.0.x at the moment.') .'</p>';
+      $output = '<p>'. t('The GeSHi filter module provides a filter for syntax highlighting of inline source code or blocks of source code based on the PHP library !GeSHi.', array('!GeSHi' => l('GeSHi (Generic Syntax Highlighter)', 'http://qbnz.com/highlighter/'))) .'</p>';
+      $output .= '<p>'. t('Usage is relatively easy: enable the GeSHi filter in the desired !inputformats, configure the general or per input format settings of the GeSHi filter, check for !filterconflicts and use the input filter as described in the !filtertips. After changing the general settings, it is typically needed to <a href="!clearfiltercache">clear the filter cache</a> before the changes take effect on old content.', array(
+        '!inputformats' => l('input formats', 'admin/settings/filters'),
+        '!filterconflicts' => l('filter conflicts', 'admin/settings/geshifilter/filterconflicts'),
+        '!filtertips' => l('filter tips', 'filter/tips'),
+        '!clearfiltercache' => url('geshifilter/clearfiltercache', drupal_get_destination())
+      )) .'</p>';
+      if ($section == 'admin/help#geshifilter') {
+        $output .= '<p>'. t('The GeSHi filter module for Drupal requires the GeSHi library to work. The GeSHi filter is actually just Drupal flavored wrapper around the GeSHi library. Because of <a href="!repositorypolicies">drupal.org repository policies</a> however, the GeSHi library is not included in the GeSHi filter package, so you\'ll have to download and install the GeSHi library separately.', array(
+          '!repositorypolicies' => url('http://drupal.org/node/66113'),
+        )) .'</p>';
+        $output .= '<p>'. t('The current version of the GeSHi filter module supports the 1.0.x branch of the GeSHi library and has basic support for the developement branch 1.1.x. Usage of the 1.0.x branch is recommended however.') .'</p>';
+      }
+      return $output;
       break;
   }
-  return $output;
 }
 
 /**
@@ -87,6 +97,14 @@ function geshifilter_menu($may_cache) {
       'description' => t('Show the disabled languages'),
       'weight' => 4,
       'type' => MENU_LOCAL_TASK,
+    );
+    // clear filter cache callback
+    $items[] = array(
+      'path' => 'geshifilter/clearfiltercache',
+      'title' => t('Clear filter cache'),
+      'callback' => 'geshifilter_clear_filter_cache',
+      'type' => MENU_CALLBACK,
+      'access' => user_access('administer site configuration'),
     );
   }
   else {
@@ -851,4 +869,13 @@ function geshifilter_process_1_1_x($format, $text, $lang, $is_block) {
   }
   // $geshi->setRenderer(new GeshiRendererHTMLCSS);
   return $geshi->parseCode();
+}
+
+/**
+ * callback function for clearing the filter cache
+ */
+function geshifilter_clear_filter_cache() {
+  cache_clear_all('*', 'cache_filter', TRUE);
+  drupal_set_message('Filter cache cleared.');
+  drupal_goto();
 }
