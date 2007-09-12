@@ -363,6 +363,7 @@ function geshifilter_per_language_settings($format, $view, $add_checkbox, $add_t
  * theming function for the per language settings table
  */
 function theme_geshifilter_per_language_settings($form) {
+  // build table body
   $rows = array();
   foreach (element_children($form['languages']) as $language) {
     $row = array();
@@ -372,9 +373,19 @@ function theme_geshifilter_per_language_settings($form) {
     }
     $rows[] = $row;
   }
-  $header = array_merge(array(t('Language')), $form['header']['#value']);
-  $output = theme('table', $header, $rows);
-  return $output;
+  // build table header
+  $header = array(t('Language'));
+  foreach ($form['header']['#value'] as $cell) {
+    if ($cell == t('Enabled')) {
+      // add JavaScript 'select all/select none' stuff
+      $header[] = array('data' => $cell) + theme('table_select_header_cell');
+    }
+    else {
+      $header[] = $cell;
+    }
+  }
+  // return themed table
+  return theme('table', $header, $rows);
 }
 
 /**
