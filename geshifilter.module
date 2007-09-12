@@ -417,7 +417,16 @@ function geshifilter_admin_general_settings() {
     '#default_value' => geshifilter_use_format_specific_options(),
     '#description' => t('Enable seperate configuration of the GeSHi filter for each <a href="!input_formats">input format</a>.', array('!input_formats' => url('admin/settings/filters'))),
   );
-  //
+    // default language
+  $languages = geshifilter_available_languages();
+  $form['geshifilter_default_language'] = array(
+    '#type' => 'select',
+    '#title' => t('Default language syntax'),
+    '#default_value' => variable_get('geshifilter_default_language', ''),
+    '#options' => array_merge(array('<no highlighting>'), $languages),
+    '#description' => t('Select the default language syntax to use. This setting can be overwritten with a language attribute in the tag.')
+  );
+  // Styling, layout and CSS
   $form['geshifilter_styling'] = array(
     '#type' => 'fieldset',
     '#title' => t('Styling, layout and CSS'),
@@ -448,16 +457,6 @@ function geshifilter_admin_general_settings() {
       GESHI_HEADER_NONE => t('Use no container'),
     ),
     '#default_value' => variable_get('geshifilter_code_container', GESHI_HEADER_PRE),
-  );
-
-  // default language
-  $languages = geshifilter_available_languages();
-  $form['geshifilter_default_language'] = array(
-    '#type' => 'select',
-    '#title' => t('Default language syntax'),
-    '#default_value' => variable_get('geshifilter_default_language', ''),
-    '#options' => array_merge(array('<no highlighting>'), $languages),
-    '#description' => t('Select the default language syntax to use. This setting can be overwritten with a language attribute in the tag.')
   );
   // tag and attributes
   if (!geshifilter_use_format_specific_options()) {
@@ -559,11 +558,13 @@ function geshifilter_admin_filter_conflicts() {
             $alerts[] = array(
               $cfilter->name,
               t('%cfilter will remove %tag tags', array('%cfilter' => $cfilter->name, '%tag' => "<$tag>")),
-              l(t('Add tag %tag to "%allowed_html_tags" of %cfilter', array(
-                '%allowed_html_tags' => t('Allowed HTML tags'),
+              t('Add tag %tag to !allowed_html_tags', array(
                 '%tag' => "<$tag>",
-                '%cfilter' => $cfilter->name,
-              )), "/admin/settings/filters/$format/configure", array(), drupal_get_destination(), NULL, FALSE, TRUE),
+                '!allowed_html_tags' => l(t('"%allowed_html_tags" of %cfilter', array(
+                  '%allowed_html_tags' => t('Allowed HTML tags'),
+                  '%cfilter' => $cfilter->name,
+                  )), "/admin/settings/filters/$format/configure", array(), drupal_get_destination(), NULL, FALSE, TRUE)
+              )),
             );
           }
         }
