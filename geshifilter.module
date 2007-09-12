@@ -124,7 +124,7 @@ function geshifilter_filter_tips($delta, $format, $long = false) {
   // get the available languages
   $languages = _geshifilter_get_enabled_languages();
 
-  $default_lang = variable_get('geshifilter_default_language', '');
+  $default_lang = variable_get('geshifilter_default_language', 'GESHIFILTER_NOHIGHLIGHTING');
   if (!$default_lang) {
     $default_lang = 'no highlighting';
   }
@@ -187,7 +187,7 @@ function geshifilter_filter($op, $delta = 0, $format = -1, $text = '') {
       return array('GeSHi filter');
 
     case 'description':
-      return t('Syntax highlighting using the <a href="http://geshi.org">GeSHi</a> engine');
+      return t('Enables syntax highlighting of inline/block source code using the GeSHi engine');
 
     case 'process':
       return geshifilter_process($format, $text);
@@ -451,8 +451,8 @@ function geshifilter_admin_general_settings() {
   $form['geshifilter_default_language'] = array(
     '#type' => 'select',
     '#title' => t('Default language syntax'),
-    '#default_value' => variable_get('geshifilter_default_language', ''),
-    '#options' => array_merge(array('<no highlighting>'), $languages),
+    '#default_value' => variable_get('geshifilter_default_language', 'GESHIFILTER_NOHIGHLIGHTING'),
+    '#options' => array_merge(array('GESHIFILTER_NOHIGHLIGHTING' => '<no highlighting>'), $languages),
     '#description' => t('Select the default language syntax to use. This setting can be overwritten with a language attribute in the tag.')
   );
   // Styling, layout and CSS
@@ -749,8 +749,8 @@ function geshifilter_process($format, $text) {
     // $match[2][xx] .... full params string type="language"...
     // $match[3][xx] .... tag content
     foreach ($match[3] as $key => $value) {
-      // determine language by language tag
-      $lang = variable_get('geshifilter_default_language', '');
+      // determine language by language tag or use default
+      $lang = variable_get('geshifilter_default_language', 'GESHIFILTER_NOHIGHLIGHTING');
       if (isset($tag_to_lang[$match[1][$key]])) {
         $lang = $tag_to_lang[$match[1][$key]];
       }
@@ -782,17 +782,17 @@ function geshifilter_process($format, $text) {
 
       $matched = $value;
 
-      if ($lang) {
+      if ($lang != 'GESHIFILTER_NOHIGHLIGHTING') {
 
         // geshi will reencode these
-        $matched = decode_entities(trim($matched));
+        $matched = decode_entities($matched);
 
         // undo nl and p formatting
         $matched = preg_replace("@<br />@", "", $matched);
         $matched = preg_replace("@<br/>@", "", $matched);
         $matched = preg_replace("@<p>|</p>@", "", $matched);
 
-        $matched = trim($matched);
+        $matched = trim($matched, "\n\r");
 
         switch ($geshi_branch) {
           case GESHIFILTER_GESHI_BRANCH_1_0_x:
@@ -811,7 +811,7 @@ function geshifilter_process($format, $text) {
         $matched = preg_replace("@<br />@", "", $matched);
         $matched = preg_replace("@<p>|</p>@", "", $matched);
 
-        $matched = trim($matched);
+        $matched = trim($matched, "\n\r");
 
         if ($is_block) {
           $matched = '<pre class="geshifilter">'. $matched .'</pre>';
