@@ -1,0 +1,5 @@
+; $Id$
+name = "GeSHi node"
+description = "Provides source code node with GeSHi syntax highlighting."
+package = "Filters"
+dependencies = geshifilter

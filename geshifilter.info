@@ -1,5 +1,4 @@
 ; $Id$
 name = "GeSHi Filter"
-description = "A filter to highlight sourcecode using GeSHi (Generic Syntax Highlighter)"
-version = "$Name$"
+description = "Provides a filter to highlight source code using the GeSHi library (Generic Syntax Highlighter)"
 package = "Filters"

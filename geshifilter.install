@@ -8,3 +8,12 @@ function geshifilter_uninstall() {
   db_query("DELETE FROM {variable} WHERE name LIKE 'geshifilter_%'");
   cache_clear_all('variables', 'cache');
 }
+
+/**
+ * Implementation of hook_update_N()
+ */
+function geshifilter_update_1() {
+  // clear the cache of available languages
+  variable_del('geshifilter_available_languages');
+  return array();
+}
