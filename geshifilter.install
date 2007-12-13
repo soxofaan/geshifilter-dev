@@ -2,6 +2,22 @@
 // $Id$
 
 /**
+ * Implementation of hook_install
+ */
+function geshifilter_install() {
+  // enable some popular languages by default
+  variable_set('geshifilter_language_enabled_php', TRUE);
+  variable_set('geshifilter_language_enabled_drupal5', TRUE);
+  variable_set('geshifilter_language_enabled_drupal6', TRUE);
+  variable_set('geshifilter_language_enabled_javascript', TRUE);
+  variable_set('geshifilter_language_enabled_java', TRUE);
+  variable_set('geshifilter_language_enabled_c', TRUE);
+  variable_set('geshifilter_language_enabled_cpp', TRUE);
+  variable_set('geshifilter_language_enabled_python', TRUE);
+  variable_set('geshifilter_language_enabled_ruby', TRUE);
+}
+
+/**
  * On uninstall: remove module variables and clear variable cache
  */
 function geshifilter_uninstall() {

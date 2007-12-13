@@ -2,3 +2,4 @@
 name = "GeSHi Filter"
 description = "Provides a filter to highlight source code using the GeSHi library (Generic Syntax Highlighter)"
 package = "Filters"
+core = 6.x
