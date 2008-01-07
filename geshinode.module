@@ -34,6 +34,10 @@ function geshinode_node_info() {
       'name' => t('Source code node'),
       'module' => 'geshinode',
       'description' => t('Source code with GeSHi syntax highlighting.'),
+      'has_title' => TRUE,
+      'title_label' => t('Title'),
+      'has_body' => TRUE,
+      'body_label' => t('Source code'),
     )
   );
 }
@@ -62,9 +66,10 @@ function geshinode_access($op, $node) {
 /**
  * Implementation of hook_form().
  */
-function geshinode_form(&$node, &$param) {
+function geshinode_form(&$node, $form_state) {
   $type = node_get_types('type', $node);
-  // We need to define form elements for the node's title and body.
+
+  // set the title field
   $form['title'] = array(
     '#type' => 'textfield',
     '#title' => check_plain($type->title_label),
@@ -72,17 +77,16 @@ function geshinode_form(&$node, &$param) {
     '#default_value' => $node->title,
     '#weight' => -5,
   );
-  $form['body'] = array(
-    '#type' => 'textarea',
-    '#title' => t('Source code'),
-    '#default_value' => $node->body,
-    '#rows' => 20,
-    '#required' => TRUE,
-  );
-  $form['language'] = array(
+
+  // the body field
+  $form['body_field'] = node_body_field($node, $type->body_label, $type->min_word_count);
+  unset($form['body_field']['format']);
+
+  // the source code language field
+  $form['source_code_language'] = array(
     '#type' => 'select',
     '#title' => t('Syntax highlighting mode'),
-    '#default_value' => $node->language ? $node->language : variable_get('geshinode_default_language', 'php'),
+    '#default_value' => isset($node->source_code_language) ? $node->source_code_language: variable_get('geshinode_default_language', 'php'),
     '#options' => _geshifilter_get_enabled_languages(),
     '#description' => t('Select the syntax highlighting mode to use.')
   );
@@ -101,7 +105,7 @@ function geshinode_validate($node) {
  */
 function geshinode_insert($node) {
   db_query("INSERT INTO {geshinode} (nid, vid, language) VALUES (%d, %d, '%s')",
-    $node->nid, $node->vid, $node->language);
+    $node->nid, $node->vid, $node->source_code_language);
 }
 
 /**
@@ -112,7 +116,7 @@ function geshinode_update($node) {
     geshinode_insert($node);
   }
   else {
-    db_query("UPDATE {geshinode} SET language = '%s' WHERE vid=%d", $node->language, $node->vid);
+    db_query("UPDATE {geshinode} SET language = '%s' WHERE vid=%d", $node->source_code_language, $node->vid);
   }
 }
 
@@ -127,7 +131,7 @@ function geshinode_delete(&$node) {
  * Implementation of hook_load().
  */
 function geshinode_load($node) {
-  return db_fetch_object(db_query('SELECT language FROM {geshinode} WHERE vid = %d', $node->vid));
+  return db_fetch_object(db_query('SELECT language AS source_code_language FROM {geshinode} WHERE vid = %d', $node->vid));
 }
 
 /**
@@ -138,7 +142,7 @@ function geshinode_view($node, $teaser = FALSE, $page = FALSE) {
   $line_numbering = variable_get('geshinode_line_numbering', GESHIFILTER_LINE_NUMBERS_DEFAULT_NONE);
   $source_code = $teaser ? $node->teaser : $node->body;
   $node->content['body'] = array(
-    '#value' => geshifilter_process($source_code, $node->language, $line_numbering),
+    '#value' => geshifilter_process($source_code, $node->source_code_language, $line_numbering),
     '#weight' => 0,
   );
   return $node;
