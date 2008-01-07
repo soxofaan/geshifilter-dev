@@ -2,45 +2,53 @@
 // $Id$
 
 /**
+ * Implementation of hook_schema()
+ */
+function geshinode_schema() {
+  $schema['geshinode'] = array(
+    'description' => t('The table for geshinodes.'),
+    'fields' => array(
+      'nid' => array(
+        'description' => t('The primary identifier for a node.'),
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'vid' => array(
+        'description' => t('The current {node_revisions}.vid version identifier.'),
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'language' => array(
+        'description' => t('The source code language of the node.'),
+        'type' => 'varchar',
+        'length' => 64,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+    ),
+    'primary key' => array('nid'),
+    'unique keys' => array(
+      'vid' => array('vid'),
+    ),
+  );
+  return $schema;
+}
+
+/**
  * Create tables on install
  */
 function geshinode_install() {
-  switch ($GLOBALS['db_type']) {
-    case 'mysql':
-    case 'mysqli':
-      db_query("CREATE TABLE {geshinode} (
-        vid int unsigned NOT NULL default '0',
-        nid int unsigned NOT NULL default '0',
-        language VARCHAR(64) NOT NULL default '',
-        PRIMARY KEY (nid, vid),
-        UNIQUE KEY vid (vid),
-        KEY nid (nid)
-        ) /*!40100 DEFAULT CHARACTER SET utf8 */;"
-      );
-      drupal_set_message('Installed geshinode database table.');
-      break;
-    case 'pgsql':
-      db_query("CREATE TABLE {geshinode} (
-        vid int unsigned NOT NULL default '0',
-        nid int unsigned NOT NULL default '0',
-        language VARCHAR(64) NOT NULL default '',
-        PRIMARY KEY (nid, vid),
-        UNIQUE (vid)
-        );"
-      );
-      db_query("CREATE INDEX {geshinode}_nid_idx ON {geshinode} (nid)");
-      drupal_set_message('Installed geshinode database table.');
-      break;
-    default:
-      drupal_set_message(t('Unsupported database.'), 'error');
-      break;
-  }
+  // Create geshinode tables.
+  drupal_install_schema('geshinode');
 }
 
 /**
  * Remove tables on uninstall.
  */
 function geshinode_uninstall() {
-  db_query("DROP TABLE {geshinode}");
-  drupal_set_message('Removed geshinode database table.');
+  // Drop geshinode tables.
+  drupal_uninstall_schema('geshinode');
 }
