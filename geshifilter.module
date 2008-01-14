@@ -736,13 +736,13 @@ function _geshifilter_prepare($format, $text) {
   // still works when teaser view trims inside the source code.
   switch (_geshifilter_brackets($format)) {
     case GESHIFILTER_BRACKETS_ANGLE:
-      $pattern = '#(<)('. $tags_string .')([^>]*)(>)(.*?)(</\2\s*>|$)#s';
+      $pattern = '#(<)('. $tags_string .')((\s+[^>]*)*)(>)(.*?)(</\2\s*>|$)#s';
       break;
     case GESHIFILTER_BRACKETS_SQUARE:
-      $pattern = '#(\[)('. $tags_string .')([^\]]*)(\])(.*?)(\[/\2\s*\]|$)#s';
+      $pattern = '#(\[)('. $tags_string .')((\s+[^\]]*)*)(\])(.*?)(\[/\2\s*\]|$)#s';
       break;
     case GESHIFILTER_BRACKETS_BOTH:
-      $pattern = '#([<\[])('. $tags_string .')([^>\]]*)([>\]])(.*?)(\1/\2\s*\4|$)#s';
+      $pattern = '#([<\[])('. $tags_string .')((\s+[^>\]]*)*)([>\]])(.*?)(\1/\2\s*\5|$)#s';
       break;
   }
   // replace the code container tag brackets
@@ -790,7 +790,7 @@ function _geshifilter_prepare_callback($match) {
   }
   // return escaped code block
   return '[geshifilter-'. $match[2] . $match[3] .']'
-    . str_replace(array("\r", "\n"), array('', '&#10;'), check_plain($match[5]))
+    . str_replace(array("\r", "\n"), array('', '&#10;'), check_plain($match[6]))
     .'[/geshifilter-'. $match[2] .']';
 }
 
