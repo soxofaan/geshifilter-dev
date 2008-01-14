@@ -757,10 +757,9 @@ function _geshifilter_prepare($format, $text) {
 
 /**
  * _geshifilter_prepare callback for preparing input text.
- * Replaces the code tags brackets with 0xFE and 0xFF
- * (e.g. "[code]" -> "\xFEcode\xFF").
- * The used bytes 0xFE and 0xFF are not valid UTF-8 data thus least likely to
- * cause problems (based on the codefilter module).
+ * Replaces the code tags brackets with geshifilter specific ones to prevent
+ * possible messing up by other filters, e.g.
+ *   '[python]foo[/python]' to '[geshifilter-python]foo[/geshifilter-python]'.
  * Replaces newlines with "&#10;" to prevent issues with the line break filter
  * Escapes the tricky characters like angle brackets with check_plain() to
  * prevent messing up by other filters like the HTML filter.
@@ -790,18 +789,18 @@ function _geshifilter_prepare_callback($match) {
     }
   }
   // return escaped code block
-  return "\xFE". $match[2] . $match[3] ."\xFF"
+  return '[geshifilter-'. $match[2] . $match[3] .']'
     . str_replace(array("\r", "\n"), array('', '&#10;'), check_plain($match[5]))
-    ."\xFE/". $match[2] ."\xFF";
+    .'[/geshifilter-'. $match[2] .']';
 }
 
 /**
  * _geshifilter_prepare callback for < ?php ... ? > blocks
  */
 function _geshifilter_prepare_php_callback($match) {
-  return "\xFE\xFEphp\xFF"
+  return '[geshifilter-questionmarkphp]'
     . str_replace(array("\r", "\n"), array('', '&#10;'), check_plain($match[2]))
-    ."\xFE/\xFEphp\xFF";
+    .'[/geshifilter-questionmarkphp]';
 }
 
 /**
@@ -817,13 +816,13 @@ function _geshifilter_process($format, $text) {
   // get the available tags
   list($generic_code_tags, $language_tags, $tag_to_lang) = _geshifilter_get_tags($format);
   if (_geshifilter_php_delimeters($format)) {
-    $language_tags[] = "\xFEphp";
-    $tag_to_lang["\xFEphp"] = 'php';
+    $language_tags[] = 'questionmarkphp';
+    $tag_to_lang['questionmarkphp'] = 'php';
   }
   $tags = array_merge($generic_code_tags, $language_tags);
   $tags_string = implode('|', $tags);
   // Pattern for matching the prepared "<code>...</code>" stuff
-  $pattern = '#\xFE('. $tags_string .')([^\xFF]*)\xFF(.*?)(\xFE/\1\xFF)#s';
+  $pattern = '#\\[geshifilter-('. $tags_string .')([^\\]]*)\\](.*?)(\\[/geshifilter-\1\\])#s';
   $text = preg_replace_callback($pattern, '_geshifilter_replace_callback', $text);
   return $text;
 }
@@ -847,8 +846,8 @@ function _geshifilter_replace_callback($match) {
   // get the possible tags and languages
   list($generic_code_tags, $language_tags, $tag_to_lang) = _geshifilter_get_tags($format);
   if (variable_get('geshifilter_enable_php_delimiters', FALSE)) {
-    $language_tags[] = "\xFEphp";
-    $tag_to_lang["\xFEphp"] = 'php';
+    $language_tags[] = 'questionmarkphp';
+    $tag_to_lang['questionmarkphp'] = 'php';
   }
 
   $enabled_languages = _geshifilter_get_enabled_languages();

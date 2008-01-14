@@ -1,6 +1,6 @@
 /**
  * CSS rules for the general GeSHi filter containers.
- * The language specific rules are generated automaticly and written to a
+ * The language specific rules are generated automatically and written to a
  * CSS file in your files directory.
  */
 
@@ -27,6 +27,10 @@ div.geshifilter > pre, div.geshifilter > div {
   margin: 0;
   padding: 0;
   overflow: auto;
+}
+
+div.geshifilter > pre ol, div.geshifilter > div ol {
+  padding-left: 1em;
 }
 
 /* Set line-height for syntax highlighting with line numbers */
