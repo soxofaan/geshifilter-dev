@@ -729,6 +729,8 @@ function _geshifilter_prepare($format, $text) {
   // get the available tags
   list($generic_code_tags, $language_tags, $tag_to_lang) = _geshifilter_get_tags($format);
   $tags = array_merge($generic_code_tags, $language_tags);
+  // escape special (regular expression) characters in tags (for tags like 'c++' and 'c#')
+  $tags = preg_replace('#(\\+|\\#)#', '\\\\$1', $tags);
   $tags_string = implode('|', $tags);
   // Pattern for matching "<code>...</code>" like stuff
   // Also matches "<code>...$"  where "$" refers to end of string, not end of
@@ -820,6 +822,8 @@ function _geshifilter_process($format, $text) {
     $tag_to_lang['questionmarkphp'] = 'php';
   }
   $tags = array_merge($generic_code_tags, $language_tags);
+  // escape special (regular expression) characters in tags (for tags like 'c++' and 'c#')
+  $tags = preg_replace('#(\\+|\\#)#', '\\\\$1', $tags);
   $tags_string = implode('|', $tags);
   // Pattern for matching the prepared "<code>...</code>" stuff
   $pattern = '#\\[geshifilter-('. $tags_string .')([^\\]]*)\\](.*?)(\\[/geshifilter-\1\\])#s';
