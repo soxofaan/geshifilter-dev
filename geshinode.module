@@ -138,6 +138,7 @@ function geshinode_load($node) {
  * Implementation of hook_view()
  */
 function geshinode_view($node, $teaser = FALSE, $page = FALSE) {
+  require_once('geshifilter.pages.inc');
   $node->readmore = (strlen($node->teaser) < strlen($node->body));
   $line_numbering = variable_get('geshinode_line_numbering', GESHIFILTER_LINE_NUMBERS_DEFAULT_NONE);
   $source_code = $teaser ? $node->teaser : $node->body;

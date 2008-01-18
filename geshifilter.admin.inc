@@ -1,7 +1,6 @@
 <?php
 // $Id$
 
-
 /**
  * Menu callback for admin settings
  */
@@ -273,6 +272,129 @@ function geshifilter_admin_filter_conflicts($check_only=FALSE) {
     $output .= theme('table', $header, $alerts);
     return $output;
   }
+}
+
+/**
+ * Helper function for some settings form fields usable as general and specific settings
+ */
+function _geshifilter_general_highlight_tags_settings($format=NULL) {
+  $form = array();
+  $f = ($format === NULL) ? '' : "_$format";
+  // generic tags
+  $form["geshifilter_tags$f"] = array(
+    '#type' => 'textfield',
+    '#title' => t('Generic syntax highlighting tags'),
+    '#default_value' => geshifilter_tags($format),
+    '#description' => t('Tags that should activate the GeSHi syntax highlighting. Specify a space-separated list of tagnames.')
+  );
+  // tag style
+  $form["geshifilter_brackets$f"] = array(
+    '#type' => 'select',
+    '#title' => t('Tag style'),
+    '#options' => array(
+      GESHIFILTER_BRACKETS_ANGLE => '<foo>',
+      GESHIFILTER_BRACKETS_SQUARE => '[foo]',
+      GESHIFILTER_BRACKETS_BOTH => t('!angle or !square', array('!angle' => '<foo>', '!square' => '[foo]')),
+    ),
+    '#default_value' => _geshifilter_brackets($format),
+    '#description' => t('Select which brackets should be used for the source code container tags.'),
+  );
+  // PHP specific delimiters
+  $form['geshifilter']["geshifilter_enable_php_delimiters$f"] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Also apply syntax highlighting to &lt;?php ... ?&gt; style PHP source code blocks.'),
+    '#description' => t('When enabled, PHP source code enclosed in &lt;?php...?&gt or &lt;%...%&gt; will also be processed.'),
+    '#default_value' => _geshifilter_php_delimeters($format),
+  );
+  return $form;
+}
+
+/**
+ * function for generating a form table for per language settings
+ */
+function geshifilter_per_language_settings($format, $view, $add_checkbox, $add_tag_option) {
+  $form = array(
+    '#theme' => 'geshifilter_per_language_settings',
+  );
+  // table header
+  $form['header'] = array(
+    '#type' => 'value',
+    '#value' => array(),
+  );
+  $form['header']['#value'][] = t('Language');
+  $form['header']['#value'][] = t('Language code');
+  if ($add_tag_option) {
+    $form['header']['#value'][] = t('Tags');
+  }
+  // table body
+  $form['languages'] = array();
+  $languages = _geshifilter_get_available_languages();
+  foreach ($languages as $language => $language_data) {
+    $enabled = variable_get("geshifilter_language_enabled_{$language}", FALSE);
+    // skip items to hide
+    if (($view == 'enabled' && !$enabled) || ($view == 'disabled' && $enabled)) {
+      continue;
+    }
+    // build language row
+    $form['languages'][$language] = array();
+    // add enable/disable checkbox
+    if ($add_checkbox) {
+      $form['languages'][$language]["geshifilter_language_enabled_{$language}"] = array(
+        '#type' => 'checkbox',
+        '#default_value' => $enabled,
+        '#title' => $language_data['fullname'],
+      );
+    }
+    else {
+      $form['languages'][$language]['fullname'] = array(
+        '#type' => 'markup',
+        '#value' => $language_data['fullname'],
+      );
+    }
+    // language code
+    $form['languages'][$language]['name'] = array(
+      '#type' => 'markup',
+      '#value' => $language,
+    );
+    // add a textfield for tags
+    if ($add_tag_option) {
+      $f = ($format === NULL) ? '' : "_$format";
+      $form['languages'][$language]["geshifilter_language_tags_{$language}{$f}"] = array(
+        '#type' => 'textfield',
+        '#default_value' => geshifilter_language_tags($language, $format),
+        '#size' => 20,
+      );
+    }
+  }
+  return $form;
+}
+
+/**
+ * theming function for the per language settings table
+ */
+function theme_geshifilter_per_language_settings($form) {
+  // build table body
+  $rows = array();
+  foreach (element_children($form['languages']) as $language) {
+    $row = array();
+    foreach (element_children($form['languages'][$language]) as $key) {
+      $row[] = drupal_render($form['languages'][$language][$key]);
+    }
+    $rows[] = $row;
+  }
+  // build table header
+  $header = array();
+  foreach ($form['header']['#value'] as $cell) {
+    if ($cell == t('Enabled')) {
+      // add JavaScript 'select all/select none' stuff
+      $header[] = array('data' => $cell) + theme('table_select_header_cell');
+    }
+    else {
+      $header[] = $cell;
+    }
+  }
+  // return themed table
+  return theme('table', $header, $rows);
 }
 
 /**
