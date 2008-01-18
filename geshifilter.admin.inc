@@ -1,6 +1,37 @@
 <?php
 // $Id$
 
+require_once('geshifilter.inc');
+
+/**
+ * Form (items) for filter settings.
+ */
+function _geshifilter_filter_settings($format) {
+  $form = array();
+  $form['geshifilter'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('GeSHi filter'),
+    '#collapsible' => TRUE,
+  );
+  if (geshifilter_use_format_specific_options()) {
+    // tags and attributes
+    $form['geshifilter']['general_tags'] = _geshifilter_general_highlight_tags_settings($format);
+    // per language tags
+    $form['geshifilter']['per_language_settings'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Per language tags'),
+      '#collapsible' => TRUE,
+      'table' => geshifilter_per_language_settings($format, 'enabled', FALSE, TRUE),
+    );
+  }
+  else {
+    $form['geshifilter']['info'] = array(
+      '#value' => '<p>'. t('The <a href="!geshi_admin_url">general settings</a> are used for the GeSHi filter . If you want specific settings per input format, you first have to enable this option in the <a href="!geshi_admin_url">general settings</a>.', array('!geshi_admin_url' => url('admin/settings/geshifilter'))) .'</p>'
+    );
+  }
+  return $form;
+}
+
 /**
  * Menu callback for admin settings
  */

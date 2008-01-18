@@ -1,6 +1,8 @@
 <?php
 // $Id$
 
+require_once('geshifilter.inc');
+
 /**
  * geshifilter_filter callback for preparing input text.
  */
