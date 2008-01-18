@@ -104,14 +104,19 @@ function geshifilter_admin_general_settings(&$form_state) {
       '#type' => 'fieldset',
       '#title' => t('Styling, layout and CSS'),
     );
-    // CSS mode
+    // CSS mode: CSS classes + external stylesheet is only possible with public downloads in a writable files directory
+    $directory = file_directory_path();
+    $external_css_possible = is_dir($directory) && is_writable($directory) && (variable_get('file_downloads', FILE_DOWNLOADS_PUBLIC) == FILE_DOWNLOADS_PUBLIC);
     $form['geshifilter_styling']['geshifilter_css_mode'] = array(
       '#type' => 'radios',
       '#title' => t('CSS mode for syntax highlighting'),
-      '#description' => t('Inline CSS is easier to set up, does not depend on an external style sheets and is consequently more robust to copy/paste operations like content aggregation. However, usage of CSS classes is generally considered to be the better way of styling and requires much less HTML code and bandwith. (GeSHi documentation: !link).',
-        array('!link' => l('Using CSS Classes', 'http://qbnz.com/highlighter/geshi-doc.html#using-css-classes'))),
-
-      '#default_value' => variable_get('geshifilter_css_mode', GESHIFILTER_CSS_INLINE),
+      '#description' => t('Inline CSS is easier to set up, does not depend on an external style sheets and is consequently more robust to copy/paste operations like content aggregation. However, usage of CSS classes and an external stylesheet (requires the public <a href="!filesystem">download method</a>) is however generally considered to be the better way of styling and requires much less HTML code and bandwith. (GeSHi documentation: !link).',
+        array(
+          '!link' => l('Using CSS Classes', 'http://qbnz.com/highlighter/geshi-doc.html#using-css-classes'),
+          '!filesystem' => url('admin/settings/file-system'),
+        )),
+      '#disabled' => !$external_css_possible,
+      '#default_value' => $external_css_possible ? intval(variable_get('geshifilter_css_mode', GESHIFILTER_CSS_INLINE)) : GESHIFILTER_CSS_INLINE,
       '#options' => array(
         GESHIFILTER_CSS_INLINE => t('Inline CSS style attributes.'),
         GESHIFILTER_CSS_CLASSES => t('CSS classes and external CSS style sheet.'),
@@ -152,7 +157,7 @@ function geshifilter_admin_general_settings_after_build($form, &$form_state) {
  */
 function geshifilter_admin_general_settings_submit($form, &$form_state) {
   // regenerate language_css
-  if (variable_get('geshifilter_css_mode', GESHIFILTER_CSS_INLINE) == GESHIFILTER_CSS_CLASSES) {
+  if (_geshifilter_css_mode() == GESHIFILTER_CSS_CLASSES) {
     _geshifilter_generate_languages_css();
   }
 }
@@ -185,7 +190,7 @@ function geshifilter_admin_per_language_settings_submit($form, &$form_state) {
   // normal system_settings_form processing
   system_settings_form_submit($form, $form_state);
   // regenerate language_css
-  if (variable_get('geshifilter_css_mode', GESHIFILTER_CSS_INLINE) == GESHIFILTER_CSS_CLASSES) {
+  if (_geshifilter_css_mode() == GESHIFILTER_CSS_CLASSES) {
     _geshifilter_generate_languages_css();
   }
 }

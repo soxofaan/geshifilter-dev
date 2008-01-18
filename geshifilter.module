@@ -146,8 +146,9 @@ function geshifilter_menu() {
 function geshifilter_init() {
   // Since the filtered content is cached, it is not possible to know on which
   // pages the css file is actually needed. Thus it is included on all pages.
-  if (variable_get('geshifilter_css_mode', GESHIFILTER_CSS_INLINE) == GESHIFILTER_CSS_CLASSES) {
+  if (_geshifilter_css_mode() == GESHIFILTER_CSS_CLASSES) {
     if ($stylesheet_file = variable_get('geshifilter_languages_css', NULL)) {
+    dvm($stylesheet_file);
       drupal_add_css($stylesheet_file);
     }
   }
@@ -723,6 +724,15 @@ function _geshifilter_get_tags($format) {
 }
 
 /**
+ * helper function for getting the CSS mode (considering the download method).
+ */
+function _geshifilter_css_mode() {
+  $directory = file_directory_path();
+  $external_css_possible = is_dir($directory) && is_writable($directory) && (variable_get('file_downloads', FILE_DOWNLOADS_PUBLIC) == FILE_DOWNLOADS_PUBLIC);
+  return $external_css_possible ? intval(variable_get('geshifilter_css_mode', GESHIFILTER_CSS_INLINE)) : GESHIFILTER_CSS_INLINE;
+}
+
+/**
  * geshifilter_filter callback for preparing input text.
  */
 function _geshifilter_prepare($format, $text) {
@@ -972,7 +982,7 @@ function geshifilter_geshi_process($source_code, $lang, $line_numbering=0, $line
   $geshi = _geshifilter_geshi_factory($source_code, $lang);
 
   // CSS mode
-  if (variable_get('geshifilter_css_mode', GESHIFILTER_CSS_INLINE) == GESHIFILTER_CSS_CLASSES) {
+  if (_geshifilter_css_mode() == GESHIFILTER_CSS_CLASSES) {
     $geshi->enable_classes(TRUE);
   }
   _geshifilter_override_geshi_defaults($geshi, $lang);
