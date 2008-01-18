@@ -108,14 +108,14 @@ function _geshifilter_process($format, $text) {
   $tags_string = implode('|', $tags);
   // Pattern for matching the prepared "<code>...</code>" stuff
   $pattern = '#\\[geshifilter-('. $tags_string .')([^\\]]*)\\](.*?)(\\[/geshifilter-\1\\])#s';
-  $text = preg_replace_callback($pattern, '_geshifilter_replace_callback', $text);
+  $text = preg_replace_callback($pattern, create_function('$match', "return _geshifilter_replace_callback(\$match, $format);"), $text);
   return $text;
 }
 
 /**
  * preg_replace_callback callback
  */
-function _geshifilter_replace_callback($match) {
+function _geshifilter_replace_callback($match, $format) {
   // $match[0]: complete matched string
   // $match[1]: tag name
   // $match[2]: tag attributes

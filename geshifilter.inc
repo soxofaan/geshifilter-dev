@@ -167,7 +167,6 @@ function geshifilter_tags($format = NULL) {
   return variable_get("geshifilter_tags_{$format}", geshifilter_tags());
 }
 
-
 function _geshifilter_php_delimeters($format = NULL) {
   if (!geshifilter_use_format_specific_options() || $format === NULL) {
     return variable_get('geshifilter_enable_php_delimiters', FALSE);
