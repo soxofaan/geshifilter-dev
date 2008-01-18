@@ -7,12 +7,18 @@
  */
 function geshifilter_admin_general_settings(&$form_state) {
   $form = array();
+
+  // try to load GeSHi library and get version if successful
+  $geshi_library = _geshifilter_check_geshi_library();
+
   // GeSHi library settings
   $form['geshifilter_library'] = array(
     '#type' => 'fieldset',
     '#title' => t('GeSHi library'),
     '#description' => t('The GeSHi filter requires the GeSHi library. You need to <a href="!geshi">download</a> and install it seperately.',
       array('!geshi' => url('http://qbnz.com/highlighter/'))),
+    '#collapsible' => TRUE,
+    '#collapsed' => $geshi_library['success'],
   );
   $form['geshifilter_library']['geshifilter_geshi_dir'] = array(
     '#type' => 'textfield',
@@ -22,12 +28,10 @@ function geshifilter_admin_general_settings(&$form_state) {
   );
   $form['geshifilter_library']['#after_build'] = array('geshifilter_admin_general_settings_after_build');
 
-  // try to load GeSHi library and get version if successful
-  $geshi_library = _geshifilter_check_geshi_library();
-
   if ($geshi_library['loaded']) {
     // show detected version
     $form['geshifilter_library']['geshifilter_detected_version'] = array(
+      '#type' => 'item',
       '#value' => t('Detected version: %version', array('%version' => GESHI_VERSION)), // GESHI_VERSION is defined in GeSHi library
     );
 
@@ -35,6 +39,7 @@ function geshifilter_admin_general_settings(&$form_state) {
     $form['geshifilter_tag_options'] = array(
       '#type' => 'fieldset',
       '#title' => t('GeSHi filter tags and delimiters'),
+      '#collapsible' => TRUE,
     );
     // usage of format specific option
     $form['geshifilter_tag_options']['geshifilter_format_specific_options'] = array(
@@ -52,6 +57,7 @@ function geshifilter_admin_general_settings(&$form_state) {
     $form['geshifilter_highlighting_options'] = array(
       '#type' => 'fieldset',
       '#title' => t('Syntax highlighting options'),
+      '#collapsible' => TRUE,
     );
     // default language
     $languages = _geshifilter_get_enabled_languages();
@@ -103,6 +109,7 @@ function geshifilter_admin_general_settings(&$form_state) {
     $form['geshifilter_styling'] = array(
       '#type' => 'fieldset',
       '#title' => t('Styling, layout and CSS'),
+      '#collapsible' => TRUE,
     );
     // CSS mode: CSS classes + external stylesheet is only possible with public downloads in a writable files directory
     $directory = file_directory_path();
