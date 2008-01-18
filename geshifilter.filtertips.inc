@@ -3,6 +3,9 @@
 
 require_once('geshifilter.inc');
 
+/**
+ * Implementation for geshifilter_filter_tips()
+ */
 function _geshifilter_filter_tips($delta, $format, $long = false) {
   if (_geshifilter_brackets($format) == GESHIFILTER_BRACKETS_SQUARE) {
     $bracket_open = '[';
