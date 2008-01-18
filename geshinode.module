@@ -67,6 +67,8 @@ function geshinode_access($op, $node) {
  * Implementation of hook_form().
  */
 function geshinode_form(&$node, $form_state) {
+  require_once('geshifilter.inc');
+
   $type = node_get_types('type', $node);
 
   // set the title field
@@ -153,6 +155,7 @@ function geshinode_view($node, $teaser = FALSE, $page = FALSE) {
  * Callback for geshinode settings form
  */
 function geshinode_settings() {
+  require_once('geshifilter.inc');
   $form = array();
   $form['geshinode_line_numbering'] = array(
     '#type' => 'select',
