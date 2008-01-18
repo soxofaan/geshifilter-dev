@@ -47,7 +47,6 @@ function geshifilter_help($path, $arg) {
           '!filterconflicts' => l(t('filter conflicts'), 'admin/settings/geshifilter/filterconflicts'),
           '!filtertips' => l(t('filter tips'), 'filter/tips'),
         ));
-        $output .= '<p>'. t('After changing the general GeSHi filter settings, it is typically needed to <a href="!clearfiltercache">clear the filter cache</a> before the changes take effect on old content.', array('!clearfiltercache' => url('geshifilter/clearfiltercache', array('query' => drupal_get_destination())))) .'</p>';
       }
       return $output;
       break;
@@ -120,14 +119,6 @@ function geshifilter_menu() {
     'page arguments' => array('geshifilter_admin_per_language_settings', 4),
     'weight' => 6,
     'type' => MENU_LOCAL_TASK,
-  );
-  // clear filter cache callback
-  $items['geshifilter/clearfiltercache'] = array(
-    'title' => t('Clear filter cache'),
-    'file' => 'geshifilter.admin.inc',
-    'page callback' => 'geshifilter_clear_filter_cache',
-    'type' => MENU_CALLBACK,
-    'access arguments' => array('administer site configuration'),
   );
   // clear available languages cache
   $items['geshifilter/clearavailablelanguagescache'] = array(

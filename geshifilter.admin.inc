@@ -26,7 +26,7 @@ function _geshifilter_filter_settings($format) {
   }
   else {
     $form['geshifilter']['info'] = array(
-      '#value' => '<p>'. t('The <a href="!geshi_admin_url">general settings</a> are used for the GeSHi filter . If you want specific settings per input format, you first have to enable this option in the <a href="!geshi_admin_url">general settings</a>.', array('!geshi_admin_url' => url('admin/settings/geshifilter'))) .'</p>'
+      '#value' => '<p>'. t('GeSHi filter is configured to use global tag settings. For separate settings per input format, enable this option in the <a href="!geshi_admin_url">general GeSHi filter settings</a>.', array('!geshi_admin_url' => url('admin/settings/geshifilter'))) .'</p>'
     );
   }
   return $form;
@@ -197,6 +197,7 @@ function geshifilter_admin_general_settings_submit($form, &$form_state) {
   if (_geshifilter_css_mode() == GESHIFILTER_CSS_CLASSES) {
     _geshifilter_generate_languages_css();
   }
+  _geshifilter_clear_filter_cache();
 }
 
 /**
@@ -230,6 +231,7 @@ function geshifilter_admin_per_language_settings_submit($form, &$form_state) {
   if (_geshifilter_css_mode() == GESHIFILTER_CSS_CLASSES) {
     _geshifilter_generate_languages_css();
   }
+  _geshifilter_clear_filter_cache();
 }
 
 /**
@@ -429,12 +431,18 @@ function theme_geshifilter_per_language_settings($form) {
 }
 
 /**
- * callback function for clearing the filter cache
+ * Helper function for clearing the appropriate filter cache entries
  */
-function geshifilter_clear_filter_cache() {
-  cache_clear_all('*', 'cache_filter', TRUE);
-  drupal_set_message('Filter cache cleared.');
-  drupal_goto();
+function _geshifilter_clear_filter_cache() {
+  // iterate over input formats
+  foreach (filter_formats() as $format => $input_format) {
+    // Get the filters in this input format
+    $filters = filter_list_format($format);
+    // look if GeSHi is enabled in this input format
+    if (isset($filters['geshifilter/0'])) {
+      cache_clear_all($format .':', 'cache_filter', TRUE);
+    }
+  }
 }
 
 /**
