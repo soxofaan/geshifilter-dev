@@ -471,6 +471,7 @@ function _geshifilter_generate_languages_css() {
   // make stylesheet file name (depends on enabled languages)
   $stylesheet_file = $path .'/geshifilter-languages-'. substr(md5(serialize($languages)), 0, 8) .'.css';
   if (!file_exists($stylesheet_file)) {
+    require_once('geshifilter.pages.inc');
     // build stylesheet
     $stylesheet = '';
     foreach ($languages as $langcode => $language_full_name) {
