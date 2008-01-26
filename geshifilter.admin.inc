@@ -174,10 +174,11 @@ function geshifilter_admin_general_settings(&$form_state) {
       '#default_value' => variable_get('geshifilter_code_container', GESHI_HEADER_PRE),
     );
   }
-  // set asubmit handlers
-  $form['#submit'] = array('geshifilter_admin_general_settings_submit');
-  // return
-  return system_settings_form($form);
+  // make it a system settings form
+  $form  = system_settings_form($form);
+  // set custom submit handlers (to be run after system_settings_form submit)
+  $form['#submit'][] = 'geshifilter_admin_general_settings_submit';
+  return $form;
 }
 
 function geshifilter_admin_general_settings_after_build($form, &$form_state) {
@@ -193,7 +194,10 @@ function geshifilter_admin_general_settings_after_build($form, &$form_state) {
  * Submit function for admin settings
  */
 function geshifilter_admin_general_settings_submit($form, &$form_state) {
-  // regenerate language_css
+  // Regenerate language_css
+  // Note that _geshifilter_css_mode() will use variable_get('geshifilter_css_mode')
+  // which is alread set to $form_state['values']['geshifilter_css_mode'] by
+  // system_settings_form_submit, which is run before this submit handler.
   if (_geshifilter_css_mode() == GESHIFILTER_CSS_CLASSES) {
     _geshifilter_generate_languages_css();
   }
@@ -218,15 +222,17 @@ function geshifilter_admin_per_language_settings($form_state, $view = 'enabled')
     '#type' => 'markup',
     '#value' => '<p>'. l(t('Flush cache of available languages'), 'geshifilter/clearavailablelanguagescache', array('query' => drupal_get_destination())) .'</p>',
   );
-  return system_settings_form($form);
+  // make it a system settings form
+  $form = system_settings_form($form);
+  // set custom submit handlers
+  $form['#submit'][] = 'geshifilter_admin_per_language_settings_submit';
+  return $form;
 }
 
 /**
  * Submit function for per language settings
  */
 function geshifilter_admin_per_language_settings_submit($form, &$form_state) {
-  // normal system_settings_form processing
-  system_settings_form_submit($form, $form_state);
   // regenerate language_css
   if (_geshifilter_css_mode() == GESHIFILTER_CSS_CLASSES) {
     _geshifilter_generate_languages_css();
