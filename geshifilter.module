@@ -85,7 +85,7 @@ function geshifilter_menu() {
   $items['admin/settings/geshifilter/filterconflicts'] = array(
     'title' => 'Filter conflicts',
     'description' => 'Information on possible conflicts with other filters.',
-    'file' => 'geshifilter.admin.inc',
+    'file' => 'geshifilter.conflicts.inc',
     'page callback' => 'geshifilter_admin_filter_conflicts',
     'type' => MENU_LOCAL_TASK,
     'weight' => 10,
@@ -231,7 +231,7 @@ function geshifilter_requirements($phase) {
       );
     }
     // check for filter conflicts
-    require_once('geshifilter.admin.inc');
+    require_once('geshifilter.conflicts.inc');
     if (geshifilter_admin_filter_conflicts(TRUE) > 0) {
       $requirements[] = array(
         'title' => 'GeSHi filter',
