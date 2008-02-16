@@ -107,11 +107,10 @@ class GeshiFilterTest extends DrupalTestCase {
     parent::tearDown();
   }
 
-
   /**
-   * helper function for testSpecialTags()
+   * Assert function for testing if GeSHi highlighting works
    */
-  function _testSpecialTags($open_tag, $source_code, $close_tag, $lang) {
+  function assertGeshiFilterHighlighting($open_tag, $source_code, $close_tag, $lang, $description) {
     // Create content.
     $edit = array(
       'title' => $this->randomName(32, 'pagetitle_'),
@@ -124,26 +123,51 @@ class GeshiFilterTest extends DrupalTestCase {
     $this->assertTrue($node, 'Node found in database. %s');
     // check if highlighting succeeded
     $highlighted = geshifilter_geshi_process($source_code, $lang);
-    $this->assertWantedRaw($highlighted,
-      t('Source code in @open_tag...@close_tag should work', array(
-        '@open_tag' => $open_tag, '@close_tag' => $close_tag
-      )));
+    $this->assertWantedRaw($highlighted, $description);
   }
 
   /**
    * Check if tags like [c++] and [c#] work
+   * Problem described in http://drupal.org/node/208720
    */
   function testSpecialTags() {
-    // enabled the tags
+    // Enabled the tags
     $this->drupalVariableSet('geshifilter_language_enabled_cpp', TRUE);
     $this->drupalVariableSet('geshifilter_language_tags_cpp', 'c++');
     $this->drupalVariableSet('geshifilter_language_enabled_csharp', TRUE);
     $this->drupalVariableSet('geshifilter_language_tags_csharp', 'c#');
-    // add nodes with source code
-    $this->_testSpecialTags('<c++>', "//C++ source code\nfor (int i=0; i<10; ++i) {\n  fun(i);\n}", '</c++>', 'cpp');
-    $this->_testSpecialTags('[c++]', "//C++ source code\nfor (int i=0; i<10; ++i) {\n  fun(i);\n}", '[/c++]', 'cpp');
-    $this->_testSpecialTags('<c#>', "//C# source code\nfor (int i=0; i<10; ++i) {\n  fun(i);\n}", '</c#>', 'csharp');
-    $this->_testSpecialTags('[c#]', "//C# source code\nfor (int i=0; i<10; ++i) {\n  fun(i);\n}", '[/c#]', 'csharp');
+    // Test the tags
+    $this->assertGeshiFilterHighlighting('<c++>', "//C++ source code\nfor (int i=0; i<10; ++i) {\n  fun(i);\n}", '</c++>',
+      'cpp', t('Source code in <c++>...</c++> should work'));
+    $this->assertGeshiFilterHighlighting('[c++]', "//C++ source code\nfor (int i=0; i<10; ++i) {\n  fun(i);\n}", '[/c++]',
+      'cpp', t('Source code in [c++]...[/c++] should work'));
+    $this->assertGeshiFilterHighlighting('<c#>', "//C# source code\nfor (int i=0; i<10; ++i) {\n  fun(i);\n}", '</c#>',
+      'csharp', t('Source code in <c#>...</c#> should work'));
+    $this->assertGeshiFilterHighlighting('[c#]', "//C# source code\nfor (int i=0; i<10; ++i) {\n  fun(i);\n}", '[/c#]',
+      'csharp', t('Source code in [c#]...[/c#] should work'));
   }
+
+  /**
+   * Test if tags like [cpp], [css], [csharp] aren't highjacked by [c]
+   */
+  function testPrefixTags() {
+    // enabled the tags
+    $this->drupalVariableSet('geshifilter_language_enabled_c', TRUE);
+    $this->drupalVariableSet('geshifilter_language_tags_c', 'c');
+    $this->drupalVariableSet('geshifilter_language_enabled_cpp', TRUE);
+    $this->drupalVariableSet('geshifilter_language_tags_cpp', 'cpp');
+    $this->drupalVariableSet('geshifilter_language_enabled_csharp', TRUE);
+    $this->drupalVariableSet('geshifilter_language_tags_csharp', 'csharp');
+    $this->drupalVariableSet('geshifilter_language_enabled_css', TRUE);
+    $this->drupalVariableSet('geshifilter_language_tags_css', 'css');
+    // Test the tags
+    $this->assertGeshiFilterHighlighting('<cpp>', "//C++ source code\nfor (int i=0; i<10; ++i) {\n  fun(i);\n}", '</cpp>',
+      'cpp', t('Source code in <cpp>...</cpp> should work when <c>...</c> is also enabled'));
+    $this->assertGeshiFilterHighlighting('<csharp>', "//C# source code\nfor (int i=0; i<10; ++i) {\n  fun(i);\n}", '</csharp>',
+      'csharp', t('Source code in <csharp>...</csharp> should work when <c>...</c> is also enabled'));
+    $this->assertGeshiFilterHighlighting('<css>', "//CSS source code\nbody {\n  color: black; text-align: right; \n}", '</css>',
+      'css', t('Source code in <css>...</css> should work when <c>...</c> is also enabled'));
+  }
+
 
 }
