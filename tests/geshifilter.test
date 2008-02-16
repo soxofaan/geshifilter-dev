@@ -110,20 +110,112 @@ class GeshiFilterTest extends DrupalTestCase {
   /**
    * Assert function for testing if GeSHi highlighting works
    */
-  function assertGeshiFilterHighlighting($open_tag, $source_code, $close_tag, $lang, $description) {
+  function assertGeshiFilterHighlighting($body, $check_list, $description) {
     // Create content.
     $edit = array(
-      'title' => $this->randomName(32, 'pagetitle_'),
-      'body' => $open_tag . $source_code . $close_tag,
+      'title' => $this->randomName(32, 'simpletest_pagetitle_'),
+      'body' => $body ."\n". $this->randomName(100),
       'format' => $this->input_format_id,
     );
+    // Post node
     $this->drupalPost('node/add/page', $edit, t('Save'));
     // check posted node
     $node = node_load(array('title' => $edit['title']));
     $this->assertTrue($node, 'Node found in database. %s');
     // check if highlighting succeeded
-    $highlighted = geshifilter_geshi_process($source_code, $lang);
-    $this->assertWantedRaw($highlighted, $description);
+    foreach ($check_list as $fragment) {
+      list($source_code, $lang, $line_numbering, $linenumbers_start, $inline_mode) = $fragment;
+      if (isset($lang)) {
+        // apply syntax highlighting
+        $source_code = geshifilter_geshi_process($source_code, $lang, $line_numbering, $linenumbers_start, $inline_mode);
+      }
+      $this->assertWantedRaw($source_code, $description);
+    }
+  }
+
+  /**
+   * Test the standard functionality of the generic tags
+   */
+  function testGenericTags() {
+    $this->drupalVariableSet('geshifilter_tags', 'code');
+    $this->drupalVariableSet('geshifilter_language_enabled_c', TRUE);
+    $this->drupalVariableSet('geshifilter_language_enabled_cpp', TRUE);
+    $this->drupalVariableSet('geshifilter_language_enabled_csharp', TRUE);
+    $this->drupalVariableSet('geshifilter_language_enabled_java', TRUE);
+
+    // body material
+    $source_code = "//C++-ish source code\nfor (int i=0; i<10; ++i) {\n  fun(i);\n  bar.foo(x, y);\n server->start(&pool); \n}";
+
+    // check language argument
+    $this->assertGeshiFilterHighlighting('<code type="cpp">'. $source_code .'</code>',
+      array(array($source_code, 'cpp', 0, 1, FALSE)),
+      t('Checking type="..." argument'));
+    $this->assertGeshiFilterHighlighting('<code lang="cpp">'. $source_code .'</code>',
+      array(array($source_code, 'cpp', 0, 1, FALSE)),
+      t('Checking lang="..." argument'));
+    $this->assertGeshiFilterHighlighting('<code language="cpp">'. $source_code .'</code>',
+      array(array($source_code, 'cpp', 0, 1, FALSE)),
+      t('Checking language="..." argument'));
+
+    // check some languages
+    $languages = array('c', 'cpp', 'java');
+    foreach ($languages as $lang) {
+      $this->assertGeshiFilterHighlighting('<code language="'. $lang .'">'. $source_code .'</code>',
+        array(array($source_code, $lang, 0, 1, FALSE)),
+        t('Checking language="@lang"', array('@lang' => $lang)));
+    }
+
+    // check line_numbering argument
+    $this->assertGeshiFilterHighlighting('<code type="cpp" linenumbers="off">'. $source_code .'</code>',
+      array(array($source_code, 'cpp', 0, 1, FALSE)),
+      t('Checking linenumbers="off" argument'));
+    $this->assertGeshiFilterHighlighting('<code type="cpp" linenumbers="normal">'. $source_code .'</code>',
+      array(array($source_code, 'cpp', 1, 1, FALSE)),
+      t('Checking linenumbers="normal" argument'));
+    $this->assertGeshiFilterHighlighting('<code type="cpp" start="27">'. $source_code .'</code>',
+      array(array($source_code, 'cpp', 1, 27, FALSE)),
+      t('Checking start="27" argument'));
+    $this->assertGeshiFilterHighlighting('<code type="cpp" linenumbers="fancy">'. $source_code .'</code>',
+      array(array($source_code, 'cpp', 5, 1, FALSE)),
+      t('Checking linenumbers="fancy" argument'));
+    $this->assertGeshiFilterHighlighting('<code type="cpp" fancy="3">'. $source_code .'</code>',
+      array(array($source_code, 'cpp', 3, 1, FALSE)),
+      t('Checking fancy="3" argument'));
+  }
+
+  /**
+   * Check if brackets work
+   */
+  function testBrackets() {
+    $this->drupalVariableSet('geshifilter_tags', 'code');
+    $this->drupalVariableSet('geshifilter_language_enabled_cpp', TRUE);
+
+    // body material
+    $source_code = "//C++ source code\nfor (int i=0; i<10; ++i) {\n  fun(i);\n  bar.foo(x, y);\n server->start(&pool); \n}";
+
+    $this->drupalVariableSet('geshifilter_brackets', GESHIFILTER_BRACKETS_BOTH);
+    $this->assertGeshiFilterHighlighting('<code language="cpp">'. $source_code .'</code>',
+      array(array($source_code, 'cpp', 0, 1, FALSE)),
+      t('Checking <foo> brackets style in GESHIFILTER_BRACKETS_BOTH mode'));
+    $this->assertGeshiFilterHighlighting('[code language="cpp"]'. $source_code .'[/code]',
+      array(array($source_code, 'cpp', 0, 1, FALSE)),
+      t('Checking [foo] brackets style in GESHIFILTER_BRACKETS_BOTH mode'));
+
+    $this->drupalVariableSet('geshifilter_brackets', GESHIFILTER_BRACKETS_ANGLE);
+    $this->assertGeshiFilterHighlighting('<code language="cpp">'. $source_code .'</code>',
+      array(array($source_code, 'cpp', 0, 1, FALSE)),
+      t('Checking <foo> brackets style in GESHIFILTER_BRACKETS_ANGLE mode'));
+    $this->assertGeshiFilterHighlighting('[code language="cpp"]'. $source_code .'[/code]',
+      array(array($source_code, NULL, 0, 1, FALSE)),
+      t('Checking [foo] brackets style in GESHIFILTER_BRACKETS_ANGLE mode'));
+
+    $this->drupalVariableSet('geshifilter_brackets', GESHIFILTER_BRACKETS_SQUARE);
+    $this->assertGeshiFilterHighlighting('<code language="cpp">'. $source_code .'</code>',
+      array(array($source_code, NULL, 0, 1, FALSE)),
+      t('Checking <foo> brackets style in GESHIFILTER_BRACKETS_SQUARE mode'));
+    $this->assertGeshiFilterHighlighting('[code language="cpp"]'. $source_code .'[/code]',
+      array(array($source_code, 'cpp', 0, 1, FALSE)),
+      t('Checking [foo] brackets style in GESHIFILTER_BRACKETS_SQUARE mode'));
   }
 
   /**
@@ -136,15 +228,15 @@ class GeshiFilterTest extends DrupalTestCase {
     $this->drupalVariableSet('geshifilter_language_tags_cpp', 'c++');
     $this->drupalVariableSet('geshifilter_language_enabled_csharp', TRUE);
     $this->drupalVariableSet('geshifilter_language_tags_csharp', 'c#');
+    // body material
+    $source_code = "//C++-ish source code\nfor (int i=0; i<10; ++i) {\n  fun(i);\n  bar.foo(x, y);\n server->start(&pool); \n}";
     // Test the tags
-    $this->assertGeshiFilterHighlighting('<c++>', "//C++ source code\nfor (int i=0; i<10; ++i) {\n  fun(i);\n}", '</c++>',
-      'cpp', t('Source code in <c++>...</c++> should work'));
-    $this->assertGeshiFilterHighlighting('[c++]', "//C++ source code\nfor (int i=0; i<10; ++i) {\n  fun(i);\n}", '[/c++]',
-      'cpp', t('Source code in [c++]...[/c++] should work'));
-    $this->assertGeshiFilterHighlighting('<c#>', "//C# source code\nfor (int i=0; i<10; ++i) {\n  fun(i);\n}", '</c#>',
-      'csharp', t('Source code in <c#>...</c#> should work'));
-    $this->assertGeshiFilterHighlighting('[c#]', "//C# source code\nfor (int i=0; i<10; ++i) {\n  fun(i);\n}", '[/c#]',
-      'csharp', t('Source code in [c#]...[/c#] should work'));
+    $this->assertGeshiFilterHighlighting('<c++>'. $source_code .'</c++>',
+      array(array($source_code, 'cpp', 0, 1, FALSE)),
+      t('Checking <c++>..</c++>'));
+    $this->assertGeshiFilterHighlighting('<c#>'. $source_code .'</c#>',
+      array(array($source_code, 'csharp', 0, 1, FALSE)),
+      t('Checking <c#>..</c#>'));
   }
 
   /**
@@ -158,15 +250,15 @@ class GeshiFilterTest extends DrupalTestCase {
     $this->drupalVariableSet('geshifilter_language_tags_cpp', 'cpp');
     $this->drupalVariableSet('geshifilter_language_enabled_csharp', TRUE);
     $this->drupalVariableSet('geshifilter_language_tags_csharp', 'csharp');
-    $this->drupalVariableSet('geshifilter_language_enabled_css', TRUE);
-    $this->drupalVariableSet('geshifilter_language_tags_css', 'css');
+    // body material
+    $source_code = "//C++-ish source code\nfor (int i=0; i<10; ++i) {\n  fun(i);\n  bar.foo(x, y);\n server->start(&pool); \n}";
     // Test the tags
-    $this->assertGeshiFilterHighlighting('<cpp>', "//C++ source code\nfor (int i=0; i<10; ++i) {\n  fun(i);\n}", '</cpp>',
-      'cpp', t('Source code in <cpp>...</cpp> should work when <c>...</c> is also enabled'));
-    $this->assertGeshiFilterHighlighting('<csharp>', "//C# source code\nfor (int i=0; i<10; ++i) {\n  fun(i);\n}", '</csharp>',
-      'csharp', t('Source code in <csharp>...</csharp> should work when <c>...</c> is also enabled'));
-    $this->assertGeshiFilterHighlighting('<css>', "//CSS source code\nbody {\n  color: black; text-align: right; \n}", '</css>',
-      'css', t('Source code in <css>...</css> should work when <c>...</c> is also enabled'));
+    $this->assertGeshiFilterHighlighting('<cpp>'. $source_code .'</cpp>',
+      array(array($source_code, 'cpp', 0, 1, FALSE)),
+      t('Source code in <cpp>...</cpp> should work when <c>...</c> is also enabled'));
+    $this->assertGeshiFilterHighlighting('<csharp>'. $source_code .'</csharp>',
+      array(array($source_code, 'csharp', 0, 1, FALSE)),
+      t('Source code in <csharp>...</csharp> should work when <c>...</c> is also enabled'));
   }
 
 
