@@ -367,6 +367,7 @@ function theme_geshifilter_per_language_settings($form) {
  * Helper function for clearing the appropriate filter cache entries
  */
 function _geshifilter_clear_filter_cache() {
+  $message = FALSE;
   // iterate over input formats
   foreach (filter_formats() as $format => $input_format) {
     // Get the filters in this input format
@@ -374,7 +375,12 @@ function _geshifilter_clear_filter_cache() {
     // look if GeSHi is enabled in this input format
     if (isset($filters['geshifilter/0'])) {
       cache_clear_all($format .':', 'cache_filter', TRUE);
+      $message = TRUE;
     }
+  }
+  // show a message that the filter cache was cleared
+  if ($message) {
+    drupal_set_message(t('GeSHi filter cleared the filter cache for the appropriate input formats.'));
   }
 }
 
