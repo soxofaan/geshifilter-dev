@@ -147,7 +147,7 @@ function geshifilter_admin_general_settings(&$form_state) {
     $form['geshifilter_styling']['geshifilter_css_mode'] = array(
       '#type' => 'radios',
       '#title' => t('CSS mode for syntax highlighting'),
-      '#description' => t('Inline CSS is easier to set up, does not depend on an external style sheets and is consequently more robust to copy/paste operations like content aggregation. However, usage of CSS classes and an external stylesheet (requires the public <a href="!filesystem">download method</a>) is however generally considered to be the better way of styling and requires much less HTML code and bandwith. (GeSHi documentation: !link).',
+      '#description' => t('Inline CSS is easier to set up, does not depend on an external style sheets and is consequently more robust to copy/paste operations like content aggregation. However, usage of CSS classes and an external stylesheet (requires the public <a href="!filesystem">download method</a>) is generally considered to be the better way of styling and requires much less HTML code and bandwith. (GeSHi documentation: !link).',
         array(
           '!link' => l('Using CSS Classes', 'http://qbnz.com/highlighter/geshi-doc.html#using-css-classes'),
           '!filesystem' => url('admin/settings/file-system'),
