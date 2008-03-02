@@ -161,8 +161,15 @@ function _geshifilter_replace_callback($match, $format) {
   foreach ($attribute_matches[1] as $a_key => $att_name) {
     $att_value = $attribute_matches[2][$a_key];
     // check for the language attributes
-    if (in_array($att_name, $language_attributes) && array_key_exists($att_value, $enabled_languages)) {
-      $lang = $att_value;
+    if (in_array($att_name, $language_attributes)) {
+      // map attribute value to geshi language code if possible
+      if (in_array($att_value, $language_tags)) {
+        $att_value = $tag_to_lang[$att_value];
+      }
+      // set language if extracted language is an enabled language
+      if (array_key_exists($att_value, $enabled_languages)) {
+        $lang = $att_value;
+      }
     }
     // check for line numbering related attributes
     // $line_numbering defines the line numbering mode:

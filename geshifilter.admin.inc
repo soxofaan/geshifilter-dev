@@ -288,9 +288,9 @@ function geshifilter_per_language_settings($format, $view, $add_checkbox, $add_t
     '#value' => array(),
   );
   $form['header']['#value'][] = t('Language');
-  $form['header']['#value'][] = t('Language code');
+  $form['header']['#value'][] = t('GeSHi language code');
   if ($add_tag_option) {
-    $form['header']['#value'][] = t('Tags');
+    $form['header']['#value'][] = t('Tag/language attribute value');
   }
   // table body
   $form['languages'] = array();

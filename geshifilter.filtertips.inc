@@ -49,15 +49,28 @@ function _geshifilter_filter_tips($delta, $format, $long = false) {
     // Options and tips
     $output .= '<p>'. t('Options and tips:') .'</p>';
     $items = array();
-    // enabled languages
-    $enabled_languages = array();
+
+    // info about language attribute to language mapping
+    $att_to_full = array();
     foreach ($languages as $langcode => $fullname) {
-      $enabled_languages[] = t('"<code>@langcode</code>" (for @fullname)', array('@langcode' => $langcode, '@fullname' => $fullname));
+      $att_to_full[$langcode] = $fullname;
     }
-    $items[] = t('The language for the generic syntax highlighting tags can be specified with one of the attribute(s): %attributes. The possible values are: !languages.', array('%attributes' => implode(', ', $lang_attributes), '!languages' => implode(', ', $enabled_languages)));
+    foreach ($tag_to_lang as $tag => $lang) {
+      $att_to_full[$tag] = $languages[$lang];
+    }
+    ksort($att_to_full);
+    $att_for_full = array();
+    foreach ($att_to_full as $att => $fullname) {
+      $att_for_full[] = t('"<code>@langcode</code>" (for @fullname)', array('@langcode' => $att, '@fullname' => $fullname));
+    }
+    $items[] = t('The language for the generic syntax highlighting tags can be specified with one of the attribute(s): %attributes. The possible values are: !languages.', array('%attributes' => implode(', ', $lang_attributes), '!languages' => implode(', ', $att_for_full)));
+
     // line numbering options
     $items[] = t('<em>Line numbering</em> can be enabled/disabled with the attribute "%linenumbers". Possible values are: "%off" for no line numbers, "%normal" for normal line numbers and "%fancy" for fancy line numbers (every n<sup>th</sup> line number highlighted). The start line number can be specified with the attribute "%start", which implicitly enables normal line numbering. For fancy line numbering the interval for the highlighted line numbers can be specified with the attribute "%fancy", which implicitly enables fancy line numbering.', array('%linenumbers' => GESHIFILTER_ATTRIBUTE_LINE_NUMBERING, '%off' => 'off', '%normal' => 'normal', '%fancy' => 'fancy', '%start' => GESHIFILTER_ATTRIBUTE_LINE_NUMBERING_START, '%fancy' => GESHIFILTER_ATTRIBUTE_FANCY_N));
+
+    // block versus inline
     $items[] = t('If the source code between the tags contains a newline (e.g. immediatly after the opening tag), the highlighted source code will be displayed as a code block. Otherwise it will be displayed inline.');
+
     if (_geshifilter_brackets($format) == GESHIFILTER_BRACKETS_BOTH) {
       $items[] = t('Beside the tag style "!angle" it is also possible to use "!bracket".' , array('!angle' => '<code>&lt;foo&gt;</code>', '!bracket' => '<code>[foo]</code>'));
     }
