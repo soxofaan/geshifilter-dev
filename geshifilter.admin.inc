@@ -41,11 +41,11 @@ function geshifilter_admin_general_settings(&$form_state) {
   // try to load GeSHi library and get version if successful
   $geshi_library = _geshifilter_check_geshi_library();
 
-  // GeSHi library settings
+  // GeSHi library settings (constant GESHI_VERSION is defined in GeSHi library)
   $form['geshifilter_library'] = array(
     '#type' => 'fieldset',
-    '#title' => t('GeSHi library'),
-    '#description' => t('The GeSHi filter requires the GeSHi library. You need to <a href="!geshi">download</a> and install it seperately.',
+    '#title' => defined('GESHI_VERSION') ? t('GeSHi library version @version detected', array('@version' => GESHI_VERSION)) : t('GeSHi library'),
+    '#description' => t('The GeSHi filter requires the GeSHi library (which needs to be <a href="!geshi">downloaded</a> and installed seperately).',
       array('!geshi' => url('http://qbnz.com/highlighter/'))),
     '#collapsible' => TRUE,
     '#collapsed' => $geshi_library['success'],
@@ -54,16 +54,11 @@ function geshifilter_admin_general_settings(&$form_state) {
     '#type' => 'textfield',
     '#title' => t('Path to GeSHi library'),
     '#default_value' => _geshifilter_get_geshi_dir(),
-    '#description' => t('Specify the path to the GeSHi library directory (which contains a file called <em>geshi.php</em>). After changing the path, it is necessary to save and refresh this settings page to see if GeSHi was successfully detected.')
+    '#description' => t('Specify the path to the GeSHi library directory (which contains a file called <em>geshi.php</em>).')
   );
   $form['geshifilter_library']['#after_build'] = array('geshifilter_admin_general_settings_after_build');
 
   if ($geshi_library['loaded']) {
-    // show detected version
-    $form['geshifilter_library']['geshifilter_detected_version'] = array(
-      '#type' => 'item',
-      '#value' => t('Detected version: %version', array('%version' => GESHI_VERSION)), // GESHI_VERSION is defined in GeSHi library
-    );
 
     // GeSHi filter tags and delimiters options
     $form['geshifilter_tag_options'] = array(
