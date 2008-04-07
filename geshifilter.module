@@ -80,6 +80,7 @@ function geshifilter_menu() {
   $items['admin/settings/geshifilter/general'] = array(
     'title' => 'General settings',
     'description' => 'General GeSHi filter settings.',
+    'access arguments' => array('administer site configuration'),
     'type' => MENU_DEFAULT_LOCAL_TASK,
   );
   $items['admin/settings/geshifilter/filterconflicts'] = array(
@@ -87,6 +88,7 @@ function geshifilter_menu() {
     'description' => 'Information on possible conflicts with other filters.',
     'file' => 'geshifilter.conflicts.inc',
     'page callback' => 'geshifilter_admin_filter_conflicts',
+    'access arguments' => array('administer site configuration'),
     'type' => MENU_LOCAL_TASK,
     'weight' => 10,
   );
@@ -103,30 +105,33 @@ function geshifilter_menu() {
   $items['admin/settings/geshifilter/languages/enabled'] = array(
     'title' => 'Enabled',
     'description' => 'Show the enabled languages',
-    'weight' => 3,
+    'access arguments' => array('administer site configuration'),
     'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 3,
   );
   $items['admin/settings/geshifilter/languages/all'] = array(
     'title' => 'All',
     'description' => 'Show all the available languages',
     'page arguments' => array('geshifilter_admin_per_language_settings', 4),
-    'weight' => 1,
+    'access arguments' => array('administer site configuration'),
     'type' => MENU_LOCAL_TASK,
+    'weight' => 1,
   );
   $items['admin/settings/geshifilter/languages/disabled'] = array(
     'title' => 'Disabled',
     'description' => 'Show the disabled languages',
     'page arguments' => array('geshifilter_admin_per_language_settings', 4),
-    'weight' => 6,
+    'access arguments' => array('administer site configuration'),
     'type' => MENU_LOCAL_TASK,
+    'weight' => 6,
   );
   // clear available languages cache
   $items['geshifilter/clearavailablelanguagescache'] = array(
     'title' => t('Clear available languages cache'),
     'file' => 'geshifilter.admin.inc',
     'page callback' => 'geshifilter_clear_available_languages_cache',
-    'type' => MENU_CALLBACK,
     'access arguments' => array('administer site configuration'),
+    'type' => MENU_CALLBACK,
   );
  return $items;
 }
