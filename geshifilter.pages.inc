@@ -33,7 +33,7 @@ function _geshifilter_prepare($format, $text) {
   $text = preg_replace_callback($pattern, '_geshifilter_prepare_callback', $text);
   if (_geshifilter_php_delimeters($format)) {
     // prepare < ?php ... ? > blocks
-    $text = preg_replace_callback('#[\[<](\?php|\?PHP|%)(.+?)(\?|%)[\]>]#s', '_geshifilter_prepare_php_callback', $text);
+    $text = preg_replace_callback('#[\[<](\?php|\?PHP|%)(.+?)((\?|%)[\]>]|$)#s', '_geshifilter_prepare_php_callback', $text);
   }
   return $text;
 }
