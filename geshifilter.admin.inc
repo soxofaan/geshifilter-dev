@@ -189,6 +189,15 @@ function geshifilter_admin_general_settings_after_build($form, &$form_state) {
  * Submit function for admin settings
  */
 function geshifilter_admin_general_settings_submit($form, &$form_state) {
+  // Cache of available languages should be cleared when GeSHi library dir changes
+  // _geshifilter_get_geshi_dir() returns the new value set by
+  // system_settings_form_submit() which runs before
+  // geshifilter_admin_general_settings_submit(),
+  // $form['geshifilter_library']['geshifilter_geshi_dir']['#default_value'] is
+  // the old value
+  if (_geshifilter_get_geshi_dir() != $form['geshifilter_library']['geshifilter_geshi_dir']['#default_value']) {
+    variable_del('geshifilter_available_languages_cache');
+  }
   // Regenerate language_css
   // Note that _geshifilter_css_mode() will use variable_get('geshifilter_css_mode')
   // which is alread set to $form_state['values']['geshifilter_css_mode'] by
@@ -383,7 +392,7 @@ function _geshifilter_clear_filter_cache() {
  * callback function for clearing the available languages cache
  */
 function geshifilter_clear_available_languages_cache() {
-  variable_del('geshifilter_available_languages');
+  variable_del('geshifilter_available_languages_cache');
   drupal_set_message('Flushed cache of available languages.');
   drupal_goto();
 }

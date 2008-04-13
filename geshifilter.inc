@@ -61,7 +61,7 @@ function _geshifilter_check_geshi_library($use_cache=TRUE, $geshi_dir=NULL, $loa
  */
 function _geshifilter_get_available_languages() {
   // try to get it from cache (database actually)
-  $available_languages = variable_get('geshifilter_available_languages', NULL);
+  $available_languages = variable_get('geshifilter_available_languages_cache', NULL);
   if ($available_languages === NULL) {
     // not in cache: build the array of available_languages
     $geshi_library = _geshifilter_check_geshi_library();
@@ -83,7 +83,7 @@ function _geshifilter_get_available_languages() {
       }
       ksort($available_languages);
       // save array to database
-      variable_set('geshifilter_available_languages', $available_languages);
+      variable_set('geshifilter_available_languages_cache', $available_languages);
     }
   }
   return $available_languages;
