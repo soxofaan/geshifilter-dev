@@ -29,6 +29,7 @@ function _geshifilter_filter_settings($format) {
       '#value' => '<p>'. t('GeSHi filter is configured to use global tag settings. For separate settings per input format, enable this option in the <a href="!geshi_admin_url">general GeSHi filter settings</a>.', array('!geshi_admin_url' => url('admin/settings/geshifilter'))) .'</p>'
     );
   }
+  $form['#validate'][] = 'geshifilter_per_language_settings_validate';
   return $form;
 }
 
@@ -228,9 +229,70 @@ function geshifilter_admin_per_language_settings($form_state, $view = 'enabled')
   );
   // make it a system settings form
   $form = system_settings_form($form);
-  // set custom submit handlers
+  // set custom validate and submit handlers
+  $form['#validate'][] = 'geshifilter_per_language_settings_validate';
   $form['#submit'][] = 'geshifilter_admin_per_language_settings_submit';
   return $form;
+}
+
+/**
+ * Validate function for per language settings
+ *
+ * Check that language tags differ between languages and fro the generic tags.
+ */
+function geshifilter_per_language_settings_validate($form, &$form_state) {
+
+  // if we're coming from the _geshifilter_filter_settings (sub)form, we should
+  // take the input format into account
+  $format = isset($form_state['values']['format']) ? $form_state['values']['format'] : NULL;
+  $f = ($format === NULL) ? '' : "_$format";
+
+  // language tags should differ from each other
+  $languages = _geshifilter_get_available_languages();
+  foreach ($languages as $language1 => $language_data1) {
+    // iterate over the enabled languages: skip disabled ones
+    $field = "geshifilter_language_enabled_{$language1}";
+    if (!(isset($form_state['values'][$field]) ? $form_state['values'][$field] : variable_get($field, FALSE))) {
+      continue;
+    }
+    // get the associated tags as $tags1
+    $field = "geshifilter_language_tags_{$language1}{$f}";
+    if (isset($form_state['values'][$field])) {
+      $tags1 = _geshifilter_tag_split($form_state['values'][$field]);
+    }
+    else {
+      $tags1 = _geshifilter_tag_split(geshifilter_language_tags($language1, $format));
+    }
+    // also include the generic tags
+    $field = "geshifilter_tags{$f}";
+    $generic_tags = isset($form_state['values'][$field]) ? $form_state['values'][$field] : geshifilter_tags($format);
+    $tags1 = array_merge($tags1, _geshifilter_tag_split($generic_tags));
+
+    // check that other languages do not use these tags
+    foreach ($languages as $language2 => $language_data2) {
+      // check these tags against the tags of other enabled languages
+      $field = "geshifilter_language_enabled_{$language2}";
+      if ($language1 == $language2 || !(isset($form_state['values'][$field]) ? $form_state['values'][$field] : variable_get($field, FALSE))) {
+        continue;
+      }
+      // get tags for $language2, or skip when not in $form_state['values']
+      $field = "geshifilter_language_tags_{$language2}{$f}";
+      if (isset($form_state['values'][$field])) {
+        $tags2 = _geshifilter_tag_split($form_state['values'][$field]);
+      }
+      else {
+        continue;
+      }
+      // and now we can check tags1 against tags2
+      foreach ($tags1 as $tag1) {
+        foreach ($tags2 as $tag2) {
+          if ($tag1 == $tag2) {
+            form_set_error("geshifilter_language_tags_{$language2}{$f}",  t('The language tags should differ between languages and from the generic tags.'));
+          }
+        }
+      }
+    }
+  }
 }
 
 /**
