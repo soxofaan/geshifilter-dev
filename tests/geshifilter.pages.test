@@ -27,7 +27,7 @@ class GeshiFilterTest extends DrupalTestCase {
   function get_info() {
     return array(
       'name'  => t('GeSHi input filter'),
-      'desc'  => t('Test the GeSHi input filter.'),
+      'desc'  => t('Test the input filter capabilities of the GeSHi filter.'),
       'group' => t('GeSHi module'),
     );
   }
@@ -43,18 +43,14 @@ class GeshiFilterTest extends DrupalTestCase {
 
     // Make sure that Geshi filter module is enabled.
     $this->drupalModuleEnable('geshifilter');
-    // Disable CAPTCHA module so users can post without trouble (just in case)
-    $this->drupalModuleDisable('captcha');
 
     // Create a filter admin user
     $permissions = array(
       'administer filters',
-      'access devel information',
     );
     $this->filter_admin_user = $this->drupalCreateUserRolePerm($permissions);
     // Create a normal user for page creation
     $permissions = array(
-      'access devel information',
       'edit own page content',
       'create page content'
     );
@@ -80,7 +76,7 @@ class GeshiFilterTest extends DrupalTestCase {
     $this->drupalVariableSet('geshifilter_default_line_numbering', GESHIFILTER_LINE_NUMBERS_DEFAULT_NONE);
 
     // log out as filter admin
-    $this->drupalGet(url('logout', array('absolute' => TRUE)));
+    $this->drupalGet('logout');
 
     // log in as the normal user for adding pages
     $this->drupalLoginUser($this->normal_user);
@@ -97,7 +93,7 @@ class GeshiFilterTest extends DrupalTestCase {
    */
   function tearDown() {
     // log in as filter admin
-    $this->drupalGet(url('logout', array('absolute' => TRUE)));
+    $this->drupalGet('logout');
     $this->drupalLoginUser($this->filter_admin_user);
 
     // remove input format
