@@ -100,7 +100,7 @@ function _geshifilter_get_enabled_languages() {
     $enabled_languages = array();
     $languages = _geshifilter_get_available_languages();
     foreach ($languages as $language => $language_data) {
-      if (variable_get("geshifilter_language_enabled_{$language}", FALSE)) {
+      if (variable_get('geshifilter_language_enabled_' . $language, FALSE)) {
         $enabled_languages[$language] = $language_data['fullname'];
       }
     }

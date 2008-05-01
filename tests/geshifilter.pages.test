@@ -271,9 +271,10 @@ class GeshiFilterTest extends DrupalTestCase {
     $this->drupalVariableSet('geshifilter_language_tags_cpp', 'cpp');
     // Set default highlighting mode to "do nothing".
     $this->drupalVariableSet('geshifilter_default_highlighting', GESHIFILTER_DEFAULT_DONOTHING);
-    // Body material with some illegal characters ('<' and '&')
+    // Body material with some characters ('<' and '&') that would be escaped
+    // except in "do nothing" mode
     $source_code = "//C++-ish source code\nfor (int i=0; i!=10; ++i) {\n  fun(i);\n  bar.foo(x, y);\n}";
-    //
+    // Tests
     $this->assertGeshiFilterHighlighting('<code>'. $source_code .'</code>',
       array(array('<code>'. $source_code .'</code>', FALSE, 0, 1, FALSE)),
       t('Do nothing mode should not touch given source code')
