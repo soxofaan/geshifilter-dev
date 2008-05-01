@@ -137,24 +137,25 @@ function geshifilter_admin_general_settings(&$form_state) {
       '#title' => t('Styling, layout and CSS'),
       '#collapsible' => TRUE,
     );
-    // CSS mode: CSS classes + external stylesheet is only possible with public downloads in a writable files directory
-    $directory = file_directory_path();
-    $external_css_possible = is_dir($directory) && is_writable($directory) && (variable_get('file_downloads', FILE_DOWNLOADS_PUBLIC) == FILE_DOWNLOADS_PUBLIC);
+
+    // CSS mode
     $form['geshifilter_styling']['geshifilter_css_mode'] = array(
       '#type' => 'radios',
       '#title' => t('CSS mode for syntax highlighting'),
-      '#description' => t('Inline CSS is easier to set up, does not depend on an external style sheets and is consequently more robust to copy/paste operations like content aggregation. However, usage of CSS classes and an external stylesheet (requires the public <a href="!filesystem">download method</a>) is generally considered to be the better way of styling and requires much less HTML code and bandwith. (GeSHi documentation: !link).',
-        array(
-          '!link' => l('Using CSS Classes', 'http://qbnz.com/highlighter/geshi-doc.html#using-css-classes'),
-          '!filesystem' => url('admin/settings/file-system'),
-        )),
-      '#disabled' => !$external_css_possible,
-      '#default_value' => $external_css_possible ? intval(variable_get('geshifilter_css_mode', GESHIFILTER_CSS_INLINE)) : GESHIFILTER_CSS_INLINE,
       '#options' => array(
         GESHIFILTER_CSS_INLINE => t('Inline CSS style attributes.'),
-        GESHIFILTER_CSS_CLASSES => t('CSS classes and external CSS style sheet.'),
+        GESHIFILTER_CSS_CLASSES_AUTOMATIC => t('Use CSS classes and an automatically managed external CSS style sheet.'),
+        GESHIFILTER_CSS_CLASSES_ONLY => t('Only add CSS classes to the markup.'),
       ),
+      '#default_value' => variable_get('geshifilter_css_mode', GESHIFILTER_CSS_INLINE),
+      '#description' => t('Inline CSS is easier to set up, does not depend on an external style sheets and is consequently more robust to copy/paste operations like content aggregation. However, usage of CSS classes and an external stylesheet requires much less markup code and bandwidth. The external style sheet can be managed automatically by the GeSHi filter module, but this feature requires the public <a href="!filesystem">download method</a>. If the GeSHi filter is configured to only add the CSS classes to the markup, the administrator or themer is responsible for adding the appropriate CSS rules to the pages (e.g. based on <a href="!cssdefaults">these defaults</a>). (GeSHi documentation: !geshidoc).',
+        array(
+          '!geshidoc' => l('Using CSS Classes', 'http://qbnz.com/highlighter/geshi-doc.html#using-css-classes'),
+          '!filesystem' => url('admin/settings/file-system'),
+          '!cssdefaults' => url('admin/settings/geshifilter/generate_css'),
+        )),
     );
+
     // Code container
     $form['geshifilter_styling']['geshifilter_code_container'] = array(
       '#type' => 'radios',
@@ -170,20 +171,33 @@ function geshifilter_admin_general_settings(&$form_state) {
       '#default_value' => variable_get('geshifilter_code_container', GESHI_HEADER_PRE),
     );
   }
-  // make it a system settings form
+  // Make it a system settings form.
   $form  = system_settings_form($form);
-  // set custom submit handlers (to be run after system_settings_form submit)
+  // Set custom validate/submit handlers (to be run after system_settings_form submit).
+  $form['#validate'][] = 'geshifilter_admin_general_settings_validate';
   $form['#submit'][] = 'geshifilter_admin_general_settings_submit';
   return $form;
 }
 
+/**
+ * After build function for admin settings
+ */
 function geshifilter_admin_general_settings_after_build($form, &$form_state) {
   $geshi_library = _geshifilter_check_geshi_library(FALSE, $form_state['values']['geshifilter_geshi_dir'], FALSE);
   if (!$geshi_library['success']) {
     form_set_error('geshifilter_geshi_dir', $geshi_library['message']);
-    unset($form['geshifilter_detected_version']);
   }
   return $form;
+}
+
+/**
+ * Validate function for admin settings
+ */
+function geshifilter_admin_general_settings_validate($form, &$form_state) {
+  // Check if automatically managed style sheet is posible
+  if ($form_state['values']['geshifilter_css_mode'] == GESHIFILTER_CSS_CLASSES_AUTOMATIC && !_geshifilter_managed_external_stylesheet_possible()) {
+    form_set_error('geshifilter_css_mode', t('GeSHi filter can not automatically manage an external CSS style sheet when the download method is private.'));
+  }
 }
 
 /**
@@ -200,11 +214,11 @@ function geshifilter_admin_general_settings_submit($form, &$form_state) {
     variable_del('geshifilter_available_languages_cache');
   }
   // Regenerate language_css
-  // Note that _geshifilter_css_mode() will use variable_get('geshifilter_css_mode')
-  // which is alread set to $form_state['values']['geshifilter_css_mode'] by
+  // Note the use of variable_get('geshifilter_css_mode') which is alread set
+  // to $form_state['values']['geshifilter_css_mode'] by
   // system_settings_form_submit, which is run before this submit handler.
-  if (_geshifilter_css_mode() == GESHIFILTER_CSS_CLASSES) {
-    _geshifilter_generate_languages_css();
+  if (variable_get('geshifilter_css_mode', GESHIFILTER_CSS_INLINE) == GESHIFILTER_CSS_CLASSES_AUTOMATIC) {
+    _geshifilter_generate_languages_css_file();
   }
   _geshifilter_clear_filter_cache();
 }
@@ -227,7 +241,7 @@ function geshifilter_admin_per_language_settings($form_state, $view = 'enabled')
     '#type' => 'markup',
     '#value' => '<p>'. l(t('Flush cache of available languages'), 'geshifilter/clearavailablelanguagescache', array('query' => drupal_get_destination())) .'</p>',
   );
-  // make it a system settings form
+  // Make it a system settings form.
   $form = system_settings_form($form);
   // set custom validate and submit handlers
   $form['#validate'][] = 'geshifilter_per_language_settings_validate';
@@ -300,8 +314,8 @@ function geshifilter_per_language_settings_validate($form, &$form_state) {
  */
 function geshifilter_admin_per_language_settings_submit($form, &$form_state) {
   // regenerate language_css
-  if (_geshifilter_css_mode() == GESHIFILTER_CSS_CLASSES) {
-    _geshifilter_generate_languages_css();
+  if (variable_get('geshifilter_css_mode', GESHIFILTER_CSS_INLINE) == GESHIFILTER_CSS_CLASSES_AUTOMATIC) {
+    _geshifilter_generate_languages_css_file();
   }
   _geshifilter_clear_filter_cache();
 }
@@ -317,7 +331,7 @@ function _geshifilter_general_highlight_tags_settings($format=NULL) {
     '#type' => 'textfield',
     '#title' => t('Generic syntax highlighting tags'),
     '#default_value' => geshifilter_tags($format),
-    '#description' => t('Tags that should activate the GeSHi syntax highlighting. Specify a space-separated list of tagnames.')
+    '#description' => t('Tags that should activate the GeSHi syntax highlighting. Specify a space-separated list of tagnames.'),
   );
   // tag style
   $form["geshifilter_brackets$f"] = array(
@@ -460,25 +474,45 @@ function geshifilter_clear_available_languages_cache() {
 }
 
 /**
+ * Helper function for generating the CSS rules
+ *
+ * @return string with the CSS rules
+ */
+function _geshifilter_generate_languages_css_rules() {
+  $output = '';
+  $geshi_library = _geshifilter_check_geshi_library();
+  if ($geshi_library['loaded']) {
+    require_once('geshifilter.pages.inc');
+    $languages = _geshifilter_get_enabled_languages();
+    foreach ($languages as $langcode => $language_full_name) {
+      // create GeSHi object
+      $geshi = _geshifilter_GeSHi_factory('', $langcode);
+      _geshifilter_override_geshi_defaults($geshi, $langcode);
+      // add CSS rules for current language
+      $output .= $geshi->get_stylesheet(FALSE) ."\n";
+      // release GeSHi object
+      unset($geshi);
+    }
+  }
+  else {
+    drupal_set_message(t('Error while generating CSS rules: could not load GeSHi library.'), 'error');
+  }
+  return $output;
+}
+
+/**
  * Function for generating the external stylesheet.
  */
-function _geshifilter_generate_languages_css() {
+function _geshifilter_generate_languages_css_file() {
   $languages = _geshifilter_get_enabled_languages();
   // create files/geshifilter directory if not already available
   $path = file_directory_path() .'/geshifilter';
   file_check_directory($path, FILE_CREATE_DIRECTORY);
-  // make stylesheet file name (depends on enabled languages)
+  // Make stylesheet file name (depends on enabled languages).
   $stylesheet_file = $path .'/geshifilter-languages-'. substr(md5(serialize($languages)), 0, 8) .'.css';
   if (!file_exists($stylesheet_file)) {
-    require_once('geshifilter.pages.inc');
     // build stylesheet
-    $stylesheet = '';
-    foreach ($languages as $langcode => $language_full_name) {
-      $geshi = _geshifilter_geshi_factory('', $langcode);
-      _geshifilter_override_geshi_defaults($geshi, $langcode);
-      $stylesheet .= $geshi->get_stylesheet(FALSE) ."\n";
-      unset($geshi);
-    }
+    $stylesheet = _geshifilter_generate_languages_css_rules();
     // save stylesheet
     $ret = file_save_data($stylesheet, $stylesheet_file, FILE_EXISTS_REPLACE);
     if ($ret) {

@@ -9,8 +9,13 @@
 define('GESHIFILTER_DEFAULT_PLAINTEXT', 'GESHIFILTER_DEFAULT_PLAINTEXT');
 define('GESHIFILTER_DEFAULT_DONOTHING', 'GESHIFILTER_DEFAULT_DONOTHING');
 
+// GeSHi CSS modes
+// Inline CSS
 define('GESHIFILTER_CSS_INLINE', 1);
-define('GESHIFILTER_CSS_CLASSES', 2);
+// Usage of CSS classes and an automatically managaged external stylesheet
+define('GESHIFILTER_CSS_CLASSES_AUTOMATIC', 2);
+// Only add CSS classes to markup, admin/themer is responsible for defining the CSS rules
+define('GESHIFILTER_CSS_CLASSES_ONLY', 3);
 
 define('GESHIFILTER_ATTRIBUTES_LANGUAGE', 'type lang language');
 define('GESHIFILTER_ATTRIBUTE_LINE_NUMBERING', 'linenumbers');
@@ -133,17 +138,15 @@ function geshifilter_menu() {
     'access arguments' => array('administer site configuration'),
     'type' => MENU_CALLBACK,
   );
+  // callback for generating CSS rules
+  $items['admin/settings/geshifilter/generate_css'] = array(
+    'page callback' => 'geshifilter_generate_language_css_rules',
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_CALLBACK,
+  );
  return $items;
 }
 
-/**
- * helper function for getting the CSS mode (considering the download method).
- */
-function _geshifilter_css_mode() {
-  $directory = file_directory_path();
-  $external_css_possible = is_dir($directory) && is_writable($directory) && (variable_get('file_downloads', FILE_DOWNLOADS_PUBLIC) == FILE_DOWNLOADS_PUBLIC);
-  return $external_css_possible ? intval(variable_get('geshifilter_css_mode', GESHIFILTER_CSS_INLINE)) : GESHIFILTER_CSS_INLINE;
-}
 
 /**
  * Implementation of hook_init()
@@ -151,7 +154,7 @@ function _geshifilter_css_mode() {
 function geshifilter_init() {
   // Since the filtered content is cached, it is not possible to know on which
   // pages the css file is actually needed. Thus it is included on all pages.
-  if (_geshifilter_css_mode() == GESHIFILTER_CSS_CLASSES) {
+  if (variable_get('geshifilter_css_mode', GESHIFILTER_CSS_INLINE) == GESHIFILTER_CSS_CLASSES_AUTOMATIC) {
     if ($stylesheet_file = variable_get('geshifilter_languages_css', NULL)) {
       drupal_add_css($stylesheet_file);
     }
@@ -235,6 +238,18 @@ function geshifilter_requirements($phase) {
         'severity' => REQUIREMENT_OK,
       );
     }
+
+    // Warn if GeSHi filter is configured to automatically managed external stylesheet when it's not possible
+    if (variable_get('geshifilter_css_mode', GESHIFILTER_CSS_INLINE) == GESHIFILTER_CSS_CLASSES_AUTOMATIC && !_geshifilter_managed_external_stylesheet_possible()) {
+      $requirements[] = array(
+        'title' => 'GeSHi filter CSS mode',
+        'value' => t('GeSHi filter can not automatically manage an external style sheet when the download method is private.'),
+        'severity' => REQUIREMENT_ERROR,
+        'description' => t('Change the CSS mode of the <a href="!geshi">GeSHi filter</a> or change the <a href="!filesystem">download mode</a> to public.',
+          array('!geshi' => url('admin/settings/geshifilter'), '!filesystem' => url('admin/settings/file-system'))),
+      );
+    }
+
     // check for filter conflicts
     require_once('geshifilter.conflicts.inc');
     if (geshifilter_admin_filter_conflicts(TRUE) > 0) {
@@ -247,4 +262,26 @@ function geshifilter_requirements($phase) {
     }
   }
   return $requirements;
+}
+
+
+/**
+ * Helper function for checking if an automatically managed style sheet is possible
+ *
+ * @return boolean indicating if an automatically managed style sheet is possible
+ */
+function _geshifilter_managed_external_stylesheet_possible() {
+  $directory = file_directory_path();
+  return is_dir($directory) && is_writable($directory) && (variable_get('file_downloads', FILE_DOWNLOADS_PUBLIC) == FILE_DOWNLOADS_PUBLIC);
+}
+
+/**
+ * Callback function for generating the CSS rules for the syntax highlighting
+ */
+function geshifilter_generate_language_css_rules() {
+  require_once('geshifilter.admin.inc');
+  drupal_set_header("Content-type: text/css");
+  $output = _geshifilter_generate_languages_css_rules();
+  print($output);
+  exit();
 }

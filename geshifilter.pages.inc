@@ -308,7 +308,8 @@ function geshifilter_geshi_process($source_code, $lang, $line_numbering=0, $line
   $geshi = _geshifilter_geshi_factory($source_code, $lang);
 
   // CSS mode
-  if (_geshifilter_css_mode() == GESHIFILTER_CSS_CLASSES) {
+  $ccs_mode = variable_get('geshifilter_css_mode', GESHIFILTER_CSS_INLINE);
+  if ($ccs_mode == GESHIFILTER_CSS_CLASSES_AUTOMATIC || $ccs_mode == GESHIFILTER_CSS_CLASSES_ONLY) {
     $geshi->enable_classes(TRUE);
   }
   _geshifilter_override_geshi_defaults($geshi, $lang);
