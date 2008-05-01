@@ -4,6 +4,87 @@
 require_once('geshifilter.inc');
 
 /**
+ * Helper function for parsing the attributes of GeSHi code tags
+ * to get the settings for language and line numbers.
+ *
+ * @param $attributes string with the attributes
+ * @param $format the concerning input format
+ * @return array of settings with fields 'language', 'line_numbering', 'linenumbers_start'
+ */
+function _geshifilter_parse_attributes($attributes, $format) {
+  // Initial values.
+  $lang = NULL;
+  $line_numbering = NULL;
+  $linenumbers_start = NULL;
+
+  // Get the possible tags and languages.
+  list($generic_code_tags, $language_tags, $tag_to_lang) = _geshifilter_get_tags($format);
+
+  $language_attributes = _geshifilter_whitespace_explode(GESHIFILTER_ATTRIBUTES_LANGUAGE);
+  $attributes_preg_string = implode('|', array_merge(
+    $language_attributes,
+    array(GESHIFILTER_ATTRIBUTE_LINE_NUMBERING, GESHIFILTER_ATTRIBUTE_LINE_NUMBERING_START, GESHIFILTER_ATTRIBUTE_FANCY_N)
+  ));
+  $enabled_languages = _geshifilter_get_enabled_languages();
+
+  // Parse $attributes to an array $attribute_matches with:
+  // $attribute_matches[0][xx] .... fully matched string, e.g. 'language="python"'
+  // $attribute_matches[1][xx] .... param name, e.g. 'language'
+  // $attribute_matches[2][xx] .... param value, e.g. 'python'
+  preg_match_all('#('. $attributes_preg_string .')="?([^\s"]*)"?#', $attributes, $attribute_matches);
+
+  foreach ($attribute_matches[1] as $a_key => $att_name) {
+    // get attribute value
+    $att_value = $attribute_matches[2][$a_key];
+
+    // Check for the language attributes.
+    if (in_array($att_name, $language_attributes)) {
+      // Try first to map the attribute value to geshi language code.
+      if (in_array($att_value, $language_tags)) {
+        $att_value = $tag_to_lang[$att_value];
+      }
+      // Set language if extracted language is an enabled language.
+      if (array_key_exists($att_value, $enabled_languages)) {
+        $lang = $att_value;
+      }
+    }
+
+    // Check for line numbering related attributes.
+    // $line_numbering defines the line numbering mode:
+    // 0: no line numbering
+    // 1: normal line numbering
+    // n>= 2: fancy line numbering every nth line
+    elseif ($att_name == GESHIFILTER_ATTRIBUTE_LINE_NUMBERING) {
+      switch (strtolower($att_value)) {
+        case "off":
+          $line_numbering = 0;
+          break;
+        case "normal":
+          $line_numbering = 1;
+          break;
+        case "fancy":
+          $line_numbering = 5;
+          break;
+      }
+    }
+    elseif ($att_name == GESHIFILTER_ATTRIBUTE_FANCY_N) {
+      $att_value = (int)($att_value);
+      if ($att_value >= 2) {
+        $line_numbering = $att_value;
+      }
+    }
+    elseif ($att_name == GESHIFILTER_ATTRIBUTE_LINE_NUMBERING_START) {
+      if ($line_numbering < 1) {
+        $line_numbering = 1;
+      }
+      $linenumbers_start = (int)($att_value);
+    }
+  }
+  // Return parsed results.
+  return array('language' => $lang, 'line_numbering' => $line_numbering, 'linenumbers_start' => $linenumbers_start);
+}
+
+/**
  * geshifilter_filter callback for preparing input text.
  */
 function _geshifilter_prepare($format, $text) {
@@ -30,7 +111,7 @@ function _geshifilter_prepare($format, $text) {
   }
   // replace the code container tag brackets
   // and prepare the container content (newline and angle bracket protection)
-  $text = preg_replace_callback($pattern, '_geshifilter_prepare_callback', $text);
+  $text = preg_replace_callback($pattern, create_function('$match', "return _geshifilter_prepare_callback(\$match, $format);"), $text);
   if (_geshifilter_php_delimeters($format)) {
     // prepare < ?php ... ? > blocks
     $text = preg_replace_callback('#[\[<](\?php|\?PHP|%)(.+?)((\?|%)[\]>]|$)#s', '_geshifilter_prepare_php_callback', $text);
@@ -47,34 +128,49 @@ function _geshifilter_prepare($format, $text) {
  * Escapes the tricky characters like angle brackets with check_plain() to
  * prevent messing up by other filters like the HTML filter.
  */
-function _geshifilter_prepare_callback($match) {
+function _geshifilter_prepare_callback($match, $format) {
+  // $match[0]: complete matched string
+  // $match[1]: opening bracket ('<' or '[')
+  // $match[2]: tag
+  // $match[3] and $match[4]: attributes
+  // $match[5]: closing bracket
+  // $match[6]: source code
+  // $match[7]: closing tag
+  $tag_name = $match[2];
+  $tag_attributes = $match[3];
+  $content = $match[6];
+
   // get the default highlighting mode
   $lang = variable_get('geshifilter_default_highlighting', GESHIFILTER_DEFAULT_PLAINTEXT);
   if ($lang == GESHIFILTER_DEFAULT_DONOTHING) {
     // If the default highlighting mode is GESHIFILTER_DEFAULT_DONOTHING
-    // and there is no language attribute, we should not do any escaping in this
-    // prepare phase, so that other filters can do their thing.
-    $language_attributes = _geshifilter_whitespace_explode(GESHIFILTER_ATTRIBUTES_LANGUAGE);
+    // and there is no language set (with language tag or language attribute),
+    // we should not do any escaping in this prepare phase,
+    // so that other filters can do their thing.
     $enabled_languages = _geshifilter_get_enabled_languages();
-    $attributes_preg_string = implode('|', $language_attributes);
-    // parse attributes
-    preg_match_all('#('. $attributes_preg_string .')="?([^\s"]*)"?#', $match[2], $attribute_matches);
-    foreach ($attribute_matches[1] as $a_key => $att_name) {
-      $att_value = $attribute_matches[2][$a_key];
-      // check for the language attributes
-      if (in_array($att_name, $language_attributes) && array_key_exists($att_value, $enabled_languages)) {
-        $lang = $att_value;
+
+    // Usage of language tag?
+    list($generic_code_tags, $language_tags, $tag_to_lang) = _geshifilter_get_tags($format);
+    if (isset($tag_to_lang[$tag_name]) && isset($enabled_languages[$tag_to_lang[$tag_name]])) {
+      $lang = $tag_to_lang[$tag_name];
+    }
+    // Usage of language attribute?
+    else {
+      // Get additional settings from the tag attributes.
+      $settings = _geshifilter_parse_attributes($tag_attributes, $format);
+      if ($settings['language'] && isset($enabled_languages[$settings['language']])) {
+        $lang = $settings['language'];
       }
     }
+    // If no language was set: prevent escaping and return original string
     if ($lang == GESHIFILTER_DEFAULT_DONOTHING) {
-      // no language set by attributes: prevent escaping and return original string
       return $match[0];
     }
   }
   // return escaped code block
-  return '[geshifilter-'. $match[2] . $match[3] .']'
-    . str_replace(array("\r", "\n"), array('', '&#10;'), check_plain($match[6]))
-    .'[/geshifilter-'. $match[2] .']';
+  return '[geshifilter-'. $tag_name . $tag_attributes .']'
+    . str_replace(array("\r", "\n"), array('', '&#10;'), check_plain($content))
+    .'[/geshifilter-'. $tag_name .']';
 }
 
 /**
@@ -112,6 +208,7 @@ function _geshifilter_process($format, $text) {
   return $text;
 }
 
+
 /**
  * preg_replace_callback callback
  */
@@ -125,91 +222,42 @@ function _geshifilter_replace_callback($match, $format) {
   $tag_attributes = $match[2];
   $source_code = $match[3];
 
-  // Undo linebreak and escaping from preparation phase
+  // Undo linebreak and escaping from preparation phase.
   $source_code = decode_entities($source_code);
 
-  // get the possible tags and languages
+  // Initialize to default settings.
+  $lang = variable_get('geshifilter_default_highlighting', GESHIFILTER_DEFAULT_PLAINTEXT);
+  $line_numbering = variable_get('geshifilter_default_line_numbering', GESHIFILTER_LINE_NUMBERS_DEFAULT_NONE);
+  $linenumbers_start = 1;
+
+  // Determine language based on tag name if possible.
   list($generic_code_tags, $language_tags, $tag_to_lang) = _geshifilter_get_tags($format);
   if (variable_get('geshifilter_enable_php_delimiters', FALSE)) {
     $language_tags[] = 'questionmarkphp';
     $tag_to_lang['questionmarkphp'] = 'php';
   }
-
-  $enabled_languages = _geshifilter_get_enabled_languages();
-
-  $language_attributes = _geshifilter_whitespace_explode(GESHIFILTER_ATTRIBUTES_LANGUAGE);
-  $attributes_preg_string = implode('|', array_merge(
-    $language_attributes,
-    array(GESHIFILTER_ATTRIBUTE_LINE_NUMBERING, GESHIFILTER_ATTRIBUTE_LINE_NUMBERING_START, GESHIFILTER_ATTRIBUTE_FANCY_N)
-  ));
-
-  // default settings
-  $lang = variable_get('geshifilter_default_highlighting', GESHIFILTER_DEFAULT_PLAINTEXT);
-  $line_numbering = variable_get('geshifilter_default_line_numbering', GESHIFILTER_LINE_NUMBERS_DEFAULT_NONE);
-  $linenumbers_start = 1;
-
-  // determine language based on tag name if possible
   if (isset($tag_to_lang[$tag_name])) {
     $lang = $tag_to_lang[$tag_name];
   }
 
-  // parse attributes (for language and line numbers)
-  preg_match_all('#('. $attributes_preg_string .')="?([^\s"]*)"?#', $tag_attributes, $attribute_matches);
-  // $attribute_matches[0][xx] .... fully matched string type="language"
-  // $attribute_matches[1][xx] .... param name
-  // $attribute_matches[2][xx] .... param value
-  foreach ($attribute_matches[1] as $a_key => $att_name) {
-    $att_value = $attribute_matches[2][$a_key];
-    // check for the language attributes
-    if (in_array($att_name, $language_attributes)) {
-      // map attribute value to geshi language code if possible
-      if (in_array($att_value, $language_tags)) {
-        $att_value = $tag_to_lang[$att_value];
-      }
-      // set language if extracted language is an enabled language
-      if (array_key_exists($att_value, $enabled_languages)) {
-        $lang = $att_value;
-      }
-    }
-    // check for line numbering related attributes
-    // $line_numbering defines the line numbering mode:
-    // 0: no line numbering
-    // 1: normal line numbering
-    // n>= 2: fancy line numbering every nth line
-    elseif ($att_name == GESHIFILTER_ATTRIBUTE_LINE_NUMBERING) {
-      switch (strtolower($att_value)) {
-        case "off":
-          $line_numbering = 0;
-          break;
-        case "normal":
-          $line_numbering = 1;
-          break;
-        case "fancy":
-          $line_numbering = 5;
-          break;
-      }
-    }
-    elseif ($att_name == GESHIFILTER_ATTRIBUTE_FANCY_N) {
-      $att_value = (int)($att_value);
-      if ($att_value >= 2) {
-        $line_numbering = $att_value;
-      }
-    }
-    elseif ($att_name == GESHIFILTER_ATTRIBUTE_LINE_NUMBERING_START) {
-      if ($line_numbering < 1) {
-        $line_numbering = 1;
-      }
-      $linenumbers_start = (int)($att_value);
-    }
+  // Get additional settings from the tag attributes.
+  $settings = _geshifilter_parse_attributes($tag_attributes, $format);
+  if ($settings['language']) {
+    $lang = $settings['language'];
+  }
+  if ($settings['line_numbering']) {
+    $line_numbering = $settings['line_numbering'];
+  }
+  if ($settings['linenumbers_start']) {
+    $linenumbers_start = $settings['linenumbers_start'];
   }
 
   if ($lang == GESHIFILTER_DEFAULT_DONOTHING) {
-    // do nothing, and return the original
+    // Do nothing, and return the original.
     return $complete_match;
   }
-
   if ($lang == GESHIFILTER_DEFAULT_PLAINTEXT) {
-    // use plain text 'highlighting'
+    // Use plain text 'highlighting'
     $lang = 'text';
   }
   $inline_mode = (strpos($source_code, "\n") === FALSE);
