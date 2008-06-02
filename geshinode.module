@@ -11,6 +11,7 @@ function geshinode_menu() {
     'description' => 'Settings of the GeSHi source code node type.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('geshinode_settings'),
+    'access arguments' => array('administer site configuration'),
     'type' => MENU_LOCAL_TASK,
   );
   return $items;
