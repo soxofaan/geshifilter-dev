@@ -1,6 +1,11 @@
 <?php
 // $Id$
 
+/**
+ * @file
+ * General GeSHi filter helper functions.
+ */
+
 function _geshifilter_get_geshi_dir() {
   return variable_get('geshifilter_geshi_dir', drupal_get_path('module', 'geshifilter') .'/geshi');
 }
@@ -100,7 +105,7 @@ function _geshifilter_get_enabled_languages() {
     $enabled_languages = array();
     $languages = _geshifilter_get_available_languages();
     foreach ($languages as $language => $language_data) {
-      if (variable_get('geshifilter_language_enabled_' . $language, FALSE)) {
+      if (variable_get('geshifilter_language_enabled_'. $language, FALSE)) {
         $enabled_languages[$language] = $language_data['fullname'];
       }
     }

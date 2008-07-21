@@ -2,6 +2,11 @@
 // $Id$
 
 /**
+ * @file
+ * Installation and uninstallation functions for the GeSHi node module.
+ */
+
+/**
  * Implementation of hook_schema()
  */
 function geshinode_schema() {

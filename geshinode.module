@@ -2,6 +2,11 @@
 // $Id$
 
 /**
+ * @file
+ * Implementation of a GeSHi node.
+ */
+
+/**
  * Implementation of hook_menu()
  */
 function geshinode_menu() {

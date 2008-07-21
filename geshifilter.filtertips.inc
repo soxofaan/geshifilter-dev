@@ -1,12 +1,17 @@
 <?php
 // $Id$
 
+/**
+ * @file
+ * Implementation of the filter tips.
+ */
+
 require_once drupal_get_path('module', 'geshifilter') .'/geshifilter.inc';
 
 /**
  * Implementation for geshifilter_filter_tips()
  */
-function _geshifilter_filter_tips($delta, $format, $long = false) {
+function _geshifilter_filter_tips($delta, $format, $long = FALSE) {
   if (_geshifilter_brackets($format) == GESHIFILTER_BRACKETS_SQUARE) {
     $bracket_open = '[';
     $bracket_close = ']';

@@ -144,12 +144,12 @@ function geshifilter_menu() {
     'access arguments' => array('administer site configuration'),
     'type' => MENU_CALLBACK,
   );
- return $items;
+  return $items;
 }
 
 
 /**
- * Implementation of hook_init()
+ * Implementation of hook_init().
  */
 function geshifilter_init() {
   // Since the filtered content is cached, it is not possible to know on which
@@ -165,7 +165,7 @@ function geshifilter_init() {
 /**
  * Implementation of hook_filter_tips().
  */
-function geshifilter_filter_tips($delta, $format, $long = false) {
+function geshifilter_filter_tips($delta, $format, $long = FALSE) {
   require_once drupal_get_path('module', 'geshifilter') .'/geshifilter.filtertips.inc';
   return _geshifilter_filter_tips($delta, $format, $long);
 }
@@ -194,7 +194,7 @@ function geshifilter_filter($op, $delta = 0, $format = -1, $text = '') {
       return _geshifilter_filter_settings($format);
 
     case 'no cache':
-      return false;
+      return FALSE;
 
     default:
       return $text;
@@ -213,7 +213,7 @@ function geshifilter_theme() {
 }
 
 /**
- * Implementation of hook_requirements()
+ * Implementation of hook_requirements().
  */
 function geshifilter_requirements($phase) {
   $requirements = array();

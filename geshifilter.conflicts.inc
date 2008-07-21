@@ -1,6 +1,11 @@
 <?php
 // $Id$
 
+/**
+ * @file
+ * Implementation of the conflict detection feature of the GeSHi filter.
+ */
+
 require_once drupal_get_path('module', 'geshifilter') .'/geshifilter.inc';
 
 /**

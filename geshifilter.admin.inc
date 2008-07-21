@@ -1,6 +1,11 @@
 <?php
 // $Id$
 
+/**
+ * @file
+ * Implementation of administration functionality.
+ */
+
 require_once drupal_get_path('module', 'geshifilter') .'/geshifilter.inc';
 
 /**

@@ -1,6 +1,15 @@
 <?php
 // $Id$
 
+/**
+ * @file
+ * Functions that handle the actual GeSHi processing.
+ *
+ * The actual GeSHi filter stuff: parsing the text to filter,
+ * configure the GeSHi parser, feed the code to the GeSHi parser and put the
+ * result back in the text.
+ */
+
 require_once drupal_get_path('module', 'geshifilter') .'/geshifilter.inc';
 
 /**
