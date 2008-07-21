@@ -1,7 +1,7 @@
 <?php
 // $Id$
 
-require_once('geshifilter.inc');
+require_once drupal_get_path('module', 'geshifilter') .'/geshifilter.inc';
 
 /**
  * Implementation for geshifilter_filter_tips()

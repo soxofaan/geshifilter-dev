@@ -1,7 +1,7 @@
 <?php
 // $Id$
 
-require_once('geshifilter.inc');
+require_once drupal_get_path('module', 'geshifilter') .'/geshifilter.inc';
 
 /**
  * Form (items) for filter settings.
@@ -482,7 +482,7 @@ function _geshifilter_generate_languages_css_rules() {
   $output = '';
   $geshi_library = _geshifilter_check_geshi_library();
   if ($geshi_library['loaded']) {
-    require_once('geshifilter.pages.inc');
+    require_once drupal_get_path('module', 'geshifilter') .'/geshifilter.pages.inc';
     $languages = _geshifilter_get_enabled_languages();
     foreach ($languages as $langcode => $language_full_name) {
       // create GeSHi object

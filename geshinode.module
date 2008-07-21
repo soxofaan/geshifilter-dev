@@ -68,7 +68,7 @@ function geshinode_access($op, $node) {
  * Implementation of hook_form().
  */
 function geshinode_form(&$node, $form_state) {
-  require_once('geshifilter.inc');
+  require_once drupal_get_path('module', 'geshifilter') .'/geshifilter.inc';
 
   $type = node_get_types('type', $node);
 
@@ -141,7 +141,7 @@ function geshinode_load($node) {
  * Implementation of hook_view()
  */
 function geshinode_view($node, $teaser = FALSE, $page = FALSE) {
-  require_once('geshifilter.pages.inc');
+  require_once drupal_get_path('module', 'geshifilter') .'/geshifilter.pages.inc';
   $node->readmore = (strlen($node->teaser) < strlen($node->body));
   $line_numbering = variable_get('geshinode_line_numbering', GESHIFILTER_LINE_NUMBERS_DEFAULT_NONE);
   $source_code = $teaser ? $node->teaser : $node->body;
@@ -156,7 +156,7 @@ function geshinode_view($node, $teaser = FALSE, $page = FALSE) {
  * Callback for geshinode settings form
  */
 function geshinode_settings() {
-  require_once('geshifilter.inc');
+  require_once drupal_get_path('module', 'geshifilter') .'/geshifilter.inc';
   $form = array();
   $form['geshinode_line_numbering'] = array(
     '#type' => 'select',

@@ -1,7 +1,7 @@
 <?php
 // $Id$
 
-require_once('geshifilter.inc');
+require_once drupal_get_path('module', 'geshifilter') .'/geshifilter.inc';
 
 /**
  * Menu callback for filter conflicts page

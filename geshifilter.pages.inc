@@ -1,7 +1,7 @@
 <?php
 // $Id$
 
-require_once('geshifilter.inc');
+require_once drupal_get_path('module', 'geshifilter') .'/geshifilter.inc';
 
 /**
  * Helper function for parsing the attributes of GeSHi code tags

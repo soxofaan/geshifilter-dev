@@ -166,7 +166,7 @@ function geshifilter_init() {
  * Implementation of hook_filter_tips().
  */
 function geshifilter_filter_tips($delta, $format, $long = false) {
-  require_once('geshifilter.filtertips.inc');
+  require_once drupal_get_path('module', 'geshifilter') .'/geshifilter.filtertips.inc';
   return _geshifilter_filter_tips($delta, $format, $long);
 }
 
@@ -182,15 +182,15 @@ function geshifilter_filter($op, $delta = 0, $format = -1, $text = '') {
       return t('Enables syntax highlighting of inline/block source code using the GeSHi engine');
 
     case 'prepare':
-      require_once('geshifilter.pages.inc');
+      require_once drupal_get_path('module', 'geshifilter') .'/geshifilter.pages.inc';
       return _geshifilter_prepare($format, $text);
 
     case 'process':
-      require_once('geshifilter.pages.inc');
+      require_once drupal_get_path('module', 'geshifilter') .'/geshifilter.pages.inc';
       return _geshifilter_process($format, $text);
 
     case 'settings':
-      require_once('geshifilter.admin.inc');
+      require_once drupal_get_path('module', 'geshifilter') .'/geshifilter.admin.inc';
       return _geshifilter_filter_settings($format);
 
     case 'no cache':
@@ -218,7 +218,7 @@ function geshifilter_theme() {
 function geshifilter_requirements($phase) {
   $requirements = array();
   if ($phase == 'runtime') {
-    require_once('geshifilter.inc');
+    require_once drupal_get_path('module', 'geshifilter') .'/geshifilter.inc';
     // check if GeSHi library is available
     $geshi_library = _geshifilter_check_geshi_library();
     if (!$geshi_library['loaded']) {
@@ -251,7 +251,7 @@ function geshifilter_requirements($phase) {
     }
 
     // check for filter conflicts
-    require_once('geshifilter.conflicts.inc');
+    require_once drupal_get_path('module', 'geshifilter') .'/geshifilter.conflicts.inc';
     if (geshifilter_admin_filter_conflicts(TRUE) > 0) {
       $requirements[] = array(
         'title' => 'GeSHi filter',
@@ -279,7 +279,7 @@ function _geshifilter_managed_external_stylesheet_possible() {
  * Callback function for generating the CSS rules for the syntax highlighting
  */
 function geshifilter_generate_language_css_rules() {
-  require_once('geshifilter.admin.inc');
+  require_once drupal_get_path('module', 'geshifilter') .'/geshifilter.admin.inc';
   drupal_set_header("Content-type: text/css");
   $output = _geshifilter_generate_languages_css_rules();
   print($output);
