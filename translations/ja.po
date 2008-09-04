@@ -214,8 +214,8 @@ msgid "Also apply syntax highlighting to &lt;?php ... ?&gt; style PHP source cod
 msgstr "&lt;?php ... ?&gt; で括られた PHP のソースコードブロックにも構文ハイライトを適用する。"
 
 #: modules/geshifilter/geshifilter.admin.inc:338
-msgid "When enabled, PHP source code enclosed in &lt;?php...?&gt or &lt;%...%&gt; will also be processed."
-msgstr "この設定を有効にした場合、&lt;?php...?&gt または &lt;%...%&gt; で括られた PHP ソースコードも同様に処理されます。"
+msgid "When enabled, PHP source code enclosed in &lt;?php...?&gt; or &lt;%...%&gt; will also be processed."
+msgstr "この設定を有効にした場合、&lt;?php...?&gt; または &lt;%...%&gt; で括られた PHP ソースコードも同様に処理されます。"
 
 #: modules/geshifilter/geshifilter.admin.inc:356
 msgid "Language"

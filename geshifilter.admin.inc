@@ -354,7 +354,7 @@ function _geshifilter_general_highlight_tags_settings($format=NULL) {
   $form['geshifilter']["geshifilter_enable_php_delimiters$f"] = array(
     '#type' => 'checkbox',
     '#title' => t('Also apply syntax highlighting to &lt;?php ... ?&gt; style PHP source code blocks.'),
-    '#description' => t('When enabled, PHP source code enclosed in &lt;?php...?&gt or &lt;%...%&gt; will also be processed.'),
+    '#description' => t('When enabled, PHP source code enclosed in &lt;?php...?&gt; or &lt;%...%&gt; will also be processed.'),
     '#default_value' => _geshifilter_php_delimeters($format),
   );
   return $form;
