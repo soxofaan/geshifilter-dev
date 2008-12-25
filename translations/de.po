@@ -18,7 +18,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: German translation of GeSHi Filter\n"
 "POT-Creation-Date: 2008-12-25 21:24+0100\n"
-"PO-Revision-Date: 2008-12-26 00:22+0100\n"
+"PO-Revision-Date: 2008-12-26 00:35+0100\n"
 "Last-Translator: Alexander Haß\n"
 "Language-Team: Alexander Haß\n"
 "MIME-Version: 1.0\n"
@@ -42,7 +42,7 @@ msgstr ""
 
 #: geshifilter.admin.inc:53
 msgid "GeSHi library version @version detected"
-msgstr "GeSHi-Bibliothek mit der Version @version wurde erkannt"
+msgstr "GeSHi-Bibliothek mit der Version @version wurde gefunden"
 
 #: geshifilter.admin.inc:53
 msgid "GeSHi library"
