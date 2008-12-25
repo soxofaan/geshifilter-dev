@@ -18,7 +18,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: German translation of GeSHi Filter\n"
 "POT-Creation-Date: 2008-12-25 21:24+0100\n"
-"PO-Revision-Date: 2008-12-26 00:17+0100\n"
+"PO-Revision-Date: 2008-12-26 00:22+0100\n"
 "Last-Translator: Alexander Haß\n"
 "Language-Team: Alexander Haß\n"
 "MIME-Version: 1.0\n"
@@ -87,7 +87,7 @@ msgstr "Keine Hervorhebung"
 
 #: geshifilter.admin.inc:101
 msgid "Do nothing"
-msgstr "Nichts machen."
+msgstr "Nichts machen"
 
 #: geshifilter.admin.inc:102
 msgid "As plain text"
@@ -212,7 +212,7 @@ msgstr "Tags welche die GeSHi-Syntaxhervorhebung aktivieren sollen. Eine durch L
 
 #: geshifilter.admin.inc:344
 msgid "Tag style"
-msgstr "Tag-Design"
+msgstr "Tag-Form"
 
 #: geshifilter.admin.inc:348
 msgid "!angle or !square"
