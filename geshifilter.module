@@ -132,7 +132,7 @@ function geshifilter_menu() {
   );
   // clear available languages cache
   $items['geshifilter/clearavailablelanguagescache'] = array(
-    'title' => t('Clear available languages cache'),
+    'title' => 'Clear available languages cache',
     'file' => 'geshifilter.admin.inc',
     'page callback' => 'geshifilter_clear_available_languages_cache',
     'access arguments' => array('administer site configuration'),
