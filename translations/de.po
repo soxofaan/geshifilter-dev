@@ -18,7 +18,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: German translation of GeSHi Filter\n"
 "POT-Creation-Date: 2008-12-25 21:24+0100\n"
-"PO-Revision-Date: 2008-12-26 00:35+0100\n"
+"PO-Revision-Date: 2008-12-26 21:38+0100\n"
 "Last-Translator: Alexander Haß\n"
 "Language-Team: Alexander Haß\n"
 "MIME-Version: 1.0\n"
@@ -192,7 +192,7 @@ msgstr "Keinen Container verwenden"
 
 #: geshifilter.admin.inc:204
 msgid "GeSHi filter can not automatically manage an external CSS style sheet when the download method is private."
-msgstr "Der GeSHi-Filter kann ein externes CSS-Stylesheet mit der privaten Downloadmethode nicht automatisch verwalten."
+msgstr "Der GeSHi-Filter kann ein externes CSS-Stylesheet mit der privaten Download-Methode nicht automatisch verwalten."
 
 #: geshifilter.admin.inc:247
 msgid "Flush cache of available languages"
@@ -503,11 +503,11 @@ msgstr "Die GeSHi-Bibliothek mit der Version %version wurde gefunden."
 
 #: geshifilter.module:246
 msgid "GeSHi filter can not automatically manage an external style sheet when the download method is private."
-msgstr "Der GeSHi-Filter kann ein externes Stylesheet nicht automatisch verwalten, wenn die private Downloadmethode verwendet wird."
+msgstr "Der GeSHi-Filter kann ein externes Stylesheet nicht automatisch verwalten, wenn die private Download-Methode verwendet wird."
 
 #: geshifilter.module:248
 msgid "Change the CSS mode of the <a href=\"!geshi\">GeSHi filter</a> or change the <a href=\"!filesystem\">download mode</a> to public."
-msgstr "Den CSS-Modus von <a href=\"!geshi\">GeSHi-Filter</a> ändern oder den <a href=\"!filesystem\">Downloadmodus</a> auf Öffentlich ändern."
+msgstr "Den CSS-Modus von <a href=\"!geshi\">GeSHi-Filter</a> ändern oder die <a href=\"!filesystem\">Download-Methode</a> auf Öffentlich ändern."
 
 #: geshifilter.module:258
 msgid "Some filter conflicts were detected."
