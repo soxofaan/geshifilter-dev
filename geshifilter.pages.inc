@@ -251,13 +251,13 @@ function _geshifilter_replace_callback($match, $format) {
 
   // Get additional settings from the tag attributes.
   $settings = _geshifilter_parse_attributes($tag_attributes, $format);
-  if ($settings['language']) {
+  if (isset($settings['language'])) {
     $lang = $settings['language'];
   }
-  if ($settings['line_numbering']) {
+  if (isset($settings['line_numbering'])) {
     $line_numbering = $settings['line_numbering'];
   }
-  if ($settings['linenumbers_start']) {
+  if (isset($settings['linenumbers_start'])) {
     $linenumbers_start = $settings['linenumbers_start'];
   }
 
