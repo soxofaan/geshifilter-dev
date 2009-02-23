@@ -76,7 +76,7 @@ msgstr ""
 "GeSHi filter je nakonfigurovaný tak, aby používal globálne "
 "nastavenie značiek. Ak chcete použiť odlišné nastavenia v každom "
 "vstupnom formáte, povoľte túto možnosť vo <a "
-"href=\"%21geshi_admin_url\">všeobecných nastaveniach filtra "
+"href=\"!geshi_admin_url\">všeobecných nastaveniach filtra "
 "GeSHi</a>."
 
 #: geshifilter.admin.inc:48
@@ -920,4 +920,3 @@ msgstr ""
 #: geshinode.info:0
 msgid "Provides source code node with GeSHi syntax highlighting."
 msgstr "Poskytuje uzol Zdrojový kód so zvýrazňovaním syntaxe GeSHi."
-
