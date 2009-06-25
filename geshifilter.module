@@ -1,5 +1,5 @@
 <?php
-// $Id: geshifilter.module,v 1.18.2.43 2008/01/14 12:17:35 soxofaan Exp $
+// $Id: geshifilter.module,v 1.18.2.50 2008/01/18 22:45:51 soxofaan Exp $
 
 /**
  * @file
@@ -47,7 +47,6 @@ function geshifilter_help($section) {
           '!filterconflicts' => l(t('filter conflicts'), 'admin/settings/geshifilter/filterconflicts'),
           '!filtertips' => l(t('filter tips'), 'filter/tips'),
         ));
-        $output .= '<p>'. t('After changing the general GeSHi filter settings, it is typically needed to <a href="!clearfiltercache">clear the filter cache</a> before the changes take effect on old content.', array('!clearfiltercache' => url('geshifilter/clearfiltercache', drupal_get_destination()))) .'</p>';
       }
       return $output;
       break;
@@ -125,14 +124,6 @@ function geshifilter_menu($may_cache) {
       'weight' => 6,
       'type' => MENU_LOCAL_TASK,
     );
-    // clear filter cache callback
-    $items[] = array(
-      'path' => 'geshifilter/clearfiltercache',
-      'title' => t('Clear filter cache'),
-      'callback' => 'geshifilter_clear_filter_cache',
-      'type' => MENU_CALLBACK,
-      'access' => user_access('administer site configuration'),
-    );
     // clear available languages cache
     $items[] = array(
       'path' => 'geshifilter/clearavailablelanguagescache',
@@ -145,7 +136,7 @@ function geshifilter_menu($may_cache) {
   else {
     // Since the filtered content is cached, it is not possible to know on which
     // pages the css file is actually needed. Thus it is included on all pages.
-    if (variable_get('geshifilter_css_mode', GESHIFILTER_CSS_INLINE) == GESHIFILTER_CSS_CLASSES) {
+    if (_geshifilter_css_mode() == GESHIFILTER_CSS_CLASSES) {
       if ($stylesheet_file = variable_get('geshifilter_languages_css', NULL)) {
         drupal_add_css($stylesheet_file);
       }
@@ -159,152 +150,8 @@ function geshifilter_menu($may_cache) {
  * Implementation of hook_filter_tips().
  */
 function geshifilter_filter_tips($delta, $format, $long = false) {
-  if (_geshifilter_brackets($format) == GESHIFILTER_BRACKETS_SQUARE) {
-    $bracket_open = '[';
-    $bracket_close = ']';
-  }
-  else {
-    // default brackets
-    $bracket_open = '&lt;';
-    $bracket_close = '&gt;';
-  }
-
-  if ($long) {
-    // get the available tags
-    list($generic_code_tags, $language_tags, $tag_to_lang) = _geshifilter_get_tags($format);
-    // get the available languages
-    $languages = _geshifilter_get_enabled_languages();
-    $lang_attributes = _geshifilter_whitespace_explode(GESHIFILTER_ATTRIBUTES_LANGUAGE);
-
-    // syntax highlighting tags
-    $output = '<p>'. t('Syntax highlighting of source code can be enabled with the following tags:') .'</p>';
-    $items = array();
-    // generic tags
-    $tags = array();
-    foreach ($generic_code_tags as $tag) {
-      $tags[] = '"<code>'. $bracket_open . $tag . $bracket_close .'</code>"';
-    }
-    $items[] = t('Generic syntax highlighting tags: !tags.', array('!tags' => implode(', ', $tags)));
-    // language tags
-    $tags = array();
-    foreach ($language_tags as $tag) {
-      $tags[] = '"<code>'. $bracket_open . $tag . $bracket_close .'</code>" '. t('for @lang source code', array('@lang' => $languages[$tag_to_lang[$tag]]));
-    }
-    $items[] = t('Language specific syntax highlighting tags: !tags.', array('!tags' => implode(', ', $tags)));
-    // PHP specific delimiters
-    if (_geshifilter_php_delimeters($format)) {
-      $items[] = t('PHP source code can also be enclosed in &lt;?php ... ?&gt; or &lt;% ... %&gt;, but additional options like line numbering are not possible here.');
-    }
-
-    $output .= theme('item_list', $items);
-
-    // Options and tips
-    $output .= '<p>'. t('Options and tips:') .'</p>';
-    $items = array();
-    // enabled languages
-    $enabled_languages = array();
-    foreach ($languages as $langcode => $fullname) {
-      $enabled_languages[] = t('"<code>@langcode</code>" (for @fullname)', array('@langcode' => $langcode, '@fullname' => $fullname));
-    }
-    $items[] = t('The language for the generic syntax highlighting tags can be specified with one of the attribute(s): %attributes. The possible values are: !languages.', array('%attributes' => implode(', ', $lang_attributes), '!languages' => implode(', ', $enabled_languages)));
-    // line numbering options
-    $items[] = t('<em>Line numbering</em> can be enabled/disabled with the attribute "%linenumbers". Possible values are: "%off" for no line numbers, "%normal" for normal line numbers and "%fancy" for fancy line numbers (every n<sup>th</sup> line number highlighted). The start line number can be specified with the attribute "%start", which implicitly enables normal line numbering. For fancy line numbering the interval for the highlighted line numbers can be specified with the attribute "%fancy", which implicitly enables fancy line numbering.', array('%linenumbers' => GESHIFILTER_ATTRIBUTE_LINE_NUMBERING, '%off' => 'off', '%normal' => 'normal', '%fancy' => 'fancy', '%start' => GESHIFILTER_ATTRIBUTE_LINE_NUMBERING_START, '%fancy' => GESHIFILTER_ATTRIBUTE_FANCY_N));
-    $items[] = t('If the source code between the tags contains a newline (e.g. immediatly after the opening tag), the highlighted source code will be displayed as a code block. Otherwise it will be displayed inline.');
-    if (_geshifilter_brackets($format) == GESHIFILTER_BRACKETS_BOTH) {
-      $items[] = t('Beside the tag style "!angle" it is also possible to use "!bracket".' , array('!angle' => '<code>&lt;foo&gt;</code>', '!bracket' => '<code>[foo]</code>'));
-    }
-    $output .= theme('item_list', $items);
-
-    // Defaults
-    $output .= '<p>'. t('Defaults:') .'</p>';
-    $items = array();
-    $default_highlighting = variable_get('geshifilter_default_highlighting', GESHIFILTER_DEFAULT_PLAINTEXT);
-    switch ($default_highlighting) {
-      case GESHIFILTER_DEFAULT_DONOTHING:
-        $description =  t('when no language attribute is specified the code block won\'t be processed by the GeSHi filter');
-        break;
-      case GESHIFILTER_DEFAULT_PLAINTEXT:
-        $description = t('when no language attribute is specified, no syntax highlighting will be done');
-        break;
-      default:
-        $description = t('the default language used for syntax highlighting is "%default_lang"', array('%default_lang' => $default_highlighting));
-        break;
-    }
-    $items[] = t('Default highlighting mode for generic syntax highlighting tags: !description.', array('!description' => $description));
-    $default_line_numbering = variable_get('geshifilter_default_line_numbering', GESHIFILTER_LINE_NUMBERS_DEFAULT_NONE);
-    switch ($default_line_numbering) {
-      case GESHIFILTER_LINE_NUMBERS_DEFAULT_NONE:
-        $description = t('no line numbers');
-        break;
-      case GESHIFILTER_LINE_NUMBERS_DEFAULT_NORMAL:
-        $description = t('normal line numbers');
-        break;
-      default:
-        $description = t('fancy line numbers (every @n lines)', array('@n' => $default_line_numbering));
-        break;
-    }
-    $items[] = t('Default line numbering: !description.', array('!description' => $description));
-    $output .= theme('item_list', $items);
-
-    // Examples
-    $output .= '<p>'. t('Examples:') .'</p>';
-    $header = array(t('You type'), t('You get'));
-    $rows = array();
-    if (count($generic_code_tags)) {
-      $generic_code_tag = $generic_code_tags[0];
-      $lang = array_rand($languages);
-      $generic_code_tag_open = $bracket_open . $generic_code_tag;
-      $generic_code_tag_close = $bracket_open .'/'. $generic_code_tag . $bracket_close;
-      $rows[] = array(
-        '<code>'. $generic_code_tag_open . $bracket_close .'foo = "bar";'. $generic_code_tag_close .'</code>',
-        t('Inline code with the default syntax highlighting mode.'),
-      );
-      $rows[] = array(
-        '<code>'. $generic_code_tag_open . $bracket_close .'<br />foo = "bar";<br />baz = "foz";<br />'. $generic_code_tag_close .'</code>',
-        t('Code block with the default syntax highlighting mode.'),
-      );
-      $rows[] = array(
-        '<code>'. $generic_code_tag_open .' '. $lang_attributes[1 % count($lang_attributes)] .'="'. $lang .'" '. GESHIFILTER_ATTRIBUTE_LINE_NUMBERING .'="normal"'. $bracket_close .'<br />foo = "bar";<br />baz = "foz";<br />'. $generic_code_tag_close .'</code>',
-        t('Code block with syntax highlighting for @lang source code<br /> and normal line numbers.', array('@lang' => $languages[$lang])),
-      );
-      $rows[] = array(
-        '<code>'. $generic_code_tag_open .' '. $lang_attributes[2 % count($lang_attributes)] .'="'. $lang .'" '. GESHIFILTER_ATTRIBUTE_LINE_NUMBERING_START .'="23" '. GESHIFILTER_ATTRIBUTE_FANCY_N .'="7"'. $bracket_close .'<br />foo = "bar";<br />baz = "foz";<br />'. $generic_code_tag_close .'</code>',
-        t('Code block with syntax highlighting for @lang source code,<br />line numbers starting from 23<br /> and highlighted line numbers every 7<sup>th</sup> line.', array('@lang' => $languages[$lang])),
-      );
-    }
-    if (count($language_tags)) {
-      $language_tag = $language_tags[0];
-      $rows[] = array(
-        '<code>'. $bracket_open . $language_tag . $bracket_close .'<br />foo = "bar";<br />baz = "foz";<br />'. $bracket_open .'/'. $language_tag . $bracket_close .'</code>',
-        t('Code block with syntax highlighting for @lang source code.', array('@lang' => $languages[$tag_to_lang[$language_tag]])),
-      );
-      $rows[] = array(
-        '<code>'. $bracket_open . $language_tag .' '. GESHIFILTER_ATTRIBUTE_LINE_NUMBERING_START .'="23" '. GESHIFILTER_ATTRIBUTE_FANCY_N .'="7"'. $bracket_close .'<br />foo = "bar";<br />baz = "foz";<br />'. $bracket_open . $language_tag . $bracket_close .'</code>',
-        t('Code block with syntax highlighting for @lang source code,<br />line numbers starting from 23<br /> and highlighted line numbers every 7<sup>th</sup> line.', array('@lang' => $languages[$tag_to_lang[$language_tag]])),
-      );
-    }
-    $output .= theme('table', $header, $rows);
-    return $output;
-  }
-  else {
-    // get the available tags
-    list($generic_code_tags, $language_tags, $tag_to_lang) = _geshifilter_get_tags($format);
-    $tags = array();
-    foreach ($generic_code_tags as $tag) {
-      $tags[] = '<code>'. $bracket_open . $tag . $bracket_close .'</code>';
-    }
-    foreach ($language_tags as $tag) {
-      $tags[] = '<code>'. $bracket_open . $tag . $bracket_close .'</code>';
-    }
-    $output = t('You can enable syntax highlighting of source code with the following tags: !tags.', array('!tags' => implode(', ', $tags)));
-    if (_geshifilter_brackets($format) == GESHIFILTER_BRACKETS_BOTH) {
-      $output .= ' '. t('Beside the tag style "!angle" it is also possible to use "!bracket".' , array('!angle' => '<code>&lt;foo&gt;</code>', '!bracket' => '<code>[foo]</code>'));
-    }
-    if (_geshifilter_php_delimeters($format)) {
-      $output .= ' '. t('PHP source code can also be enclosed in &lt;?php ... ?&gt; or &lt;% ... %&gt;.');
-    }
-    return $output;
-  }
+  require_once('geshifilter.filtertips.inc');
+  return _geshifilter_filter_tips($delta, $format, $long);
 }
 
 /**
@@ -319,9 +166,11 @@ function geshifilter_filter($op, $delta = 0, $format = -1, $text = '') {
       return t('Enables syntax highlighting of inline/block source code using the GeSHi engine');
 
     case 'prepare':
+      require_once('geshifilter.pages.inc');
       return _geshifilter_prepare($format, $text);
 
     case 'process':
+      require_once('geshifilter.pages.inc');
       return _geshifilter_process($format, $text);
 
     case 'settings':
@@ -400,7 +249,7 @@ function _geshifilter_general_highlight_tags_settings($format=NULL) {
     '#type' => 'textfield',
     '#title' => t('Generic syntax highlighting tags'),
     '#default_value' => geshifilter_tags($format),
-    '#description' => t('Tags that should activate the GeSHi syntax highlighting. Specify a space-separated list of tagnames.')
+    '#description' => t('Tags that should activate the GeSHi syntax highlighting. Specify a space-separated list of tagnames.'),
   );
   // tag style
   $form["geshifilter_brackets$f"] = array(
@@ -447,7 +296,7 @@ function _geshifilter_filter_settings($format) {
   }
   else {
     $form['geshifilter']['info'] = array(
-      '#value' => '<p>'. t('The <a href="!geshi_admin_url">general settings</a> are used for the GeSHi filter . If you want specific settings per input format, you first have to enable this option in the <a href="!geshi_admin_url">general settings</a>.', array('!geshi_admin_url' => url('admin/settings/geshifilter'))) .'</p>'
+      '#value' => '<p>'. t('GeSHi filter is configured to use global tag settings. For separate settings per input format, enable this option in the <a href="!geshi_admin_url">general GeSHi filter settings</a>.', array('!geshi_admin_url' => url('admin/settings/geshifilter'))) .'</p>'
     );
   }
   return $form;
@@ -546,12 +395,16 @@ function theme_geshifilter_per_language_settings($form) {
  */
 function geshifilter_admin_general_settings() {
   $form = array();
+  // try to load GeSHi library and get version if successful
+  $geshi_library = _geshifilter_check_geshi_library();
   // GeSHi library settings
   $form['geshifilter_library'] = array(
     '#type' => 'fieldset',
     '#title' => t('GeSHi library'),
     '#description' => t('The GeSHi filter requires the GeSHi library. You need to <a href="!geshi">download</a> and install it seperately.',
       array('!geshi' => url('http://qbnz.com/highlighter/'))),
+    '#collapsible' => TRUE,
+    '#collapsed' => $geshi_library['success'],
   );
   $form['geshifilter_library']['geshifilter_geshi_dir'] = array(
     '#type' => 'textfield',
@@ -559,11 +412,10 @@ function geshifilter_admin_general_settings() {
     '#default_value' => _geshifilter_get_geshi_dir(),
     '#description' => t('Specify the path to the GeSHi library directory (which contains a file called <em>geshi.php</em>). After changing the path, it is necessary to save and refresh this settings page to see if GeSHi was successfully detected.')
   );
-  // try to load GeSHi library and get version if successful
-  $geshi_library = _geshifilter_check_geshi_library();
   if ($geshi_library['loaded']) {
     // show detected version
     $form['geshifilter_library']['geshifilter_detected_version'] = array(
+      '#type' => 'item',
       '#value' => t('Detected version: %version', array('%version' => GESHI_VERSION)), // GESHI_VERSION is defined in GeSHi library
     );
   }
@@ -580,6 +432,7 @@ function geshifilter_admin_general_settings() {
   $form['geshifilter_tag_options'] = array(
     '#type' => 'fieldset',
     '#title' => t('GeSHi filter tags and delimiters'),
+    '#collapsible' => TRUE,
   );
   // usage of format specific option
   $form['geshifilter_tag_options']['geshifilter_format_specific_options'] = array(
@@ -597,6 +450,7 @@ function geshifilter_admin_general_settings() {
   $form['geshifilter_highlighting_options'] = array(
     '#type' => 'fieldset',
     '#title' => t('Syntax highlighting options'),
+    '#collapsible' => TRUE,
   );
   // default language
   $languages = _geshifilter_get_enabled_languages();
@@ -648,15 +502,21 @@ function geshifilter_admin_general_settings() {
   $form['geshifilter_styling'] = array(
     '#type' => 'fieldset',
     '#title' => t('Styling, layout and CSS'),
+    '#collapsible' => TRUE,
   );
-  // CSS mode
+  // CSS mode: CSS classes + external stylesheet is only possible with public downloads in a writable files directory
+  $directory = file_directory_path();
+  $external_css_possible = is_dir($directory) && is_writable($directory) && (variable_get('file_downloads', FILE_DOWNLOADS_PUBLIC) == FILE_DOWNLOADS_PUBLIC);
   $form['geshifilter_styling']['geshifilter_css_mode'] = array(
     '#type' => 'radios',
     '#title' => t('CSS mode for syntax highlighting'),
-    '#description' => t('Inline CSS is easier to set up, does not depend on an external style sheets and is consequently more robust to copy/paste operations like content aggregation. However, usage of CSS classes is generally considered to be the better way of styling and requires much less HTML code and bandwith. (GeSHi documentation: !link).',
-      array('!link' => l('Using CSS Classes', 'http://qbnz.com/highlighter/geshi-doc.html#using-css-classes'))),
-
-    '#default_value' => variable_get('geshifilter_css_mode', GESHIFILTER_CSS_INLINE),
+    '#description' => t('Inline CSS is easier to set up, does not depend on an external style sheets and is consequently more robust to copy/paste operations like content aggregation. However, usage of CSS classes and an external stylesheet (requires the public <a href="!filesystem">download method</a>) is however generally considered to be the better way of styling and requires much less HTML code and bandwith. (GeSHi documentation: !link).',
+      array(
+        '!link' => l('Using CSS Classes', 'http://qbnz.com/highlighter/geshi-doc.html#using-css-classes'),
+        '!filesystem' => url('admin/settings/file-system'),
+      )),
+    '#disabled' => !$external_css_possible,
+    '#default_value' => $external_css_possible ? intval(variable_get('geshifilter_css_mode', GESHIFILTER_CSS_INLINE)) : GESHIFILTER_CSS_INLINE,
     '#options' => array(
       GESHIFILTER_CSS_INLINE => t('Inline CSS style attributes.'),
       GESHIFILTER_CSS_CLASSES => t('CSS classes and external CSS style sheet.'),
@@ -711,9 +571,10 @@ function geshifilter_admin_general_settings_submit($form_id, $form_values) {
   // normal system_settings_form processing
   system_settings_form_submit($form_id, $form_values);
   // regenerate language_css
-  if (variable_get('geshifilter_css_mode', GESHIFILTER_CSS_INLINE) == GESHIFILTER_CSS_CLASSES) {
+  if (_geshifilter_css_mode() == GESHIFILTER_CSS_CLASSES) {
     _geshifilter_generate_languages_css();
   }
+  _geshifilter_clear_filter_cache();
 }
 
 /**
@@ -744,9 +605,10 @@ function geshifilter_admin_per_language_settings_submit($form_id, $form_values) 
   // normal system_settings_form processing
   system_settings_form_submit($form_id, $form_values);
   // regenerate language_css
-  if (variable_get('geshifilter_css_mode', GESHIFILTER_CSS_INLINE) == GESHIFILTER_CSS_CLASSES) {
+  if (_geshifilter_css_mode() == GESHIFILTER_CSS_CLASSES) {
     _geshifilter_generate_languages_css();
   }
+  _geshifilter_clear_filter_cache();
 }
 
 /**
@@ -993,305 +855,27 @@ function _geshifilter_get_tags($format) {
 }
 
 /**
- * geshifilter_filter callback for preparing input text.
+ * helper function for getting the CSS mode (considering the download method).
  */
-function _geshifilter_prepare($format, $text) {
-  // get the available tags
-  list($generic_code_tags, $language_tags, $tag_to_lang) = _geshifilter_get_tags($format);
-  $tags = array_merge($generic_code_tags, $language_tags);
-  $tags_string = implode('|', $tags);
-  // Pattern for matching "<code>...</code>" like stuff
-  // Also matches "<code>...$"  where "$" refers to end of string, not end of
-  // line (because PCRE_MULTILINE (modifier 'm') is not enabled), so matching
-  // still works when teaser view trims inside the source code.
-  switch (_geshifilter_brackets($format)) {
-    case GESHIFILTER_BRACKETS_ANGLE:
-      $pattern = '#(<)('. $tags_string .')((\s+[^>]*)*)(>)(.*?)(</\2\s*>|$)#s';
-      break;
-    case GESHIFILTER_BRACKETS_SQUARE:
-      $pattern = '#(\[)('. $tags_string .')((\s+[^\]]*)*)(\])(.*?)(\[/\2\s*\]|$)#s';
-      break;
-    case GESHIFILTER_BRACKETS_BOTH:
-      $pattern = '#([<\[])('. $tags_string .')((\s+[^>\]]*)*)([>\]])(.*?)(\1/\2\s*\5|$)#s';
-      break;
-  }
-  // replace the code container tag brackets
-  // and prepare the container content (newline and angle bracket protection)
-  $text = preg_replace_callback($pattern, '_geshifilter_prepare_callback', $text);
-  if (_geshifilter_php_delimeters($format)) {
-    // prepare < ?php ... ? > blocks
-    $text = preg_replace_callback('#[\[<](\?php|\?PHP|%)(.+?)(\?|%)[\]>]#s', '_geshifilter_prepare_php_callback', $text);
-  }
-  return $text;
+function _geshifilter_css_mode() {
+  $directory = file_directory_path();
+  $external_css_possible = is_dir($directory) && is_writable($directory) && (variable_get('file_downloads', FILE_DOWNLOADS_PUBLIC) == FILE_DOWNLOADS_PUBLIC);
+  return $external_css_possible ? intval(variable_get('geshifilter_css_mode', GESHIFILTER_CSS_INLINE)) : GESHIFILTER_CSS_INLINE;
 }
 
 /**
- * _geshifilter_prepare callback for preparing input text.
- * Replaces the code tags brackets with geshifilter specific ones to prevent
- * possible messing up by other filters, e.g.
- *   '[python]foo[/python]' to '[geshifilter-python]foo[/geshifilter-python]'.
- * Replaces newlines with "&#10;" to prevent issues with the line break filter
- * Escapes the tricky characters like angle brackets with check_plain() to
- * prevent messing up by other filters like the HTML filter.
+ * Helper function for clearing the appropriate filter cache entries
  */
-function _geshifilter_prepare_callback($match) {
-  // get the default highlighting mode
-  $lang = variable_get('geshifilter_default_highlighting', GESHIFILTER_DEFAULT_PLAINTEXT);
-  if ($lang == GESHIFILTER_DEFAULT_DONOTHING) {
-    // If the default highlighting mode is GESHIFILTER_DEFAULT_DONOTHING
-    // and there is no language attribute, we should not do any escaping in this
-    // prepare phase, so that other filters can do their thing.
-    $language_attributes = _geshifilter_whitespace_explode(GESHIFILTER_ATTRIBUTES_LANGUAGE);
-    $enabled_languages = _geshifilter_get_enabled_languages();
-    $attributes_preg_string = implode('|', $language_attributes);
-    // parse attributes
-    preg_match_all('#('. $attributes_preg_string .')="?([^\s"]*)"?#', $match[2], $attribute_matches);
-    foreach ($attribute_matches[1] as $a_key => $att_name) {
-      $att_value = $attribute_matches[2][$a_key];
-      // check for the language attributes
-      if (in_array($att_name, $language_attributes) && array_key_exists($att_value, $enabled_languages)) {
-        $lang = $att_value;
-      }
-    }
-    if ($lang == GESHIFILTER_DEFAULT_DONOTHING) {
-      // no language set by attributes: prevent escaping and return original string
-      return $match[0];
+function _geshifilter_clear_filter_cache() {
+  // iterate over input formats
+  foreach (filter_formats() as $format => $input_format) {
+    // Get the filters in this input format
+    $filters = filter_list_format($format);
+    // look if GeSHi is enabled in this input format
+    if (isset($filters['geshifilter/0'])) {
+      cache_clear_all($format .':', 'cache_filter', TRUE);
     }
   }
-  // return escaped code block
-  return '[geshifilter-'. $match[2] . $match[3] .']'
-    . str_replace(array("\r", "\n"), array('', '&#10;'), check_plain($match[6]))
-    .'[/geshifilter-'. $match[2] .']';
-}
-
-/**
- * _geshifilter_prepare callback for < ?php ... ? > blocks
- */
-function _geshifilter_prepare_php_callback($match) {
-  return '[geshifilter-questionmarkphp]'
-    . str_replace(array("\r", "\n"), array('', '&#10;'), check_plain($match[2]))
-    .'[/geshifilter-questionmarkphp]';
-}
-
-/**
- * geshifilter_filter callback for processing input text.
- */
-function _geshifilter_process($format, $text) {
-  // load GeSHi library (if not already)
-  $geshi_library = _geshifilter_check_geshi_library();
-  if (!$geshi_library['success']) {
-    drupal_set_message($geshi_library['message'], 'error');
-    return $text;
-  }
-  // get the available tags
-  list($generic_code_tags, $language_tags, $tag_to_lang) = _geshifilter_get_tags($format);
-  if (_geshifilter_php_delimeters($format)) {
-    $language_tags[] = 'questionmarkphp';
-    $tag_to_lang['questionmarkphp'] = 'php';
-  }
-  $tags = array_merge($generic_code_tags, $language_tags);
-  $tags_string = implode('|', $tags);
-  // Pattern for matching the prepared "<code>...</code>" stuff
-  $pattern = '#\\[geshifilter-('. $tags_string .')([^\\]]*)\\](.*?)(\\[/geshifilter-\1\\])#s';
-  $text = preg_replace_callback($pattern, '_geshifilter_replace_callback', $text);
-  return $text;
-}
-
-/**
- * preg_replace_callback callback
- */
-function _geshifilter_replace_callback($match) {
-  // $match[0]: complete matched string
-  // $match[1]: tag name
-  // $match[2]: tag attributes
-  // $match[3]: tag content
-  $complete_match = $match[0];
-  $tag_name = $match[1];
-  $tag_attributes = $match[2];
-  $source_code = $match[3];
-
-  // Undo linebreak and escaping from preparation phase
-  $source_code = decode_entities($source_code);
-
-  // get the possible tags and languages
-  list($generic_code_tags, $language_tags, $tag_to_lang) = _geshifilter_get_tags($format);
-  if (variable_get('geshifilter_enable_php_delimiters', FALSE)) {
-    $language_tags[] = 'questionmarkphp';
-    $tag_to_lang['questionmarkphp'] = 'php';
-  }
-
-  $enabled_languages = _geshifilter_get_enabled_languages();
-
-  $language_attributes = _geshifilter_whitespace_explode(GESHIFILTER_ATTRIBUTES_LANGUAGE);
-  $attributes_preg_string = implode('|', array_merge(
-    $language_attributes,
-    array(GESHIFILTER_ATTRIBUTE_LINE_NUMBERING, GESHIFILTER_ATTRIBUTE_LINE_NUMBERING_START, GESHIFILTER_ATTRIBUTE_FANCY_N)
-  ));
-
-  // default settings
-  $lang = variable_get('geshifilter_default_highlighting', GESHIFILTER_DEFAULT_PLAINTEXT);
-  $line_numbering = variable_get('geshifilter_default_line_numbering', GESHIFILTER_LINE_NUMBERS_DEFAULT_NONE);
-  $linenumbers_start = 1;
-
-  // determine language based on tag name if possible
-  if (isset($tag_to_lang[$tag_name])) {
-    $lang = $tag_to_lang[$tag_name];
-  }
-
-  // parse attributes (for language and line numbers)
-  preg_match_all('#('. $attributes_preg_string .')="?([^\s"]*)"?#', $tag_attributes, $attribute_matches);
-  // $attribute_matches[0][xx] .... fully matched string type="language"
-  // $attribute_matches[1][xx] .... param name
-  // $attribute_matches[2][xx] .... param value
-  foreach ($attribute_matches[1] as $a_key => $att_name) {
-    $att_value = $attribute_matches[2][$a_key];
-    // check for the language attributes
-    if (in_array($att_name, $language_attributes) && array_key_exists($att_value, $enabled_languages)) {
-      $lang = $att_value;
-    }
-    // check for line numbering related attributes
-    // $line_numbering defines the line numbering mode:
-    // 0: no line numbering
-    // 1: normal line numbering
-    // n>= 2: fancy line numbering every nth line
-    elseif ($att_name == GESHIFILTER_ATTRIBUTE_LINE_NUMBERING) {
-      switch (strtolower($att_value)) {
-        case "off":
-          $line_numbering = 0;
-          break;
-        case "normal":
-          $line_numbering = 1;
-          break;
-        case "fancy":
-          $line_numbering = 5;
-          break;
-      }
-    }
-    elseif ($att_name == GESHIFILTER_ATTRIBUTE_FANCY_N) {
-      $att_value = (int)($att_value);
-      if ($att_value >= 2) {
-        $line_numbering = $att_value;
-      }
-    }
-    elseif ($att_name == GESHIFILTER_ATTRIBUTE_LINE_NUMBERING_START) {
-      if ($line_numbering < 1) {
-        $line_numbering = 1;
-      }
-      $linenumbers_start = (int)($att_value);
-    }
-  }
-
-  if ($lang == GESHIFILTER_DEFAULT_DONOTHING) {
-    // do nothing, and return the original
-    return $complete_match;
-  }
-
-  if ($lang == GESHIFILTER_DEFAULT_PLAINTEXT) {
-    // use plain text 'highlighting'
-    $lang = 'text';
-  }
-  $inline_mode = (strpos($source_code, "\n") === FALSE);
-  // process and return
-  return geshifilter_process($source_code, $lang, $line_numbering, $linenumbers_start, $inline_mode);
-}
-
-/**
- * Helper function for overriding some GeSHi defaults
- */
-function _geshifilter_override_geshi_defaults(&$geshi, $langcode) {
-  // override the some default GeSHi styles (e.g. GeSHi uses Courier by default, which is ugly)
-  $geshi->set_line_style('font-family: monospace; font-weight: normal;', 'font-family: monospace; font-weight: bold; font-style: italic;');
-  $geshi->set_code_style('font-family: monospace; font-weight: normal; font-style: normal');
-  // overall class needed for CSS
-  $geshi->set_overall_class('geshifilter-'. $langcode);
-  // set keyword linking
-  $geshi->enable_keyword_links(variable_get('geshifilter_enable_keyword_urls', TRUE));
-}
-
-/**
- * General geshifilter processing function
- */
-function geshifilter_process($source_code, $lang, $line_numbering=0, $linenumbers_start=1, $inline_mode=FALSE) {
-  // process
-  if ($lang == 'php' && variable_get('geshifilter_use_highlight_string_for_php', FALSE)) {
-    return geshifilter_highlight_string_process($source_code, $inline_mode);
-  }
-  else {
-    // process with GeSHi
-    return geshifilter_geshi_process($source_code, $lang, $line_numbering, $linenumbers_start, $inline_mode);
-  }
-}
-
-/**
- * geshifilter wrapper for GeSHi processing.
- */
-function geshifilter_geshi_process($source_code, $lang, $line_numbering=0, $linenumbers_start=1, $inline_mode=FALSE) {
-  // load GeSHi library (if not already)
-  $geshi_library = _geshifilter_check_geshi_library();
-  if (!$geshi_library['loaded']) {
-    drupal_set_message($geshi_library['message'], 'error');
-    return $source_code;
-  }
-  // remove leading/trailing newlines
-  $source_code = trim($source_code, "\n\r");
-  // create GeSHi object
-  $geshi = _geshifilter_GeSHi_factory($source_code, $lang);
-
-  // CSS mode
-  if (variable_get('geshifilter_css_mode', GESHIFILTER_CSS_INLINE) == GESHIFILTER_CSS_CLASSES) {
-    $geshi->enable_classes(TRUE);
-  }
-  _geshifilter_override_geshi_defaults($geshi, $lang);
-  // some more GeSHi settings and parsing
-  if ($inline_mode) {
-    // inline source code mode
-    $geshi->set_header_type(GESHI_HEADER_NONE);
-    $source_code = '<span class="geshifilter"><code class="'. $geshi->overall_class .'">'. $geshi->parse_code() .'</code></span>';
-  }
-  else {
-    // block source code mode
-    $geshi->set_header_type((int)variable_get('geshifilter_code_container', GESHI_HEADER_PRE));
-    if ($line_numbering == 1) {
-      $geshi->enable_line_numbers(GESHI_NORMAL_LINE_NUMBERS);
-      $geshi->start_line_numbers_at($linenumbers_start);
-    }
-    elseif ($line_numbering >= 2) {
-      $geshi->enable_line_numbers(GESHI_FANCY_LINE_NUMBERS, $line_numbering);
-      $geshi->start_line_numbers_at($linenumbers_start);
-    }
-    $source_code = '<div class="geshifilter">'. $geshi->parse_code() .'</div>';
-  }
-  return $source_code;
-}
-
-/**
- * geshifilter wrapper for highlight_string() processing of PHP
- */
-function geshifilter_highlight_string_process($source_code, $inline_mode) {
-  // Make sure that the source code starts with < ?php and ends with ? >
-  $text = trim($source_code);
-  if (substr($text, 0, 5) != '<?php') {
-    $source_code = '<?php'. $source_code;
-  }
-  if (substr($text, -2) != '?>') {
-    $source_code = $source_code .'?>';
-  }
-  // Use the right container
-  $container = $inline_mode ? 'span' : 'div';
-  // Process with highlight_string()
-  $text = '<'. $container .' class="codeblock geshifilter">'. highlight_string($source_code, TRUE) .'</'. $container .'>';
-  // Remove newlines (added by highlight_string()) to avoid issues with the linebreak filter
-  $text = str_replace("\n", '', $text);
-  return $text;
-}
-
-/**
- * callback function for clearing the filter cache
- */
-function geshifilter_clear_filter_cache() {
-  cache_clear_all('*', 'cache_filter', TRUE);
-  drupal_set_message('Filter cache cleared.');
-  drupal_goto();
 }
 
 /**
