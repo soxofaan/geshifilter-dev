@@ -1,3 +1,7 @@
+<<<<<<< geshifilter.css
+=======
+/* $Id: geshifilter.css,v 1.7 2008/01/18 22:58:39 soxofaan Exp $ */
+>>>>>>> 1.7
 
 /**
  * GeSHi filter CSS for code blocks
@@ -22,9 +26,21 @@ pre.geshifilter, div.geshifilter {
   margin: 0;
 }
 
+<<<<<<< geshifilter.css
 /**
  * GeSHi filter CSS for syntax highlighting
  */
+=======
+div.geshifilter > pre ol, div.geshifilter > div ol {
+  padding-left: 1em;
+}
+
+/* Set line-height for syntax highlighting with line numbers */
+.geshifilter ol {
+  margin: 0;
+  line-height: 1.3;
+}
+>>>>>>> 1.7
 
 .geshifilter .br0 {color: #66cc66;}
 .geshifilter .co1 {color: #808080;}
