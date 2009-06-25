@@ -1,5 +1,5 @@
 <?php
-// $Id: geshinode.module,v 1.1.2.3 2007/09/22 17:30:30 soxofaan Exp $
+// $Id: geshinode.module,v 1.1.2.4 2007/10/31 02:27:17 soxofaan Exp $
 
 /**
  * Implementation of hook_menu()
@@ -19,11 +19,15 @@ function geshinode_menu($may_cache) {
   return $items;
 }
 
+/**
+ * Implementation of hook_help().
+ */
 function geshinode_help($section) {
   if ($section == 'admin/settings/geshifilter/geshinode') {
     return '<p>'. t('Settings of the GeSHi source code node type.') .'</p>';
   }
 }
+
 /**
  * Implementation of hook_node_info().
  */
@@ -137,7 +141,7 @@ function geshinode_view($node, $teaser = FALSE, $page = FALSE) {
   $line_numbering = variable_get('geshinode_line_numbering', GESHIFILTER_LINE_NUMBERS_DEFAULT_NONE);
   $source_code = $teaser ? $node->teaser : $node->body;
   $node->content['body'] = array(
-    '#value' => geshifilter_geshi_process($source_code, $node->language, $line_numbering),
+    '#value' => geshifilter_process($source_code, $node->language, $line_numbering),
     '#weight' => 0,
   );
   return $node;
