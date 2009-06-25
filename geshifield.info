@@ -1,0 +1,6 @@
+; $Id$
+name = "GeSHi field"
+description = "Provides a CCK field for source code with GeSHI syntax highlighting."
+dependencies = content
+package = "Filters"
+core = 6.x

@@ -1,0 +1,36 @@
+<?php
+
+/**
+ * @file
+ * Install and unistall related function for the GeSHi Field module.
+ * 
+ * @todo check this content_notify stuff.
+ */
+
+/**
+ * Implementation of hook_install().
+ */
+function geshifield_install() {
+  content_notify('install', 'geshifield');
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function geshifield_uninstall() {
+  content_notify('uninstall', 'geshifield');
+}
+
+/**
+ * Implementation of hook_enable().
+ */
+function geshifield_enable() {
+  content_notify('enable', 'geshifield');
+}
+
+/**
+ * Implementation of hook_disable().
+ */
+function geshifield_disable() {
+  content_notify('disable', 'geshifield');
+}
