@@ -1,5 +1,5 @@
 <?php
-// $Id: geshifilter.module,v 1.18.2.50 2008/01/18 22:45:51 soxofaan Exp $
+// $Id: geshifilter.module,v 1.18.2.53 2008/02/22 09:09:32 soxofaan Exp $
 
 /**
  * @file
@@ -266,7 +266,7 @@ function _geshifilter_general_highlight_tags_settings($format=NULL) {
   // PHP specific delimiters
   $form['geshifilter']["geshifilter_enable_php_delimiters$f"] = array(
     '#type' => 'checkbox',
-    '#title' => t('Also apply syntax highlighting to &lt;?php ... ?&gt; style PHP source code blocks.'),
+    '#title' => t('Apply syntax highlighting to &lt;?php ... ?&gt; style PHP source code blocks.'),
     '#description' => t('When enabled, PHP source code enclosed in &lt;?php...?&gt or &lt;%...%&gt; will also be processed.'),
     '#default_value' => _geshifilter_php_delimeters($format),
   );
@@ -615,73 +615,8 @@ function geshifilter_admin_per_language_settings_submit($form_id, $form_values) 
  * Menu callback for filter conflicts page
  */
 function geshifilter_admin_filter_conflicts($check_only=FALSE) {
-  // start
-  $output = '';
-  // check if GeSHi library is available
-  $geshi_library = _geshifilter_check_geshi_library();
-  if (!$geshi_library['success']) {
-    if (!$check_only) {
-      drupal_set_message($geshi_library['message'], 'error');
-    }
-    return $output;
-  }
-  $alerts = array();
-  // some known order conflict filters
-  $order_conflict_filters = array(
-    'filter/0' => array( // HTML filter
-      'order' => 'after',
-      'description' => '%geshifilter should come after %cfilter to prevent loss of layout and highlighting.',
-      'solution' => array('text' => 'Rearrange filters', 'link' => '/order'),
-    ),
-    'pearwiki_filter/0' => array(
-      'order' => 'after',
-      'description' => 'It is recommended to put %geshifilter after %cfilter.',
-      'solution' => array('text' => 'Rearrange filters', 'link' => '/order'),
-    ),
-    'codefilter/0' => array(
-      'order' => 'both',
-      'description' => '%geshifilter and %cfilter should not be used in the same input format.',
-      'solution' => array('text' => 'Disable one of the filters', 'link' => ''),
-    )
-  );
-  foreach (filter_formats() as $format => $input_format) {
-    // Get the filters in this input format
-    $filters = filter_list_format($format);
-    // look if GeSHi is enabled in this input format
-    if (isset($filters['geshifilter/0'])) {
-      $geshifilter = $filters['geshifilter/0'];
-      // Check if possibly conflicting filters are also present in input format
-      foreach ($order_conflict_filters as $filter_key => $conflict_info) {
-        // does this filter exist in the input format?
-        if (array_key_exists($filter_key, $filters)) {
-          $cfilter = $filters[$filter_key];
-          if (($conflict_info['order'] == 'both')
-            || ($conflict_info['order'] == 'after' && $geshifilter->weight <= $cfilter->weight)
-            || ($conflict_info['order'] == 'before' && $geshifilter->weight >= $cfilter->weight)
-          ) {
-            $alerts[] = array(
-              l(t($input_format->name), "admin/settings/filters/$format"),
-              $cfilter->name,
-              t($conflict_info['description'], array('%cfilter' => $cfilter->name, '%geshifilter' => $geshifilter->name)),
-              l(t($conflict_info['solution']['text']), "admin/settings/filters/$format". $conflict_info['solution']['link'], array(), drupal_get_destination()),
-            );
-          }
-        }
-      }
-    }
-  }
-  if ($check_only) {
-    return count($alerts);
-  }
-  else {
-    // show alerts
-    if (count($alerts) == 0) {
-      $alerts[] = array(array('data' => t('No known filter conflicts were detected.'), 'colspan' => 4));
-    }
-    $header = array(t('Input format'), t('Filter'), t('Description'), t('Possible solutions'));
-    $output .= theme('table', $header, $alerts);
-    return $output;
-  }
+  require_once('geshifilter.conflicts.inc');
+  return _geshifilter_admin_filter_conflicts($check_only);
 }
 
 /**
@@ -867,6 +802,7 @@ function _geshifilter_css_mode() {
  * Helper function for clearing the appropriate filter cache entries
  */
 function _geshifilter_clear_filter_cache() {
+  $message = FALSE;
   // iterate over input formats
   foreach (filter_formats() as $format => $input_format) {
     // Get the filters in this input format
@@ -874,7 +810,12 @@ function _geshifilter_clear_filter_cache() {
     // look if GeSHi is enabled in this input format
     if (isset($filters['geshifilter/0'])) {
       cache_clear_all($format .':', 'cache_filter', TRUE);
+      $message = TRUE;
     }
+  }
+  // give a message that the filter cache was cleared
+  if ($message) {
+    drupal_set_message(t('GeSHi filter cleared the filter cache for the appropriate input formats.'));
   }
 }
 
@@ -898,6 +839,7 @@ function _geshifilter_generate_languages_css() {
   // make stylesheet file name (depends on enabled languages)
   $stylesheet_file = $path .'/geshifilter-languages-'. substr(md5(serialize($languages)), 0, 8) .'.css';
   if (!file_exists($stylesheet_file)) {
+    require_once('geshifilter.pages.inc');
     // build stylesheet
     $stylesheet = '';
     foreach ($languages as $langcode => $language_full_name) {
