@@ -1,6 +1,11 @@
 <?php
-// $Id: geshifilter.conflicts.inc,v 1.1.2.3 2008/02/19 10:23:27 soxofaan Exp $
+// $Id: geshifilter.conflicts.inc,v 1.1.2.4 2008/05/01 17:01:02 soxofaan Exp $
 
+require_once('geshifilter.inc');
+
+/**
+ * Menu callback for filter conflicts page
+ */
 function _geshifilter_admin_filter_conflicts($check_only=FALSE) {
   // start
   $output = '';

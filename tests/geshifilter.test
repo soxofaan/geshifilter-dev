@@ -1,5 +1,5 @@
 <?php
-// $Id: geshifilter.test,v 1.1.2.3 2008/02/19 10:17:10 soxofaan Exp $
+// $Id: geshifilter.test,v 1.1.2.4 2008/04/13 22:49:08 soxofaan Exp $
 
 /**
 * Unit tests for the GeSHi filter module.
@@ -80,7 +80,7 @@ class GeshiFilterTest extends DrupalTestCase {
     $this->drupalVariableSet('geshifilter_default_line_numbering', GESHIFILTER_LINE_NUMBERS_DEFAULT_NONE);
 
     // log out as filter admin
-    $this->drupalGet(url('logout', array('absolute' => TRUE)));
+    $this->drupalGet(url('logout', NULL, NULL, TRUE));
 
     // log in as the normal user for adding pages
     $this->drupalLoginUser($this->normal_user);
@@ -97,7 +97,7 @@ class GeshiFilterTest extends DrupalTestCase {
    */
   function tearDown() {
     // log in as filter admin
-    $this->drupalGet(url('logout', array('absolute' => TRUE)));
+    $this->drupalGet(url('logout', NULL, NULL, TRUE));
     $this->drupalLoginUser($this->filter_admin_user);
 
     // remove input format
