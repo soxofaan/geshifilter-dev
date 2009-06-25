@@ -130,20 +130,13 @@ function geshifilter_menu() {
     'type' => MENU_LOCAL_TASK,
     'weight' => 6,
   );
-  // clear available languages cache
-  $items['geshifilter/clearavailablelanguagescache'] = array(
-    'title' => 'Clear available languages cache',
-    'file' => 'geshifilter.admin.inc',
-    'page callback' => 'geshifilter_clear_available_languages_cache',
-    'access arguments' => array('administer site configuration'),
-    'type' => MENU_CALLBACK,
-  );
-  // callback for generating CSS rules
+  // Callback for generating CSS rules.
   $items['admin/settings/geshifilter/generate_css'] = array(
     'page callback' => 'geshifilter_generate_language_css_rules',
     'access arguments' => array('administer site configuration'),
     'type' => MENU_CALLBACK,
   );
+
   return $items;
 }
 
@@ -155,9 +148,7 @@ function geshifilter_init() {
   // Since the filtered content is cached, it is not possible to know on which
   // pages the css file is actually needed. Thus it is included on all pages.
   if (variable_get('geshifilter_css_mode', GESHIFILTER_CSS_INLINE) == GESHIFILTER_CSS_CLASSES_AUTOMATIC) {
-    if ($stylesheet_file = variable_get('geshifilter_languages_css', NULL)) {
-      drupal_add_css($stylesheet_file);
-    }
+    drupal_add_css(file_directory_path() .'/geshifilter-languages.css');
   }
   drupal_add_css(drupal_get_path('module', 'geshifilter') .'/geshifilter.css');
 }
