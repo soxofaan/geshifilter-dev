@@ -16,10 +16,12 @@ pre.geshifilter, div.geshifilter {
   margin: 0.5em;
   border: 1px solid #ccc;
   background-color: #ffe;
+  line-height: 1.3;
 }
 
 .geshifilter ol {
   margin: 0;
+  line-height: 1.3;
 }
 
 /**
@@ -55,3 +57,6 @@ pre.geshifilter, div.geshifilter {
 .geshifilter .sc2 {color: #339933;}
 .geshifilter .sc3 {color: #009900;}
 .geshifilter .st0 {color: #483d8b;}
+.geshifilter .li1 {font-weight: normal;}
+.geshifilter .li2 {font-weight: bold; font-style: italic;}
+.geshifilter .li2 div {font-weight: normal; font-style: normal;}
