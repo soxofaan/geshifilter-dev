@@ -1,5 +1,5 @@
 <?php
-// $Id: geshifilter.module,v 1.18.2.40 2007/12/12 15:17:23 soxofaan Exp $
+// $Id: geshifilter.module,v 1.18.2.43 2008/01/14 12:17:35 soxofaan Exp $
 
 /**
  * @file
@@ -55,7 +55,7 @@ function geshifilter_help($section) {
     case 'admin/settings/geshifilter/languages/enabled':
     case 'admin/settings/geshifilter/languages/all':
     case 'admin/settings/geshifilter/languages/disabled':
-      $output = '<p>'. t('Here you can enable/disable the desired languages to use. It is suggested to disable languages that are not relevant for you site not only to avoid unnecessary cluttering of the GeSHi filter configuration pages and the !filtertips, but also to make the GeSHi filter processing lighter.', array('!filtertips' => l(t('filter tips'), 'filter/tips'),)) .'</p>';
+      $output = '<p>'. t('Here you can enable/disable the desired languages to use. It is suggested to disable languages that are not relevant for you site not only to avoid unnecessary cluttering of the GeSHi filter configuration pages and the !filtertips, but also to make the GeSHi filter processing lighter.', array('!filtertips' => l(t('filter tips'), 'filter/tips'))) .'</p>';
       if (!geshifilter_use_format_specific_options()) {
         $output .= '<p>'. t('You can also define the language specific tags here.') .'</p>';
       }
@@ -366,7 +366,7 @@ function _geshifilter_check_geshi_library($use_cache=TRUE, $geshi_dir=NULL, $loa
       if ($load_when_found) {
         require_once($geshi_dir .'/geshi.php');
         // check version
-        $geshi_library_version = explode('.',GESHI_VERSION);
+        $geshi_library_version = explode('.', GESHI_VERSION);
         if (!($geshi_library_version[0] == '1' &&  $geshi_library_version[1] == '0')) {
           $geshi_library['success'] = FALSE;
           $geshi_library['loaded'] = FALSE;
@@ -488,7 +488,8 @@ function geshifilter_per_language_settings($format, $view, $add_checkbox, $add_t
         '#default_value' => $enabled,
         '#title' => $language_data['fullname'],
       );
-    } else {
+    }
+    else {
       $form['languages'][$language]['fullname'] = array(
         '#type' => 'markup',
         '#value' => $language_data['fullname'],
@@ -1005,13 +1006,13 @@ function _geshifilter_prepare($format, $text) {
   // still works when teaser view trims inside the source code.
   switch (_geshifilter_brackets($format)) {
     case GESHIFILTER_BRACKETS_ANGLE:
-      $pattern = '#(<)('. $tags_string .')([^>]*)(>)(.*?)(</\2\s*>|$)#s';
+      $pattern = '#(<)('. $tags_string .')((\s+[^>]*)*)(>)(.*?)(</\2\s*>|$)#s';
       break;
     case GESHIFILTER_BRACKETS_SQUARE:
-      $pattern = '#(\[)('. $tags_string .')([^\]]*)(\])(.*?)(\[/\2\s*\]|$)#s';
+      $pattern = '#(\[)('. $tags_string .')((\s+[^\]]*)*)(\])(.*?)(\[/\2\s*\]|$)#s';
       break;
     case GESHIFILTER_BRACKETS_BOTH:
-      $pattern = '#([<\[])('. $tags_string .')([^>\]]*)([>\]])(.*?)(\1/\2\s*\4|$)#s';
+      $pattern = '#([<\[])('. $tags_string .')((\s+[^>\]]*)*)([>\]])(.*?)(\1/\2\s*\5|$)#s';
       break;
   }
   // replace the code container tag brackets
@@ -1026,10 +1027,9 @@ function _geshifilter_prepare($format, $text) {
 
 /**
  * _geshifilter_prepare callback for preparing input text.
- * Replaces the code tags brackets with 0xFE and 0xFF
- * (e.g. "[code]" -> "\xFEcode\xFF").
- * The used bytes 0xFE and 0xFF are not valid UTF-8 data thus least likely to
- * cause problems (based on the codefilter module).
+ * Replaces the code tags brackets with geshifilter specific ones to prevent
+ * possible messing up by other filters, e.g.
+ *   '[python]foo[/python]' to '[geshifilter-python]foo[/geshifilter-python]'.
  * Replaces newlines with "&#10;" to prevent issues with the line break filter
  * Escapes the tricky characters like angle brackets with check_plain() to
  * prevent messing up by other filters like the HTML filter.
@@ -1059,18 +1059,18 @@ function _geshifilter_prepare_callback($match) {
     }
   }
   // return escaped code block
-  return "\xFE". $match[2] . $match[3] ."\xFF"
-    . str_replace(array("\r", "\n"), array('', '&#10;'), check_plain($match[5]))
-    ."\xFE/". $match[2]. "\xFF";
+  return '[geshifilter-'. $match[2] . $match[3] .']'
+    . str_replace(array("\r", "\n"), array('', '&#10;'), check_plain($match[6]))
+    .'[/geshifilter-'. $match[2] .']';
 }
 
 /**
  * _geshifilter_prepare callback for < ?php ... ? > blocks
  */
 function _geshifilter_prepare_php_callback($match) {
-  return "\xFE\xFEphp\xFF"
+  return '[geshifilter-questionmarkphp]'
     . str_replace(array("\r", "\n"), array('', '&#10;'), check_plain($match[2]))
-    ."\xFE/\xFEphp\xFF";
+    .'[/geshifilter-questionmarkphp]';
 }
 
 /**
@@ -1086,13 +1086,13 @@ function _geshifilter_process($format, $text) {
   // get the available tags
   list($generic_code_tags, $language_tags, $tag_to_lang) = _geshifilter_get_tags($format);
   if (_geshifilter_php_delimeters($format)) {
-    $language_tags[] = "\xFEphp";
-    $tag_to_lang["\xFEphp"] = 'php';
+    $language_tags[] = 'questionmarkphp';
+    $tag_to_lang['questionmarkphp'] = 'php';
   }
   $tags = array_merge($generic_code_tags, $language_tags);
   $tags_string = implode('|', $tags);
   // Pattern for matching the prepared "<code>...</code>" stuff
-  $pattern = '#\xFE('. $tags_string .')([^\xFF]*)\xFF(.*?)(\xFE/\1\xFF)#s';
+  $pattern = '#\\[geshifilter-('. $tags_string .')([^\\]]*)\\](.*?)(\\[/geshifilter-\1\\])#s';
   $text = preg_replace_callback($pattern, '_geshifilter_replace_callback', $text);
   return $text;
 }
@@ -1116,8 +1116,8 @@ function _geshifilter_replace_callback($match) {
   // get the possible tags and languages
   list($generic_code_tags, $language_tags, $tag_to_lang) = _geshifilter_get_tags($format);
   if (variable_get('geshifilter_enable_php_delimiters', FALSE)) {
-    $language_tags[] = "\xFEphp";
-    $tag_to_lang["\xFEphp"] = 'php';
+    $language_tags[] = 'questionmarkphp';
+    $tag_to_lang['questionmarkphp'] = 'php';
   }
 
   $enabled_languages = _geshifilter_get_enabled_languages();
@@ -1312,11 +1312,11 @@ function _geshifilter_generate_languages_css() {
   $path = file_directory_path() .'/geshifilter';
   file_check_directory($path, FILE_CREATE_DIRECTORY);
   // make stylesheet file name (depends on enabled languages)
-  $stylesheet_file = $path . '/' . 'geshifilter-languages-'. substr(md5(serialize($languages)), 0, 8) .'.css';
+  $stylesheet_file = $path .'/geshifilter-languages-'. substr(md5(serialize($languages)), 0, 8) .'.css';
   if (!file_exists($stylesheet_file)) {
     // build stylesheet
     $stylesheet = '';
-    foreach($languages as $langcode => $language_full_name) {
+    foreach ($languages as $langcode => $language_full_name) {
       $geshi = _geshifilter_GeSHi_factory('', $langcode);
       _geshifilter_override_geshi_defaults($geshi, $langcode);
       $stylesheet .= $geshi->get_stylesheet(FALSE) ."\n";
@@ -1326,7 +1326,7 @@ function _geshifilter_generate_languages_css() {
     $ret = file_save_data($stylesheet, $stylesheet_file, FILE_EXISTS_REPLACE);
     if ($ret) {
       variable_set('geshifilter_languages_css', $ret);
-      drupal_set_message(t('Generated external CSS file %file.', array('%file'=> $ret)));
+      drupal_set_message(t('Generated external CSS file %file.', array('%file' => $ret)));
     }
     else {
       drupal_set_message(t('Could not generate external CSS file. Check the settings of your !filesystem.',
