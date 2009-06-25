@@ -1,5 +1,5 @@
 <?php
-// $Id: geshifilter.admin.inc,v 1.15.2.4 2008/05/27 23:12:43 soxofaan Exp $
+// $Id: geshifilter.admin.inc,v 1.15.2.5 2008/09/04 09:17:01 soxofaan Exp $
 
 require_once('geshifilter.inc');
 
@@ -358,7 +358,7 @@ function _geshifilter_general_highlight_tags_settings($format=NULL) {
   $form['geshifilter']["geshifilter_enable_php_delimiters$f"] = array(
     '#type' => 'checkbox',
     '#title' => t('Also apply syntax highlighting to &lt;?php ... ?&gt; style PHP source code blocks.'),
-    '#description' => t('When enabled, PHP source code enclosed in &lt;?php...?&gt or &lt;%...%&gt; will also be processed.'),
+    '#description' => t('When enabled, PHP source code enclosed in &lt;?php...?&gt; or &lt;%...%&gt; will also be processed.'),
     '#default_value' => _geshifilter_php_delimeters($format),
   );
   return $form;

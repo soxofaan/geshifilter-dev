@@ -1,5 +1,5 @@
 <?php
-// $Id: geshifilter.module,v 1.18.2.62 2008/05/01 20:08:57 soxofaan Exp $
+// $Id: geshifilter.module,v 1.18.2.63 2009/01/04 16:46:52 soxofaan Exp $
 
 /**
  * @file
@@ -45,7 +45,7 @@ function geshifilter_help($section) {
           '!repositorypolicies' => url('http://drupal.org/node/66113'),
           '!geshi' => url('http://qbnz.com/highlighter/'),
         )) .'</p>';
-        $output .= t('<p>Quick overview of how to set up and use the GeSHi filter:</p><ul><li>Install the GeSHi library and specify its path on the <a href="!geshifilter_settings">GeSHi filter administration page</a>.</li><li>Configure the <a href="!geshifilter_settings">general GeSHi filter settings</a>.</li><li><a href="!geshifilter_languages">Enable the relevant languages</a> for your site.</li><li>Enable the GeSHi filter in the desired !inputformats.</li><li>Check for !filterconflicts and resolve them.</li><li>Use the input format during content submission as described in the !filtertips.</li></ul>', array(
+        $output .= t('<p>Quick overview of how to set up and use the GeSHi filter:</p><ul><li>Install the GeSHi library and specify its path on the <a href="!geshifilter_settings">GeSHi filter administration page</a>.</li><li>Configure the <a href="!geshifilter_settings">general GeSHi filter settings</a>.</li><li><a href="!geshifilter_languages">Enable the relevant languages</a> for your site and set their language tags if needed.</li><li>Enable the GeSHi filter in the desired !inputformats.</li><li>Check for !filterconflicts and resolve them.</li><li>Use the input format during content submission as described in the !filtertips.</li></ul>', array(
           '!geshifilter_settings' => url('admin/settings/geshifilter'),
           '!geshifilter_languages' => url('admin/settings/geshifilter/languages/all'),
           '!inputformats' => l(t('input formats'), 'admin/settings/filters'),

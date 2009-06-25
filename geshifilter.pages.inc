@@ -1,5 +1,5 @@
 <?php
-// $Id: geshifilter.pages.inc,v 1.3.2.7 2008/05/01 19:41:08 soxofaan Exp $
+// $Id: geshifilter.pages.inc,v 1.3.2.8 2009/01/04 17:41:52 soxofaan Exp $
 
 require_once('geshifilter.inc');
 
@@ -242,13 +242,13 @@ function _geshifilter_replace_callback($match, $format) {
 
   // Get additional settings from the tag attributes.
   $settings = _geshifilter_parse_attributes($tag_attributes, $format);
-  if ($settings['language']) {
+  if (isset($settings['language'])) {
     $lang = $settings['language'];
   }
-  if ($settings['line_numbering']) {
+  if (isset($settings['line_numbering'])) {
     $line_numbering = $settings['line_numbering'];
   }
-  if ($settings['linenumbers_start']) {
+  if (isset($settings['linenumbers_start'])) {
     $linenumbers_start = $settings['linenumbers_start'];
   }
 

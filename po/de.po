@@ -1,39 +1,40 @@
-# $Id: geshifilter.pot,v 1.1.2.3 2008/12/25 23:46:40 hass Exp $
+# $Id: de.po,v 1.1.2.2 2008/12/26 20:36:06 hass Exp $
 #
 # LANGUAGE translation of Drupal (general)
 # Copyright YEAR NAME <EMAIL@ADDRESS>
 # Generated from files:
-#  geshifilter.admin.inc,v 1.15.2.5 2008/09/04 09:17:01 soxofaan
-#  geshifilter.module,v 1.18.2.62 2008/05/01 20:08:57 soxofaan
-#  geshifilter.filtertips.inc,v 1.1.2.3 2008/05/01 17:01:02 soxofaan
-#  geshinode.module,v 1.1.2.6 2008/06/02 22:24:45 soxofaan
-#  geshifilter.conflicts.inc,v 1.1.2.4 2008/05/01 17:01:02 soxofaan
-#  geshifilter.inc,v 1.4.2.2 2008/05/01 17:01:02 soxofaan
-#  geshifilter.info,v 1.2.2.2 2007/09/22 12:52:16 soxofaan
-#  geshinode.info,v 1.1.2.2 2007/09/22 17:30:30 soxofaan
-#  geshifilter.install,v 1.2.2.2 2008/04/12 22:33:53 soxofaan
-#  geshinode.install,v 1.1.2.2 2007/09/22 16:32:23 soxofaan
+#  geshifilter.admin.inc,v 1.19 2008/09/04 09:13:15 soxofaan
+#  geshifilter.module,v 1.41 2008/07/21 17:44:23 soxofaan
+#  geshifilter.filtertips.inc,v 1.5 2008/07/21 17:44:23 soxofaan
+#  geshinode.module,v 1.9 2008/07/21 17:44:23 soxofaan
+#  geshifilter.conflicts.inc,v 1.4 2008/07/21 17:44:23 soxofaan
+#  geshifilter.inc,v 1.5 2008/07/21 17:44:23 soxofaan
+#  geshifilter.info,v 1.4 2007/12/13 00:13:22 soxofaan
+#  geshinode.info,v 1.3 2008/01/07 01:20:40 soxofaan
+#  geshifilter.install,v 1.6 2008/07/21 17:44:23 soxofaan
+#  geshinode.install,v 1.4 2008/07/21 17:44:23 soxofaan
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
+"Project-Id-Version: German translation of GeSHi Filter\n"
 "POT-Creation-Date: 2008-12-26 00:44+0100\n"
-"PO-Revision-Date: YYYY-mm-DD HH:MM+ZZZZ\n"
-"Last-Translator: NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
+"PO-Revision-Date: 2008-12-26 21:35+0100\n"
+"Last-Translator: Alexander Haß\n"
+"Language-Team: Alexander Haß\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-Language: German\n"
+"X-Poedit-Country: GERMANY\n"
 
 #: geshifilter.admin.inc:13
 msgid "GeSHi filter"
-msgstr ""
+msgstr "GeSHi-Filter"
 
 #: geshifilter.admin.inc:22
 msgid "Per language tags"
-msgstr ""
+msgstr "Tags nach Sprache"
 
 #: geshifilter.admin.inc:29
 msgid "GeSHi filter is configured to use global tag settings. For separate settings per input format, enable this option in the <a href=\"!geshi_admin_url\">general GeSHi filter settings</a>."
@@ -41,19 +42,20 @@ msgstr ""
 
 #: geshifilter.admin.inc:48
 msgid "GeSHi library version @version detected"
-msgstr ""
+msgstr "GeSHi-Bibliothek mit der Version @version wurde gefunden"
 
 #: geshifilter.admin.inc:48
 msgid "GeSHi library"
-msgstr ""
+msgstr "GeSHi-Bibliothek"
 
+# BUG English: seperately -> separately
 #: geshifilter.admin.inc:49
 msgid "The GeSHi filter requires the GeSHi library (which needs to be <a href=\"!geshi\">downloaded</a> and installed seperately)."
-msgstr ""
+msgstr "Der GeSHi-Filter benötigt die GeSHi-Bibliothek (welche gesondert <a href=\"!geshi\">heruntergeladen</a> und installiert werden muss)."
 
 #: geshifilter.admin.inc:56
 msgid "Path to GeSHi library"
-msgstr ""
+msgstr "Pfad zur GeSHi-Bibliothek"
 
 #: geshifilter.admin.inc:58
 msgid "Specify the path to the GeSHi library directory (which contains a file called <em>geshi.php</em>)."
@@ -61,11 +63,11 @@ msgstr ""
 
 #: geshifilter.admin.inc:75
 msgid "GeSHi filter tags and delimiters"
-msgstr ""
+msgstr "GeSHi-Filter-Tags und Trennzeichen"
 
 #: geshifilter.admin.inc:81
 msgid "Use input format specific tag settings."
-msgstr ""
+msgstr "Eingabeformatspezifische Tag-Einstellungen verwenden."
 
 #: geshifilter.admin.inc:83
 msgid "Enable seperate tag settings of the GeSHi filter for each <a href=\"!input_formats\">input format</a> instead of global tag settings."
@@ -73,87 +75,95 @@ msgstr ""
 
 #: geshifilter.admin.inc:93
 msgid "Syntax highlighting options"
-msgstr ""
+msgstr "Optionen für Syntaxhervorhebung"
 
 #: geshifilter.admin.inc:100
 msgid "Default highlighting mode"
-msgstr ""
+msgstr "Standardmäßiger Hervorhebungsmodus"
 
 #: geshifilter.admin.inc:103
 msgid "No highlighting"
-msgstr ""
+msgstr "Keine Hervorhebung"
 
 #: geshifilter.admin.inc:104
 msgid "Do nothing"
-msgstr ""
+msgstr "Nichts machen"
 
 #: geshifilter.admin.inc:105
 msgid "As plain text"
-msgstr ""
+msgstr "Als Klartext"
 
-#: geshifilter.admin.inc:107 geshifilter.module:104
+#: geshifilter.admin.inc:107
+#: geshifilter.module:104
 msgid "Languages"
-msgstr ""
+msgstr "Sprachen"
 
 #: geshifilter.admin.inc:109
 msgid "Select the default highlighting mode to use when no language is defined with a language attribute in the tag."
-msgstr ""
+msgstr "Den Standardmäßig zu verwendende Hervorhebungsmodus auswählen, wenn im Tag mit dem Sprachattribut keine Sprache festgelegt wurde."
 
 #: geshifilter.admin.inc:114
 msgid "Default line numbering"
-msgstr ""
+msgstr "Standardmäßige Zeilennummerierung"
 
-#: geshifilter.admin.inc:117 geshifilter.filtertips.inc:98 geshinode.module:166
+#: geshifilter.admin.inc:117
+#: geshifilter.filtertips.inc:98
+#: geshinode.module:166
 msgid "no line numbers"
-msgstr ""
+msgstr "Keine Zeilennummern"
 
-#: geshifilter.admin.inc:118 geshifilter.filtertips.inc:101 geshinode.module:167
+#: geshifilter.admin.inc:118
+#: geshifilter.filtertips.inc:101
+#: geshinode.module:167
 msgid "normal line numbers"
-msgstr ""
+msgstr "Normale Zeilennummern"
 
-#: geshifilter.admin.inc:119;120;121 geshifilter.filtertips.inc:104 geshinode.module:168;169;170
+#: geshifilter.admin.inc:119;120;121
+#: geshifilter.filtertips.inc:104
+#: geshinode.module:168;169;170
 msgid "fancy line numbers (every @n lines)"
-msgstr ""
+msgstr "Ausgefallene Zeilennummern (jede @n Zeilen)"
 
+# Englisch needs work. context sensitive string
 #: geshifilter.admin.inc:123
 msgid "Select the default line numbering scheme: no line numbers, normal line numbers or fancy line numbers. With fancy line numbers every n<sup>th</sup> line number is highlighted. (GeSHi documentation: !link)."
-msgstr ""
+msgstr "Das standardmäßige Zeilennummerierungsschema auswählen: keine Zeilennummern, normale Zeilennummern oder ausgefallene Zeilennummern. Mit ausgefallenen Zeilennummern wird jede n<sup>te</sup>-Zeilennummer hervorgehoben. (GeSHi-Dokumentation: !link)."
 
 #: geshifilter.admin.inc:129
 msgid "Use built-in PHP function <code>highlight_string()</code> for PHP source code."
-msgstr ""
+msgstr "Die in PHP eingebaute Funktion <code>highlight_string()</code> für PHP-Quellcode verwenden."
 
 #: geshifilter.admin.inc:130
 msgid "When enabled, PHP source code will be syntax highlighted with the built-in PHP function <code>!highlight_string</code> instead of with the GeSHi library. GeSHi features like for example line numbering and usage of an external CSS stylesheet are not available."
-msgstr ""
+msgstr "Sobald aktiviert, wird die eingebaute PHP-Funktion <code>!highlight_string</code> zur Syntaxhervorhebung des PHP-Quellcodes anstatt die GeSHi-Bibliothek verwendet. GeSHi-Funktionen wie beispielsweise die Zeilennummerierung und Verwendung eines externe CSS-Stylesheets sind nicht verfügbar."
 
 #: geshifilter.admin.inc:136
 msgid "Enable GeSHi keyword URLs"
-msgstr ""
+msgstr "GeSHi-Schlüsselwort-URL‘s aktivieren"
 
 #: geshifilter.admin.inc:137
 msgid "For some languages GeSHi can link language keywords (e.g. standard library functions) to their online documentation. (GeSHi documentation: !link)"
-msgstr ""
+msgstr "Für einige Spachen kann GeSHi die Sprachschlüsselwörter (z.b. standardmäßige Bibliothek-Funktionen) mit ihrer Online-Dokumentation verlinken. (GeSHi-Dokumentation: !link)"
 
 #: geshifilter.admin.inc:145
 msgid "Styling, layout and CSS"
-msgstr ""
+msgstr "Design, Layout und CSS"
 
 #: geshifilter.admin.inc:152
 msgid "CSS mode for syntax highlighting"
-msgstr ""
+msgstr "CSS-Modus für die Syntaxhervorhebung"
 
 #: geshifilter.admin.inc:154
 msgid "Inline CSS style attributes."
-msgstr ""
+msgstr "Designattribute mit Inline-CSS."
 
 #: geshifilter.admin.inc:155
 msgid "Use CSS classes and an automatically managed external CSS style sheet."
-msgstr ""
+msgstr "CSS-Klassen und ein automatisch verwaltetes CSS-Stylesheet verwenden."
 
 #: geshifilter.admin.inc:156
 msgid "Only add CSS classes to the markup."
-msgstr ""
+msgstr "Nur die CSS-Klassen zum Markup hinzufügen"
 
 #: geshifilter.admin.inc:159
 msgid "Inline CSS is easier to set up, does not depend on an external style sheets and is consequently more robust to copy/paste operations like content aggregation. However, usage of CSS classes and an external stylesheet requires much less markup code and bandwidth. The external style sheet can be managed automatically by the GeSHi filter module, but this feature requires the public <a href=\"!filesystem\">download method</a>. If the GeSHi filter is configured to only add the CSS classes to the markup, the administrator or themer is responsible for adding the appropriate CSS rules to the pages (e.g. based on <a href=\"!cssdefaults\">these defaults</a>). (GeSHi documentation: !geshidoc)."
@@ -161,51 +171,52 @@ msgstr ""
 
 #: geshifilter.admin.inc:170
 msgid "Code container"
-msgstr ""
+msgstr "Code-Container"
 
 #: geshifilter.admin.inc:171
 msgid "Define the container element to use for code blocks. (GeSHi documentation: !link)."
-msgstr ""
+msgstr "Das für Code-Blöcke zu verwendende Container-Element festlegen. (GeSHi-Dokumentation: !link)."
 
+# whitespace translation or as-is?
 #: geshifilter.admin.inc:175
 msgid "Use @cnt container (efficient whitespace coding, no automatic line wrapping)"
-msgstr ""
+msgstr "@cnt-Container verwenden (Effiziente Leerraum-Codierung, kein automatischer Zeilenumbruch)"
 
 #: geshifilter.admin.inc:176
 msgid "Use @cnt container (enables automatic line wrapping)"
-msgstr ""
+msgstr "@cnt-Container verwenden (aktiviert automatischen Zeilenumbruch)"
 
 #: geshifilter.admin.inc:177
 msgid "Use no container"
-msgstr ""
+msgstr "Keinen Container verwenden"
 
 #: geshifilter.admin.inc:211
 msgid "GeSHi filter can not automatically manage an external CSS style sheet when the download method is private."
-msgstr ""
+msgstr "Der GeSHi-Filter kann ein externes CSS-Stylesheet mit der privaten Download-Methode nicht automatisch verwalten."
 
 #: geshifilter.admin.inc:251
 msgid "Flush cache of available languages"
-msgstr ""
+msgstr "Cache von verfügbaren Sprachen leeren"
 
 #: geshifilter.admin.inc:311
 msgid "The language tags should differ between languages and from the generic tags."
-msgstr ""
+msgstr "Die Sprach-Tags sollten sich zwischen den Sprachen und von generischen Tags unterscheiden."
 
 #: geshifilter.admin.inc:341
 msgid "Generic syntax highlighting tags"
-msgstr ""
+msgstr "Generische Syntaxhervorhebungs-Tags"
 
 #: geshifilter.admin.inc:343
 msgid "Tags that should activate the GeSHi syntax highlighting. Specify a space-separated list of tagnames."
-msgstr ""
+msgstr "Tags welche die GeSHi-Syntaxhervorhebung aktivieren sollen. Eine durch Leerzeichen getrennte Liste von Tagnamen angeben."
 
 #: geshifilter.admin.inc:348
 msgid "Tag style"
-msgstr ""
+msgstr "Tag-Form"
 
 #: geshifilter.admin.inc:352
 msgid "!angle or !square"
-msgstr ""
+msgstr "!angle oder !square"
 
 #: geshifilter.admin.inc:355
 msgid "Select which brackets should be used for the source code container tags."
@@ -221,91 +232,101 @@ msgstr ""
 
 #: geshifilter.admin.inc:379
 msgid "Language"
-msgstr ""
+msgstr "Sprache"
 
 #: geshifilter.admin.inc:380
 msgid "GeSHi language code"
-msgstr ""
+msgstr "GeSHi-Sprachcode"
 
 #: geshifilter.admin.inc:382
 msgid "Tag/language attribute value"
-msgstr ""
+msgstr "Tag/Sprachattributwert"
 
-#: geshifilter.admin.inc:443 geshifilter.module:113
+#: geshifilter.admin.inc:443
+#: geshifilter.module:113
 msgid "Enabled"
-msgstr ""
+msgstr "Aktiviert"
 
 #: geshifilter.admin.inc:472
 msgid "GeSHi filter cleared the filter cache for the appropriate input formats."
-msgstr ""
+msgstr "Der GeSHi-Filter hat den Filter-Cache für die entsprechenden Eingabeformate geleert."
 
 #: geshifilter.admin.inc:498
 msgid "Error while generating CSS rules: could not load GeSHi library."
-msgstr ""
+msgstr "Fehler beim Generieren von CSS-Regeln: GeSHi-Bibliothek konnte nicht geladen werden."
 
 #: geshifilter.admin.inc:520
 msgid "Generated external CSS file %file."
-msgstr ""
+msgstr "Die externe CSS-Datei %file wurde erstellt."
 
 #: geshifilter.admin.inc:523
+#, fuzzy
 msgid "Could not generate external CSS file. Check the settings of your !filesystem."
-msgstr ""
+msgstr "Die externe CSS-Datei konnte nicht generiert werden. Die Einstellungen für das !filesystem sollten überprüft werden."
 
 #: geshifilter.admin.inc:524
 msgid "file system"
-msgstr ""
+msgstr "Dateisystem"
 
 #: geshifilter.conflicts.inc:55
 msgid "No known filter conflicts were detected."
-msgstr ""
+msgstr "Es wurden keine bekannten Filterkonflikte erkannt."
 
 #: geshifilter.conflicts.inc:57
 msgid "Input format"
-msgstr ""
+msgstr "Eingabeformat"
 
 #: geshifilter.conflicts.inc:57
 msgid "Filter"
-msgstr ""
+msgstr "Filter"
 
 #: geshifilter.conflicts.inc:57
 msgid "Description"
-msgstr ""
+msgstr "Beschreibung"
 
 #: geshifilter.conflicts.inc:57
 msgid "Possible solutions"
-msgstr ""
+msgstr "Mögliche Lösungen"
 
 #: geshifilter.conflicts.inc:71
+#, fuzzy
 msgid "%cfilter should not come after %geshifilter to prevent loss of layout and highlighting."
-msgstr ""
+msgstr "%cfilter sollte nicht nach %geshifilter kommen, um den Verlust von Layout und Hervorherbung zu verhindern."
 
 #: geshifilter.conflicts.inc:73
 msgid "Rearrange filters"
-msgstr ""
+msgstr "Filter neu anordnen"
 
 #: geshifilter.conflicts.inc:79
+#, fuzzy
 msgid "%cfilter is configured to \"%escape\", which is likely to cause propblems with %geshifilter."
-msgstr ""
+msgstr "%cfilter wurde konfiguriert „%escape“, was wahrscheinlich Probleme mit %geshifilter verursachen wird."
 
 #: geshifilter.conflicts.inc:80
+#, fuzzy
 msgid "Escape all tags"
-msgstr ""
+msgstr "Alle Tags im Klartext anzeigen"
 
 #: geshifilter.conflicts.inc:81
+#, fuzzy
 msgid "Configure HTML filtering to \"%strip\""
-msgstr ""
+msgstr "HTML-Filterung zum „%strip“ konfigurieren"
 
 #: geshifilter.conflicts.inc:81
+#, fuzzy
 msgid "Strip disallowed tags"
-msgstr ""
+msgstr "Verbotene Tags löschen"
 
+# meaning? reagieren?
 #: geshifilter.conflicts.inc:96
+#, fuzzy
 msgid "%cfilter and %geshifilter trigger on the same tag \"&lt;code&gt;\"."
-msgstr ""
+msgstr "%cfilter und %geshifilter reagieren auf den gleichen Tag „&lt;code&gt;“."
 
 #: geshifilter.conflicts.inc:98
+#, fuzzy
 msgid "Remove \"code\" as generic syntax highlighting tag for %geshifilter, limit %geshifilter to tag style \"[foo]\" only or disable %cfilter"
-msgstr ""
+msgstr "Der Tag „code“ sollte für %geshifilter als generischer Syntaxhervorhebungstag entfernt werden und nur auf den Tag „[foo]“ begrenzt oder %cfilter deaktiviert werden."
 
 #: geshifilter.filtertips.inc:28
 msgid "Syntax highlighting of source code can be enabled with the following tags:"
@@ -313,15 +334,16 @@ msgstr ""
 
 #: geshifilter.filtertips.inc:35
 msgid "Generic syntax highlighting tags: !tags."
-msgstr ""
+msgstr "Generische Syntaxhervorhebungstags: !tags."
 
 #: geshifilter.filtertips.inc:39
+#, fuzzy
 msgid "for @lang source code"
-msgstr ""
+msgstr "für @lang-Quellcode"
 
 #: geshifilter.filtertips.inc:41
 msgid "Language specific syntax highlighting tags: !tags."
-msgstr ""
+msgstr "Sprachspezifische Syntaxhervorhebungstags: !tags."
 
 #: geshifilter.filtertips.inc:44
 msgid "PHP source code can also be enclosed in &lt;?php ... ?&gt; or &lt;% ... %&gt;, but additional options like line numbering are not possible here."
@@ -329,11 +351,11 @@ msgstr ""
 
 #: geshifilter.filtertips.inc:50
 msgid "Options and tips:"
-msgstr ""
+msgstr "Optionen und Tips:"
 
 #: geshifilter.filtertips.inc:64
 msgid "\"<code>@langcode</code>\" (for @fullname)"
-msgstr ""
+msgstr "„<code>@langcode</code>“ (für @fullname)"
 
 #: geshifilter.filtertips.inc:66
 msgid "The language for the generic syntax highlighting tags can be specified with one of the attribute(s): %attributes. The possible values are: !languages."
@@ -349,11 +371,11 @@ msgstr ""
 
 #: geshifilter.filtertips.inc:75;162
 msgid "Beside the tag style \"!angle\" it is also possible to use \"!bracket\"."
-msgstr ""
+msgstr "Neben der Tag-Form „!angle“ kann auch „!bracket“ verwendet werden."
 
 #: geshifilter.filtertips.inc:80
 msgid "Defaults:"
-msgstr ""
+msgstr "Standards:"
 
 #: geshifilter.filtertips.inc:85
 msgid "when no language attribute is specified the code block won't be processed by the GeSHi filter"
@@ -373,19 +395,21 @@ msgstr ""
 
 #: geshifilter.filtertips.inc:107
 msgid "Default line numbering: !description."
-msgstr ""
+msgstr "Standardmäßige Zeilennummerierung: !description."
 
 #: geshifilter.filtertips.inc:111
 msgid "Examples:"
-msgstr ""
+msgstr "Beispiele:"
 
 #: geshifilter.filtertips.inc:112
+#, fuzzy
 msgid "You type"
-msgstr ""
+msgstr "Eingegeben"
 
 #: geshifilter.filtertips.inc:112
+#, fuzzy
 msgid "You get"
-msgstr ""
+msgstr "Ergebnis"
 
 #: geshifilter.filtertips.inc:121
 msgid "Inline code with the default syntax highlighting mode."
@@ -413,19 +437,20 @@ msgstr ""
 
 #: geshifilter.filtertips.inc:165
 msgid "PHP source code can also be enclosed in &lt;?php ... ?&gt; or &lt;% ... %&gt;."
-msgstr ""
+msgstr "PHP-Quellcode kann in &lt;?php ... ?&gt; or &lt;% ... %&gt; eingeschlossen werden."
 
 #: geshifilter.inc:27
 msgid "GeSHi library error: %dir is not a directory."
-msgstr ""
+msgstr "GeSHi-Bibliothek-Fehler: %dir ist kein Verzeichnis."
 
 #: geshifilter.inc:39
 msgid "GeSHi library error: The detected version of GeSHi library (%version) is not supported. A version from the 1.0.x branch is required."
-msgstr ""
+msgstr "GeSHi-Bibliothek-Fehler: Die erkannte Version der GeSHi-Bibliothek (%version) wird nicht unterstützt. Eine Version aus dem 1.0.x-Zweig ist erforderlich."
 
 #: geshifilter.inc:48
+#, fuzzy
 msgid "GeSHi library error: Could not find a known version of the GeSHi library at %dir."
-msgstr ""
+msgstr "GeSHi-Bibliothek-Fehler: Es konnte keine bekannte Version der GeSHi-Bibliothek unter %dir gefunden werden."
 
 #: geshifilter.module:42
 msgid "The GeSHi filter module provides a filter for syntax highlighting of inline source code or blocks of source code based on the PHP library !GeSHi."
@@ -441,15 +466,15 @@ msgstr ""
 
 #: geshifilter.module:51
 msgid "input formats"
-msgstr ""
+msgstr "Eingabeformate"
 
 #: geshifilter.module:52
 msgid "filter conflicts"
-msgstr ""
+msgstr "Filterkonflikte"
 
 #: geshifilter.module:53;62
 msgid "filter tips"
-msgstr ""
+msgstr "Filtertips"
 
 #: geshifilter.module:62
 msgid "Here you can enable/disable the desired languages to use. It is suggested to disable languages that are not relevant for you site not only to avoid unnecessary cluttering of the GeSHi filter configuration pages and the !filtertips, but also to make the GeSHi filter processing lighter."
@@ -457,59 +482,60 @@ msgstr ""
 
 #: geshifilter.module:64
 msgid "You can also define the language specific tags here."
-msgstr ""
+msgstr "Hier können die sprachspezifischen Tags festgelegt werden."
 
-#: geshifilter.module:80 geshifilter.info:0
+#: geshifilter.module:80
+#: geshifilter.info:0
 msgid "GeSHi Filter"
-msgstr ""
+msgstr "GeSHi-Filter"
 
 #: geshifilter.module:81
 msgid "Configure the GeSHi filter."
-msgstr ""
+msgstr "GeSHi-Filter konfigurieren."
 
 #: geshifilter.module:89
 msgid "General settings"
-msgstr ""
+msgstr "Allgemeine Einstellungen"
 
 #: geshifilter.module:90
 msgid "General GeSHi filter settings."
-msgstr ""
+msgstr "Allgemeine GeSHi-Filtereinstellungen."
 
 #: geshifilter.module:95
 msgid "Filter conflicts"
-msgstr ""
+msgstr "Filter-Konflikte"
 
 #: geshifilter.module:96
 msgid "Information on possible conflicts with other filters."
-msgstr ""
+msgstr "Informationen über mögliche Konflikte mit anderen Filtern."
 
 #: geshifilter.module:105
 msgid "Enable the desired languages and configure their settings."
-msgstr ""
+msgstr "Die gewünschten Sprachen aktivieren und deren Einstellungen konfigurieren."
 
 #: geshifilter.module:114
 msgid "Show the enabled languages"
-msgstr ""
+msgstr "Die aktivierten Sprachen anzeigen"
 
 #: geshifilter.module:120
 msgid "All"
-msgstr ""
+msgstr "Alle"
 
 #: geshifilter.module:121
 msgid "Show all the available languages"
-msgstr ""
+msgstr "Alle verfügbaren Sprachen anzeigen"
 
 #: geshifilter.module:127
 msgid "Disabled"
-msgstr ""
+msgstr "Deaktiviert"
 
 #: geshifilter.module:128
 msgid "Show the disabled languages"
-msgstr ""
+msgstr "Die deaktivierten Sprachen anzeigen"
 
 #: geshifilter.module:135
 msgid "Clear available languages cache"
-msgstr ""
+msgstr "Cache der verfügbaren Sprachen leeren"
 
 #: geshifilter.module:178
 msgid "Enables syntax highlighting of inline/block source code using the GeSHi engine"
@@ -517,91 +543,93 @@ msgstr ""
 
 #: geshifilter.module:237
 msgid "GeSHi library not found."
-msgstr ""
+msgstr "GeSHi-Bibliothek wurde nicht gefunden."
 
 #: geshifilter.module:238
+#, fuzzy
 msgid "You should install the GeSHi library and set its path in the !geshisettings."
-msgstr ""
+msgstr "Die GeSHi-Bibliothek muss installiert und der Pfad in den !geshisettings eingestellt werden."
 
 #: geshifilter.module:246
 msgid "Found GeSHi library version %version"
-msgstr ""
+msgstr "Die GeSHi-Bibliothek mit der Version %version wurde gefunden."
 
 #: geshifilter.module:256
 msgid "GeSHi filter can not automatically manage an external style sheet when the download method is private."
-msgstr ""
+msgstr "Der GeSHi-Filter kann ein externes Stylesheet nicht automatisch verwalten, wenn die private Download-Methode verwendet wird."
 
 #: geshifilter.module:258
 msgid "Change the CSS mode of the <a href=\"!geshi\">GeSHi filter</a> or change the <a href=\"!filesystem\">download mode</a> to public."
-msgstr ""
+msgstr "Den CSS-Modus von <a href=\"!geshi\">GeSHi-Filter</a> ändern oder die <a href=\"!filesystem\">Download-Methode</a> auf Öffentlich ändern."
 
 #: geshifilter.module:267
 msgid "Some filter conflicts were detected."
-msgstr ""
+msgstr "Einige Filterkonflikte wurden erkannt."
 
 #: geshifilter.module:268
 msgid "View and resolve the detected filter conflicts"
-msgstr ""
+msgstr "Erkannte Filterkonflikte anzeigen und beseitigen"
 
 #: geshifilter.module:0
 msgid "geshifilter"
-msgstr ""
+msgstr "geshifilter"
 
-#: geshinode.module:12 geshinode.info:0
+#: geshinode.module:12
+#: geshinode.info:0
 msgid "GeSHi node"
-msgstr ""
+msgstr "GeSHi-Beitrag"
 
 #: geshinode.module:13;27
 msgid "Settings of the GeSHi source code node type."
-msgstr ""
+msgstr "Einstellungen des Beitragstyps für GeSHi-Quellcode."
 
 #: geshinode.module:37
 msgid "Source code node"
-msgstr ""
+msgstr "Quellcode-Beitrag"
 
 #: geshinode.module:39
 msgid "Source code with GeSHi syntax highlighting."
-msgstr ""
+msgstr "Quellcode mit GeSHi-Syntaxhervorhebung."
 
 #: geshinode.module:82
 msgid "Source code"
-msgstr ""
+msgstr "Quellcode"
 
 #: geshinode.module:89
 msgid "Syntax highlighting mode"
-msgstr ""
+msgstr "Syntaxhervorherbungsmodus"
 
 #: geshinode.module:92
 msgid "Select the syntax highlighting mode to use."
-msgstr ""
+msgstr "Den zu verwendenden Syntaxhervorhebungsmodus auswählen."
 
 #: geshinode.module:163
 msgid "Line numbering"
-msgstr ""
+msgstr "Zeilennummerierung"
 
 #: geshinode.module:175
 msgid "Default language"
-msgstr ""
+msgstr "Standardmäßige Sprache"
 
 #: geshinode.module:48
 msgid "create source code node"
-msgstr ""
+msgstr "Quellcode-Beitag erstellen"
 
 #: geshinode.module:48
 msgid "edit source code node"
-msgstr ""
+msgstr "Quellcode-Beitag bearbeiten"
 
 #: geshinode.module:48
 msgid "edit own source code node"
-msgstr ""
+msgstr "Eigenen Quellcode-Beitag bearbeiten"
 
 #: geshinode.module:0
 msgid "geshinode"
-msgstr ""
+msgstr "geshinode"
 
 #: geshifilter.install:20
 msgid "GeSHi filter is installed. You should now <a href=\"!geshi_admin\">configure the GeSHi filter</a> and enable it in the desired <a href=\"!input_formats\">input formats</a>."
-msgstr ""
+msgstr "Der GeSHi-Filter ist installiert. Jetzt den <a href=\"!geshi_admin\">GeSHi-Filter konfigurieren</a> und in den gewünschten <a href=\"!input_formats\">Eingabeformaten</a> aktivieren."
 
 #: geshinode.install:35
 msgid "Unsupported database."
@@ -609,13 +637,14 @@ msgstr ""
 
 #: geshifilter.info:0
 msgid "Provides a filter to highlight source code using the GeSHi library (Generic Syntax Highlighter)"
-msgstr ""
+msgstr "Beitet einen Filter zum Hervorheben von Quellcode unter Verwendung der GeSHi-Bibliothek (Generische Syntaxhervorhebung)"
 
-#: geshifilter.info:0 geshinode.info:0
+#: geshifilter.info:0
+#: geshinode.info:0
 msgid "Filters"
-msgstr ""
+msgstr "Filter"
 
 #: geshinode.info:0
 msgid "Provides source code node with GeSHi syntax highlighting."
-msgstr ""
+msgstr "Bietet einen Quellcode-Beitrag mit GeSHi-Syntaxhervorhebung."
 

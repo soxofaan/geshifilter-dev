@@ -33,9 +33,29 @@ INSTALLATION
 
 CONFIGURATION
 -------------
-1. The general GeSHi Filter settings and further configuration instructions
-  can be found by navigating to:
+1. The general GeSHi Filter settings can be found by navigating to:
   administer > site configuration > geshifilter
+2. Further configuration instructions can be found by following the
+  "more help..." link at the top of that general settings page, which leads
+  to www.example.com/?q=admin/help/geshifilter .
+
+
+USAGE
+-----
+The basic usage (with the default settings) is:
+  <code language="java">
+  for (int i; i<10; ++i) {
+    dothisdothat(i);
+  }
+  </code>
+When language tags are enabled (like "<java>" for Java) you can also do
+  <java>
+  for (int i; i<10; ++i) {
+    dothisdothat(i);
+  }
+  </java>
+More options and tricks can be found in the filter tips of the input format at
+www.example.com/?q=filter/tips .
 
 
 AUTHORS
