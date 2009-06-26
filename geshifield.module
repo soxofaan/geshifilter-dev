@@ -3,7 +3,7 @@
 
 /**
  * @file
- * Defines a field for source code with GeSHi syntax highlighting.
+ * Defines a CCK field for source code with GeSHi syntax highlighting.
  */
 
 /**
@@ -33,8 +33,9 @@ function geshifield_theme() {
 function geshifield_field_info() {
   return array(
     'geshifield' => array(
-      'label' => t('Source code text field'),
-      'description' => t('Source code textfield with GeSHi syntax highlighting.'),
+      // @todo: better label? "Source code field"?
+      'label' => t('GeSHi field'),
+      'description' => t('Source code text field with GeSHi syntax highlighting.'),
     )
   );
 }
@@ -47,20 +48,24 @@ function geshifield_field_settings($op, $field) {
     case 'database columns':
       $columns =  array(
         'sourcecode' => array(
-          'type' => 'longtext',
+          'type' => 'text',
+          'size' => 'big',
           'not null' => FALSE,
           'sortable' => TRUE,
+          'views' => TRUE, //@todo what does this do?
         ),
         'language' => array(
           'type' => 'varchar',
           'length' => 32,
           'not null' => FALSE,
           'sortable' => TRUE,
+          'views' => TRUE, //@todo what does this do?
         ),
       );
       return $columns;
   }
 }
+
 
 /**
  * Implementation of hook_field().
@@ -78,9 +83,9 @@ function geshifield_content_is_empty($item, $field) {
   return empty($item['sourcecode']);
 }
 
-
 /*
  * Implementation of hook_default_value().
+ * @todo how does this work?
  */
 function geshifield_default_value(&$form, &$form_state, $field, $delta) {
   return 'print("hello world")';
@@ -100,7 +105,7 @@ function geshifield_widget_info() {
       ),  
     ),
   );
-  // @TODO provide a file upload widget too.
+  // @todo provide a file upload widget too.
 }
 
 /**
@@ -120,13 +125,15 @@ function geshifield_elements() {
  * Process callback for geshifield_textarea widget.
  */
 function geshifield_textarea_process($element, $edit, &$form_state, $form) {
+  module_load_include('inc', 'geshifilter');
+
   $defaults = $element['#value'];
   $field = content_fields($element['#field_name'], $element['#type_name']);
   $enabled_languages = _geshifilter_get_enabled_languages();
   
   $element['sourcecode'] = array(
     '#type' => 'textarea',
-    '#title' => t($field['widget']['label']),
+    '#title' => t('Source code'),
     '#default_value' => $defaults['sourcecode'],
     '#required' => $field['required'],
     '#rows' => $field['widget']['rows'],
@@ -161,20 +168,23 @@ function geshifield_widget_settings($op, $widget) {
       $form = array();
       $form['rows'] = array(
         '#type' => 'textfield',
-        '#title' => t('Rows'),
-        '#default_value' => $widget['rows'] ? $widget['rows'] : 20,
+        '#title' => t('Default number of rows in text area'),
+        '#description' => t('The default number of rows to provide in the text area for entering the source code.'),
+        '#default_value' => isset($widget['rows']) ? $widget['rows'] : 20,
         '#required' => TRUE,
       );
       return $form;
+      break;
 
     case 'validate':
       if (!is_numeric($widget['rows']) || intval($widget['rows']) != $widget['rows'] || $widget['rows'] <= 0 || $widget['rows'] > 100) {
-        form_set_error('rows', t('"Rows" must be a positive integer.'));
+        form_set_error('rows', t('The number of rows must be an integer between 1 and 100.'));
       }
       break;
 
     case 'save':
       return array('rows');
+      break;
   }
 }
 
@@ -212,13 +222,19 @@ function geshifield_field_formatter_info() {
 
 
 function theme_geshifield_formatter_default($element) {
+  // @todo: use caching.
+  module_load_include('inc', 'geshifilter', 'geshifilter.pages');
   return geshifilter_geshi_process($element['#item']['sourcecode'], $element['#item']['language']);
 }
 
 function theme_geshifield_formatter_nohighlighting($element) {
+  // @todo: use caching.
+  module_load_include('inc', 'geshifilter', 'geshifilter.pages');
   return geshifilter_geshi_process($element['#item']['sourcecode'], 'text');
 }
 
 function theme_geshifield_formatter_trimmed($element) {
+  // @todo: use caching.
+  module_load_include('inc', 'geshifilter', 'geshifilter.pages');
   return geshifilter_geshi_process(node_teaser($element['#item']['sourcecode']), $element['#item']['language']);
 }
