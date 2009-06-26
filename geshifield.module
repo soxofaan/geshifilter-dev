@@ -4,6 +4,8 @@
 /**
  * @file
  * Defines a CCK field for source code with GeSHi syntax highlighting.
+ *
+ * @todo: is the GeSHi CSS file always loaded when needed?
  */
 
 /**
@@ -129,7 +131,9 @@ function geshifield_textarea_process($element, $edit, &$form_state, $form) {
 
   $defaults = $element['#value'];
   $field = content_fields($element['#field_name'], $element['#type_name']);
+
   $enabled_languages = _geshifilter_get_enabled_languages();
+  // @todo: also add "no highlighting" options.
   
   $element['sourcecode'] = array(
     '#type' => 'textarea',
