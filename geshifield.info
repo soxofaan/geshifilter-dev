@@ -4,3 +4,4 @@ description = "Provides a CCK field for source code with GeSHI syntax highlighti
 package = "Filters"
 core = 6.x
 dependencies[] = content
+dependencies[] = geshifilter
