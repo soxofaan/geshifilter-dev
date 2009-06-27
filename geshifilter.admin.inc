@@ -1,5 +1,5 @@
 <?php
-// $Id: geshifilter.admin.inc,v 1.19 2008/09/04 09:13:15 soxofaan Exp $
+// $Id: geshifilter.admin.inc,v 1.20 2009/06/27 12:54:15 soxofaan Exp $
 
 /**
  * @file
@@ -7,6 +7,8 @@
  */
 
 require_once drupal_get_path('module', 'geshifilter') .'/geshifilter.inc';
+
+define('GESHIFILTER_FLUSH_LANGUAGE_DEFINITION_CACHE_TEXT', 'Flush the GeSHi language definition cache');
 
 /**
  * Form (items) for filter settings.
@@ -39,12 +41,12 @@ function _geshifilter_filter_settings($format) {
 }
 
 /**
- * Menu callback for admin settings
+ * General settings form for the GeSHi filter.
  */
 function geshifilter_admin_general_settings(&$form_state) {
   $form = array();
 
-  // try to load GeSHi library and get version if successful
+  // Try to load GeSHi library and get version if successful.
   $geshi_library = _geshifilter_check_geshi_library();
 
   // GeSHi library settings (constant GESHI_VERSION is defined in GeSHi library)
@@ -64,7 +66,26 @@ function geshifilter_admin_general_settings(&$form_state) {
   );
   $form['geshifilter_library']['#after_build'] = array('geshifilter_admin_general_settings_after_build');
 
+  // If the GeSHi library is loaded, show all the options and settings.
   if ($geshi_library['loaded']) {
+
+    // Option for flushing the GeSHi language definition cache.
+    $form['geshifilter_library']['geshi_language_definition_caching'] = array(
+      '#type' => 'item',
+      '#title' => t('GeSHi language definition caching'),
+      '#description' => t('The GeSHi library uses languages definition files to define the properties and highlight rules of the supported languages. In most scenarios these language definition files do not change and a lot of derivative data, such as the list of available languages or the CSS style sheet, can be cached for efficiency reasons. Sometimes however, this cache needs to be flushed and the languages definition files need to be reparsed, for example after an upgrade of the GeSHi library or after adding/editing some language definition files manually.'),
+    );
+    // Non-submitting button for flushing the GeSHi language definition file cache.
+    $form['geshifilter_library']['geshi_language_definition_caching']['flush_geshi_language_definition_cache'] = array(
+      '#type' => 'button',
+      '#value' => t(GESHIFILTER_FLUSH_LANGUAGE_DEFINITION_CACHE_TEXT),
+    );
+    // Handle the button for flushing the GeSHi language definition cache.
+    // This is done here instead of in a submit handler because the button is
+    // not a submitting button.
+    if (isset($form_state['post']['op']) && $form_state['post']['op'] == t(GESHIFILTER_FLUSH_LANGUAGE_DEFINITION_CACHE_TEXT)) {
+      _geshifilter_flush_language_definition_cache();
+    }
 
     // GeSHi filter tags and delimiters options
     $form['geshifilter_tag_options'] = array(
@@ -242,15 +263,14 @@ function geshifilter_admin_per_language_settings($form_state, $view = 'enabled')
   $add_checkbox = TRUE;
   $add_tag_option = (!geshifilter_use_format_specific_options());
   $form['language_settings'] = geshifilter_per_language_settings(NULL, $view, $add_checkbox, $add_tag_option);
-  $form['rescan_languages'] = array(
-    '#type' => 'markup',
-    '#value' => '<p>'. l(t('Flush cache of available languages'), 'geshifilter/clearavailablelanguagescache', array('query' => drupal_get_destination())) .'</p>',
-  );
+
   // Make it a system settings form.
   $form = system_settings_form($form);
+
   // set custom validate and submit handlers
   $form['#validate'][] = 'geshifilter_per_language_settings_validate';
   $form['#submit'][] = 'geshifilter_admin_per_language_settings_submit';
+
   return $form;
 }
 
@@ -449,6 +469,19 @@ function theme_geshifilter_per_language_settings($form) {
 }
 
 /**
+ * Helper function for flushing the GeSHi language definition cache
+ */
+function _geshifilter_flush_language_definition_cache() {
+  if (GESHIFILTER_CSS_CLASSES_AUTOMATIC == variable_get('geshifilter_css_mode', GESHIFILTER_CSS_INLINE)) {
+    // Forced regeneration of the CSS file
+    _geshifilter_generate_languages_css_file(TRUE);
+  }
+  // Flush cache of available languages
+  variable_del('geshifilter_available_languages_cache');
+  drupal_set_message(t('Flushed the GeSHi language definition cache.'));
+}
+
+/**
  * Helper function for clearing the appropriate filter cache entries
  */
 function _geshifilter_clear_filter_cache() {
@@ -467,15 +500,6 @@ function _geshifilter_clear_filter_cache() {
   if ($message) {
     drupal_set_message(t('GeSHi filter cleared the filter cache for the appropriate input formats.'));
   }
-}
-
-/**
- * callback function for clearing the available languages cache
- */
-function geshifilter_clear_available_languages_cache() {
-  variable_del('geshifilter_available_languages_cache');
-  drupal_set_message('Flushed cache of available languages.');
-  drupal_goto();
 }
 
 /**
@@ -507,26 +531,29 @@ function _geshifilter_generate_languages_css_rules() {
 
 /**
  * Function for generating the external stylesheet.
+ *
+ * @param $force force the regeneration of the CSS file
  */
-function _geshifilter_generate_languages_css_file() {
+function _geshifilter_generate_languages_css_file($force=FALSE) {
   $languages = _geshifilter_get_enabled_languages();
-  // create files/geshifilter directory if not already available
-  $path = file_directory_path() .'/geshifilter';
-  file_check_directory($path, FILE_CREATE_DIRECTORY);
-  // Make stylesheet file name (depends on enabled languages).
-  $stylesheet_file = $path .'/geshifilter-languages-'. substr(md5(serialize($languages)), 0, 8) .'.css';
-  if (!file_exists($stylesheet_file)) {
-    // build stylesheet
+  // Serialize the array of enabled languages as sort of hash.
+  $languages_hash = serialize($languages);
+
+  // Check if generation of the CSS file is needed
+  if ($force || $languages_hash != variable_get('geshifilter_cssfile_languages', '')) {
+    // Build stylesheet.
     $stylesheet = _geshifilter_generate_languages_css_rules();
-    // save stylesheet
-    $ret = file_save_data($stylesheet, $stylesheet_file, FILE_EXISTS_REPLACE);
+    // Save stylesheet.
+    $stylesheet_filename = file_directory_path() .'/geshifilter-languages.css';
+    $ret = file_save_data($stylesheet, $stylesheet_filename, FILE_EXISTS_REPLACE);
     if ($ret) {
-      variable_set('geshifilter_languages_css', $ret);
-      drupal_set_message(t('Generated external CSS file %file.', array('%file' => $ret)));
+      drupal_set_message(t('(Re)generated external CSS style sheet %file.', array('%file' => $ret)));
     }
     else {
       drupal_set_message(t('Could not generate external CSS file. Check the settings of your !filesystem.',
         array('!filesystem' => l(t('file system'), 'admin/settings/file-system'))), 'error');
     }
+    // Remember for which list of languages the CSS file was generated
+    variable_set('geshifilter_cssfile_languages', $languages_hash);
   }
 }
