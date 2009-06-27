@@ -85,14 +85,6 @@ function geshifield_content_is_empty($item, $field) {
   return empty($item['sourcecode']);
 }
 
-/*
- * Implementation of hook_default_value().
- * @todo how does this work?
- */
-function geshifield_default_value(&$form, &$form_state, $field, $delta) {
-  return 'print("hello world")';
-}
-
 /**
  * Implementation of hook_widget_info().
  */
@@ -101,9 +93,12 @@ function geshifield_widget_info() {
     'geshifield_textarea' => array(
       'label' => t('Source code text area'),
       'field types' => array('geshifield'),
+      // Let CCK core handle multiple values.
       'multiple values' => CONTENT_HANDLE_CORE,
       'callbacks' => array(
-        'default value' => CONTENT_CALLBACK_DEFAULT,
+        // Do not provide default values through CCK core's
+        // default value handling. @todo: or should we?
+        'default value' => CONTENT_CALLBACK_NONE,
       ),
     ),
   );
@@ -176,6 +171,7 @@ function geshifield_widget_settings($op, $widget) {
         '#default_value' => isset($widget['rows']) ? $widget['rows'] : 20,
         '#required' => TRUE,
       );
+      // @todo add an option for the default language
       return $form;
       break;
 
