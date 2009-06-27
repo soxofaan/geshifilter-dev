@@ -472,13 +472,13 @@ function theme_geshifilter_per_language_settings($form) {
  * Helper function for flushing the GeSHi language definition cache
  */
 function _geshifilter_flush_language_definition_cache() {
-  if (variable_get('geshifilter_css_mode', GESHIFILTER_CSS_INLINE) == GESHIFILTER_CSS_CLASSES_AUTOMATIC) {
+  if (GESHIFILTER_CSS_CLASSES_AUTOMATIC == variable_get('geshifilter_css_mode', GESHIFILTER_CSS_INLINE)) {
     // Forced regeneration of the CSS file
     _geshifilter_generate_languages_css_file(TRUE);
   }
   // Flush cache of available languages
   variable_del('geshifilter_available_languages_cache');
-  drupal_set_message(t('The GeSHi language definition cache was flushed.'));
+  drupal_set_message(t('Flushed the GeSHi language definition cache.'));
 }
 
 /**
