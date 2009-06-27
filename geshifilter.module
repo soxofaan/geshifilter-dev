@@ -1,5 +1,5 @@
 <?php
-// $Id: geshifilter.module,v 1.43 2009/01/04 17:17:47 soxofaan Exp $
+// $Id: geshifilter.module,v 1.44 2009/06/26 00:53:44 soxofaan Exp $
 
 /**
  * @file
@@ -17,7 +17,7 @@ define('GESHIFILTER_CSS_CLASSES_AUTOMATIC', 2);
 // Only add CSS classes to markup, admin/themer is responsible for defining the CSS rules
 define('GESHIFILTER_CSS_CLASSES_ONLY', 3);
 
-define('GESHIFILTER_ATTRIBUTES_LANGUAGE', 'type lang language');
+define('GESHIFILTER_ATTRIBUTES_LANGUAGE', 'type lang language class');
 define('GESHIFILTER_ATTRIBUTE_LINE_NUMBERING', 'linenumbers');
 define('GESHIFILTER_ATTRIBUTE_LINE_NUMBERING_START', 'start');
 define('GESHIFILTER_ATTRIBUTE_FANCY_N', 'fancy');
