@@ -13,17 +13,17 @@
  */
 function geshifield_theme() {
   return array(
-    'geshifield_textarea' => array( 
-       'arguments' => array('element' => NULL), 
+    'geshifield_textarea' => array(
+       'arguments' => array('element' => NULL),
     ),
-    'geshifield_formatter_default' => array( 
-       'arguments' => array('element' => NULL), 
+    'geshifield_formatter_default' => array(
+       'arguments' => array('element' => NULL),
     ),
-    'geshifield_formatter_nohighlighting' => array( 
-       'arguments' => array('element' => NULL), 
+    'geshifield_formatter_nohighlighting' => array(
+       'arguments' => array('element' => NULL),
     ),
-    'geshifield_formatter_trimmed' => array( 
-       'arguments' => array('element' => NULL), 
+    'geshifield_formatter_trimmed' => array(
+       'arguments' => array('element' => NULL),
     ),
   );
 }
@@ -104,7 +104,7 @@ function geshifield_widget_info() {
       'multiple values' => CONTENT_HANDLE_CORE,
       'callbacks' => array(
         'default value' => CONTENT_CALLBACK_DEFAULT,
-      ),  
+      ),
     ),
   );
   // @todo provide a file upload widget too.
@@ -120,7 +120,7 @@ function geshifield_elements() {
       '#process' => array('geshifield_textarea_process' ),
     ),
   );
-  return $elements;  
+  return $elements;
 }
 
 /**
@@ -134,7 +134,7 @@ function geshifield_textarea_process($element, $edit, &$form_state, $form) {
 
   $enabled_languages = _geshifilter_get_enabled_languages();
   // @todo: also add "no highlighting" options.
-  
+
   $element['sourcecode'] = array(
     '#type' => 'textarea',
     '#title' => t('Source code'),
@@ -143,7 +143,7 @@ function geshifield_textarea_process($element, $edit, &$form_state, $form) {
     '#rows' => $field['widget']['rows'],
     '#description' => t($field['widget']['description']),
   );
-    
+
   $element['language'] = array(
     '#type' => 'select',
     '#title' => t('Syntax highlighting mode'),
@@ -151,7 +151,7 @@ function geshifield_textarea_process($element, $edit, &$form_state, $form) {
     '#options' => $enabled_languages,
     '#description' => t('Select the syntax highlighting mode to use for the source code.'),
   );
-  
+
   return $element;
 }
 
@@ -161,7 +161,6 @@ function geshifield_textarea_process($element, $edit, &$form_state, $form) {
 function theme_geshifield_textarea(&$element) {
   return theme( 'form_element', $element, $element['#children'] );
 }
-
 
 /**
  * Implementation of hook_widget_settings().
