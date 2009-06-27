@@ -73,7 +73,7 @@ function geshifilter_admin_general_settings(&$form_state) {
     $form['geshifilter_library']['geshi_language_definition_caching'] = array(
       '#type' => 'item',
       '#title' => t('GeSHi language definition caching'),
-      '#description' => t('The GeSHi library uses languages definition files to define the properties and highlight rules of the supported languages. In most scenarios these language definition files do not change and a lot of derivative data (e.g. the list of available languages or the external CSS style sheet) can be cached for efficiency reasons. In some situations however, this cache needs to be flushed and the languages definition files need to be reparsed (e.g. after an upgrade of the GeSHi library or after you added/edited some language definition files manually).'),
+      '#description' => t('The GeSHi library uses languages definition files to define the properties and highlight rules of the supported languages. In most scenarios these language definition files do not change and a lot of derivative data, such as the list of available languages or the CSS style sheet, can be cached for efficiency reasons. Sometimes however, this cache needs to be flushed and the languages definition files need to be reparsed, for example after an upgrade of the GeSHi library or after adding/editing some language definition files manually.'),
     );
     // Non-submitting button for flushing the GeSHi language definition file cache.
     $form['geshifilter_library']['geshi_language_definition_caching']['flush_geshi_language_definition_cache'] = array(
