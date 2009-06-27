@@ -221,19 +221,17 @@ function geshifield_field_formatter_info() {
 
 
 function theme_geshifield_formatter_default($element) {
-  // @todo: use caching.
+  // @todo: These theme functions seem to be called more than expected for some reason.
   module_load_include('inc', 'geshifilter', 'geshifilter.pages');
   return geshifilter_geshi_process($element['#item']['sourcecode'], $element['#item']['language']);
 }
 
 function theme_geshifield_formatter_nohighlighting($element) {
-  // @todo: use caching.
   module_load_include('inc', 'geshifilter', 'geshifilter.pages');
   return geshifilter_geshi_process($element['#item']['sourcecode'], 'text');
 }
 
 function theme_geshifield_formatter_trimmed($element) {
-  // @todo: use caching.
   module_load_include('inc', 'geshifilter', 'geshifilter.pages');
   return geshifilter_geshi_process(node_teaser($element['#item']['sourcecode']), $element['#item']['language']);
 }
