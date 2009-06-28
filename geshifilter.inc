@@ -186,6 +186,16 @@ function _geshifilter_brackets($format = NULL) {
   return variable_get("geshifilter_brackets_{$format}", _geshifilter_brackets());
 }
 
+function _geshifilter_tag_styles($format = NULL) {
+  if (!geshifilter_use_format_specific_options() || $format === NULL) {
+    return variable_get('geshifilter_tag_styles', array(
+      GESHIFILTER_BRACKETS_ANGLE => GESHIFILTER_BRACKETS_ANGLE,
+      GESHIFILTER_BRACKETS_SQUARE => GESHIFILTER_BRACKETS_SQUARE,
+    ));
+  }
+  return variable_get("geshifilter_tag_styles_{$format}", _geshifilter_tag_styles());
+}
+
 function geshifilter_language_tags($language, $format = NULL) {
   if (!geshifilter_use_format_specific_options() || $format === NULL)
     return variable_get("geshifilter_language_tags_{$language}", '');
