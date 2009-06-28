@@ -93,14 +93,15 @@ function geshifilter_admin_general_settings(&$form_state) {
       '#title' => t('GeSHi filter tags and delimiters'),
       '#collapsible' => TRUE,
     );
-    // usage of format specific option
+    // Usage of format specific options.
     $form['geshifilter_tag_options']['geshifilter_format_specific_options'] = array(
       '#type' => 'checkbox',
       '#title' => t('Use input format specific tag settings.'),
       '#default_value' => geshifilter_use_format_specific_options(),
       '#description' => t('Enable seperate tag settings of the GeSHi filter for each <a href="!input_formats">input format</a> instead of global tag settings.', array('!input_formats' => url('admin/settings/filters'))),
     );
-    // generic tags
+    // Generic tags.
+    // @todo: do this conditional form part showing/hiding in jQuery instead of in the form builder.
     if (!geshifilter_use_format_specific_options()) {
       $form['geshifilter_tag_options']['geshifilter_general_tags'] = _geshifilter_general_highlight_tags_settings();
     }

@@ -1,6 +1,8 @@
 <?php
 // $Id: geshifilter.admin.test,v 1.1 2008/04/28 22:52:17 soxofaan Exp $
 
+// @todo: test the tag style widget, both on general settings form and format specific form:  at least one tag style should be selected.
+
 /**
 * Funcional tests for the GeSHi filter administration.
 */
