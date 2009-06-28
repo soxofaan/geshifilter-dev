@@ -12,6 +12,7 @@ require_once drupal_get_path('module', 'geshifilter') .'/geshifilter.inc';
  * Implementation for geshifilter_filter_tips()
  */
 function _geshifilter_filter_tips($delta, $format, $long = FALSE) {
+  // @todo: replace this with _geshifilter_tag_styles() usage.
   if (_geshifilter_brackets($format) == GESHIFILTER_BRACKETS_SQUARE) {
     $bracket_open = '[';
     $bracket_close = ']';
@@ -76,6 +77,7 @@ function _geshifilter_filter_tips($delta, $format, $long = FALSE) {
     // block versus inline
     $items[] = t('If the source code between the tags contains a newline (e.g. immediatly after the opening tag), the highlighted source code will be displayed as a code block. Otherwise it will be displayed inline.');
 
+    // @todo: replace this with the new system.
     if (_geshifilter_brackets($format) == GESHIFILTER_BRACKETS_BOTH) {
       $items[] = t('Beside the tag style "!angle" it is also possible to use "!bracket".' , array('!angle' => '<code>&lt;foo&gt;</code>', '!bracket' => '<code>[foo]</code>'));
     }

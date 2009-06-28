@@ -179,6 +179,7 @@ function _geshifilter_php_delimeters($format = NULL) {
   return variable_get("geshifilter_enable_php_delimiters_{$format}", _geshifilter_php_delimeters());
 }
 
+// @todo: remove this function.
 function _geshifilter_brackets($format = NULL) {
   if (!geshifilter_use_format_specific_options() || $format === NULL) {
     return variable_get('geshifilter_brackets', GESHIFILTER_BRACKETS_BOTH);

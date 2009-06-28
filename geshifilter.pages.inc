@@ -107,6 +107,7 @@ function _geshifilter_prepare($format, $text) {
   // Also matches "<code>...$"  where "$" refers to end of string, not end of
   // line (because PCRE_MULTILINE (modifier 'm') is not enabled), so matching
   // still works when teaser view trims inside the source code.
+  // @todo: replace this with the new system: _geshifilter_tag_styles()
   switch (_geshifilter_brackets($format)) {
     case GESHIFILTER_BRACKETS_ANGLE:
       $pattern = '#(<)('. $tags_string .')((\s+[^>]*)*)(>)(.*?)(</\2\s*>|$)#s';

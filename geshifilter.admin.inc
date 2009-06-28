@@ -388,7 +388,8 @@ function _geshifilter_general_highlight_tags_settings($format=NULL) {
     '#default_value' => _geshifilter_tag_styles($format),
     '#description' => t('Select the container tag styles that should trigger GeSHi syntax highlighting.'),
   );
-  // PHP specific delimiters
+  // PHP specific delimiters.
+  // @todo: merge this option into geshifilter_tag_styles$f.
   $form['geshifilter']["geshifilter_enable_php_delimiters$f"] = array(
     '#type' => 'checkbox',
     '#title' => t('Also apply syntax highlighting to &lt;?php ... ?&gt; style PHP source code blocks.'),
