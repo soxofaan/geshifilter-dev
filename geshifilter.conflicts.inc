@@ -90,11 +90,11 @@ function _geshifilter_htmlfilter_conflicts($format, $cfilter, $geshifilter) {
 }
 
 /**
- * conflict detection for codefilter
+ * Conflict detection for codefilter.
  */
 function _geshifilter_codefilter_conflicts($format, $cfilter, $geshifilter) {
   $conflicts = array();
-  if (_geshifilter_brackets($format) != GESHIFILTER_BRACKETS_SQUARE) {
+  if (in_array(GESHIFILTER_BRACKETS_ANGLE, array_filter(_geshifilter_tag_styles($format)))) {
     list($generic_code_tags, $language_tags, $tag_to_lang) = _geshifilter_get_tags($format);
     if (in_array('code', $generic_code_tags) || in_array('code', $language_tags)) {
       $conflicts[] = array(
