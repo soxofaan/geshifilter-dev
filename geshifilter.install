@@ -39,3 +39,6 @@ function geshifilter_update_1() {
   variable_del('geshifilter_available_languages');
   return array();
 }
+
+// @todo upgrade path from geshifilter_brackets to geshifilter_tag_styles
+
