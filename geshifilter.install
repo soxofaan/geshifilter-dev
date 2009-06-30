@@ -32,7 +32,7 @@ function geshifilter_uninstall() {
 }
 
 /**
- * Implementation of hook_update_N()
+ * Implementation of hook_update_N().
  */
 function geshifilter_update_1() {
   // clear the cache of available languages
@@ -40,5 +40,27 @@ function geshifilter_update_1() {
   return array();
 }
 
-// @todo upgrade path from geshifilter_brackets to geshifilter_tag_styles
+/**
+ * Implementation of hook_update_N().
+ *
+ * Upgrade path from usage of geshifilter_brackets variable
+ * to geshifilter_tag_styles variable.
+ */
+function geshifilter_update_601() {
+  $geshifilter_brackets = variable_get('geshifilter_brackets', NULL);
+  switch ($geshifilter_brackets) {
+    case GESHIFILTER_BRACKETS_ANGLE:
+    case GESHIFILTER_BRACKETS_SQUARE:
+      variable_set('geshifilter_tag_styles', array($geshifilter_brackets => $geshifilter_brackets));
+      break;
+    case GESHIFILTER_BRACKETS_BOTH:
+      variable_set('geshifilter_tag_styles', array(
+        GESHIFILTER_BRACKETS_ANGLE => GESHIFILTER_BRACKETS_ANGLE,
+        GESHIFILTER_BRACKETS_SQUARE => GESHIFILTER_BRACKETS_SQUARE,
+      ));
+      break;
+  }
+  variable_del('geshifilter_brackets');
+  return array();
+}
 
