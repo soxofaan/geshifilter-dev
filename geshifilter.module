@@ -24,7 +24,7 @@ define('GESHIFILTER_ATTRIBUTE_FANCY_N', 'fancy');
 
 define('GESHIFILTER_BRACKETS_ANGLE', 1);
 define('GESHIFILTER_BRACKETS_SQUARE', 2);
-define('GESHIFILTER_BRACKETS_BOTH', 3); //@todo: remove this constant when not needed/used anymore.
+define('GESHIFILTER_BRACKETS_BOTH', 3); // Deprecated, only used in upgrade path.
 define('GESHIFILTER_BRACKETS_DOUBLESQUARE', 4);
 
 define('GESHIFILTER_LINE_NUMBERS_DEFAULT_NONE', 0);
