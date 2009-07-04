@@ -230,6 +230,8 @@ class GeshiFilterTest extends DrupalTestCase {
     $this->assertGeshiFilterHighlighting('[code language="cpp"]'. $source_code .'[/code]',
       array(array($source_code, 'cpp', 0, 1, FALSE)),
       t('Checking [foo] brackets style in GESHIFILTER_BRACKETS_SQUARE mode'));
+
+    // @todo: test php style code blocks.
   }
 
   /**
