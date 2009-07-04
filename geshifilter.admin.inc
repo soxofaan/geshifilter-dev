@@ -385,17 +385,13 @@ function _geshifilter_general_highlight_tags_settings($format=NULL) {
       GESHIFILTER_BRACKETS_ANGLE => '<code>'. check_plain('<foo> ... </foo>') .'</code>',
       GESHIFILTER_BRACKETS_SQUARE => '<code>'. check_plain('[foo] ... [/foo]') .'</code>',
       GESHIFILTER_BRACKETS_DOUBLESQUARE => '<code>'. check_plain('[[foo]] ... [[/foo]]') .'</code>',
+      GESHIFILTER_BRACKETS_PHPBLOCK => t('PHP style source code blocks: !php and !percent', array(
+        '!php' => '<code>'. check_plain('<?php ... ?>'). '</code>',
+        '!percent' =>  '<code>'. check_plain('<% ... %>'). '</code>',
+      )),
     ),
     '#default_value' => _geshifilter_tag_styles($format),
     '#description' => t('Select the container tag styles that should trigger GeSHi syntax highlighting.'),
-  );
-  // PHP specific delimiters.
-  // @todo: merge this option into geshifilter_tag_styles$f.
-  $form['geshifilter']["geshifilter_enable_php_delimiters$f"] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Also apply syntax highlighting to &lt;?php ... ?&gt; style PHP source code blocks.'),
-    '#description' => t('When enabled, PHP source code enclosed in &lt;?php...?&gt; or &lt;%...%&gt; will also be processed.'),
-    '#default_value' => _geshifilter_php_delimeters($format),
   );
   return $form;
 }
