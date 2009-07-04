@@ -190,7 +190,8 @@ function _geshifilter_tag_styles($format = NULL) {
 }
 
 function geshifilter_language_tags($language, $format = NULL) {
-  if (!geshifilter_use_format_specific_options() || $format === NULL)
+  if (!geshifilter_use_format_specific_options() || $format === NULL) {
     return variable_get("geshifilter_language_tags_{$language}", '');
+  }
   return variable_get("geshifilter_language_tags_{$language}_{$format}", geshifilter_language_tags($language));
 }
