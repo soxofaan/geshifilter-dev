@@ -83,3 +83,47 @@ function _geshifilter_update_6001_brackets_to_tag_styles($format) {
     variable_del('geshifilter_brackets'. $format);
   }
 }
+
+/**
+ * Implementation of hook_update_N().
+ *
+ * Upgrade path for merging of geshifilter_enable_php_delimiters
+ * into to the geshifilter_tag_styles variable.
+ */
+function geshifilter_update_6002() {
+  _geshifilter_update_6002_php_delimter_into_tag_styles(NULL);
+  foreach (filter_formats() as $format => $input_format) {
+    _geshifilter_update_6002_php_delimter_into_tag_styles($format);
+  }
+  return array();
+}
+
+/**
+ * Helper function for merging old geshifilter_enable_php_delimiters
+ * into geshifilter_tag_styles variables.
+ * @param $format NULL (for global variable) or input format id.
+ */
+function _geshifilter_update_6002_php_delimter_into_tag_styles($format) {
+  // Load geshifilter.inc because we need _geshifilter_tag_styles().
+  require_once drupal_get_path('module', 'geshifilter') .'/geshifilter.inc';
+
+  // Make $format a suffix for usage in variable name.
+  $format = isset($format) ? "_{$format}" : '';
+  // Try to fetch the variable value and convert it if found.
+  $geshifilter_enable_php_delimiters = variable_get('geshifilter_enable_php_delimiters'. $format, NULL);
+  if (isset($geshifilter_enable_php_delimiters)) {
+    // First get the current value of the geshifilter_tag_styles variable.
+    $geshifilter_brackets = _geshifilter_tag_styles($format);
+    // Insert value for PHP style code blocks
+    if ($geshifilter_enable_php_delimiters) {
+      $geshifilter_brackets[GESHIFILTER_BRACKETS_PHPBLOCK] = GESHIFILTER_BRACKETS_PHPBLOCK;
+    }
+    else {
+      $geshifilter_brackets[GESHIFILTER_BRACKETS_PHPBLOCK] = 0;
+    }
+    // Save the new settings.
+    variable_set('geshifilter_tag_styles'. $format, $geshifilter_brackets);
+    // Remove old variable.
+    variable_del('geshifilter_enable_php_delimiters'. $format);
+  }
+}
