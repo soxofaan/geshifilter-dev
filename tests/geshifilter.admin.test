@@ -1,5 +1,7 @@
 <?php
-// $Id: geshifilter.admin.test,v 1.1 2008/04/28 22:52:17 soxofaan Exp $
+// $Id: geshifilter.admin.test,v 1.2 2009/07/04 09:49:00 soxofaan Exp $
+
+// @todo: test the tag style widget, both on general settings form and format specific form:  at least one tag style should be selected.
 
 /**
 * Funcional tests for the GeSHi filter administration.
@@ -59,7 +61,10 @@ class GeshiFilterAdministrationTest extends DrupalTestCase {
 
     // set some default GeSHi filter admin settings
     $this->drupalVariableSet('geshifilter_format_specific_options', FALSE);
-    $this->drupalVariableSet('geshifilter_brackets', GESHIFILTER_BRACKETS_BOTH);
+    $this->drupalVariableSet('geshifilter_tag_styles', array(
+      GESHIFILTER_BRACKETS_ANGLE => GESHIFILTER_BRACKETS_ANGLE,
+      GESHIFILTER_BRACKETS_SQUARE => GESHIFILTER_BRACKETS_SQUARE,
+    ));
     $this->drupalVariableSet('geshifilter_default_line_numbering', GESHIFILTER_LINE_NUMBERS_DEFAULT_NONE);
 
   }

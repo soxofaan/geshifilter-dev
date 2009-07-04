@@ -1,5 +1,5 @@
 <?php
-// $Id: geshifilter.pages.inc,v 1.10 2009/01/04 17:44:38 soxofaan Exp $
+// $Id: geshifilter.pages.inc,v 1.12 2009/07/04 11:05:56 soxofaan Exp $
 
 /**
  * @file
@@ -107,23 +107,30 @@ function _geshifilter_prepare($format, $text) {
   // Also matches "<code>...$"  where "$" refers to end of string, not end of
   // line (because PCRE_MULTILINE (modifier 'm') is not enabled), so matching
   // still works when teaser view trims inside the source code.
-  switch (_geshifilter_brackets($format)) {
-    case GESHIFILTER_BRACKETS_ANGLE:
-      $pattern = '#(<)('. $tags_string .')((\s+[^>]*)*)(>)(.*?)(</\2\s*>|$)#s';
-      break;
-    case GESHIFILTER_BRACKETS_SQUARE:
-      $pattern = '#(\[)('. $tags_string .')((\s+[^\]]*)*)(\])(.*?)(\[/\2\s*\]|$)#s';
-      break;
-    case GESHIFILTER_BRACKETS_BOTH:
-      $pattern = '#([<\[])('. $tags_string .')((\s+[^>\]]*)*)([>\]])(.*?)(\1/\2\s*\5|$)#s';
-      break;
+
+  // Replace the code container tag brackets
+  // and prepare the container content (newline and angle bracket protection).
+  // @todo: make sure that these replacements can be done in serie.
+  $tag_styles = array_filter(_geshifilter_tag_styles($format));
+  if (in_array(GESHIFILTER_BRACKETS_ANGLE, $tag_styles)) {
+    // Prepare <foo>..</foo> blocks.
+    $pattern = '#(<)('. $tags_string .')((\s+[^>]*)*)(>)(.*?)(</\2\s*>|$)#s';
+    $text = preg_replace_callback($pattern, create_function('$match', "return _geshifilter_prepare_callback(\$match, $format);"), $text);
   }
-  // replace the code container tag brackets
-  // and prepare the container content (newline and angle bracket protection)
-  $text = preg_replace_callback($pattern, create_function('$match', "return _geshifilter_prepare_callback(\$match, $format);"), $text);
-  if (_geshifilter_php_delimeters($format)) {
-    // prepare < ?php ... ? > blocks
-    $text = preg_replace_callback('#[\[<](\?php|\?PHP|%)(.+?)((\?|%)[\]>]|$)#s', '_geshifilter_prepare_php_callback', $text);
+  if (in_array(GESHIFILTER_BRACKETS_SQUARE, $tag_styles)) {
+    // Prepare [foo]..[/foo] blocks.
+    $pattern = '#((?<!\[)\[)('. $tags_string .')((\s+[^\]]*)*)(\](?!\[))(.*?)((?<!\[)\[/\2\s*\](?<!\[)|$)#s';
+    $text = preg_replace_callback($pattern, create_function('$match', "return _geshifilter_prepare_callback(\$match, $format);"), $text);
+  }
+  if (in_array(GESHIFILTER_BRACKETS_DOUBLESQUARE, $tag_styles)) {
+    // Prepare [[foo]]..[[/foo]] blocks.
+    $pattern = '#(\[\[)('. $tags_string .')((\s+[^\]]*)*)(\]\])(.*?)(\[\[/\2\s*\]\]|$)#s';
+    $text = preg_replace_callback($pattern, create_function('$match', "return _geshifilter_prepare_callback(\$match, $format);"), $text);
+  }
+  if (in_array(GESHIFILTER_BRACKETS_PHPBLOCK, $tag_styles)) {
+    // Prepare < ?php ... ? > blocks.
+    $pattern = '#[\[<](\?php|\?PHP|%)(.+?)((\?|%)[\]>]|$)#s';
+    $text = preg_replace_callback($pattern, '_geshifilter_prepare_php_callback', $text);
   }
   return $text;
 }
@@ -203,7 +210,7 @@ function _geshifilter_process($format, $text) {
   }
   // get the available tags
   list($generic_code_tags, $language_tags, $tag_to_lang) = _geshifilter_get_tags($format);
-  if (_geshifilter_php_delimeters($format)) {
+  if (in_array(GESHIFILTER_BRACKETS_PHPBLOCK, array_filter(_geshifilter_tag_styles($format)))) {
     $language_tags[] = 'questionmarkphp';
     $tag_to_lang['questionmarkphp'] = 'php';
   }
@@ -241,7 +248,7 @@ function _geshifilter_replace_callback($match, $format) {
 
   // Determine language based on tag name if possible.
   list($generic_code_tags, $language_tags, $tag_to_lang) = _geshifilter_get_tags($format);
-  if (variable_get('geshifilter_enable_php_delimiters', FALSE)) {
+  if (in_array(GESHIFILTER_BRACKETS_PHPBLOCK, array_filter(_geshifilter_tag_styles($format)))) {
     $language_tags[] = 'questionmarkphp';
     $tag_to_lang['questionmarkphp'] = 'php';
   }
