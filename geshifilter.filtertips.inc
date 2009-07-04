@@ -1,5 +1,5 @@
 <?php
-// $Id: geshifilter.filtertips.inc,v 1.6 2009/07/04 09:48:59 soxofaan Exp $
+// $Id: geshifilter.filtertips.inc,v 1.7 2009/07/04 11:05:56 soxofaan Exp $
 
 /**
  * @file
