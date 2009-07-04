@@ -179,15 +179,19 @@ function _geshifilter_php_delimeters($format = NULL) {
   return variable_get("geshifilter_enable_php_delimiters_{$format}", _geshifilter_php_delimeters());
 }
 
-function _geshifilter_brackets($format = NULL) {
+function _geshifilter_tag_styles($format = NULL) {
   if (!geshifilter_use_format_specific_options() || $format === NULL) {
-    return variable_get('geshifilter_brackets', GESHIFILTER_BRACKETS_BOTH);
+    return variable_get('geshifilter_tag_styles', array(
+      GESHIFILTER_BRACKETS_ANGLE => GESHIFILTER_BRACKETS_ANGLE,
+      GESHIFILTER_BRACKETS_SQUARE => GESHIFILTER_BRACKETS_SQUARE,
+    ));
   }
-  return variable_get("geshifilter_brackets_{$format}", _geshifilter_brackets());
+  return variable_get("geshifilter_tag_styles_{$format}", _geshifilter_tag_styles());
 }
 
 function geshifilter_language_tags($language, $format = NULL) {
-  if (!geshifilter_use_format_specific_options() || $format === NULL)
+  if (!geshifilter_use_format_specific_options() || $format === NULL) {
     return variable_get("geshifilter_language_tags_{$language}", '');
+  }
   return variable_get("geshifilter_language_tags_{$language}_{$format}", geshifilter_language_tags($language));
 }

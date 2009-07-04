@@ -74,7 +74,10 @@ class GeshiFilterTest extends DrupalTestCase {
         // Set default highlighting mode to "do nothing".
     $this->drupalVariableSet('geshifilter_default_highlighting', GESHIFILTER_DEFAULT_PLAINTEXT);
     $this->drupalVariableSet('geshifilter_format_specific_options', FALSE);
-    $this->drupalVariableSet('geshifilter_brackets', GESHIFILTER_BRACKETS_BOTH);
+    $this->drupalVariableSet('geshifilter_tag_styles', array(
+      GESHIFILTER_BRACKETS_ANGLE => GESHIFILTER_BRACKETS_ANGLE,
+      GESHIFILTER_BRACKETS_SQUARE => GESHIFILTER_BRACKETS_SQUARE,
+    ));
     $this->drupalVariableSet('geshifilter_default_line_numbering', GESHIFILTER_LINE_NUMBERS_DEFAULT_NONE);
 
     // log out as filter admin
@@ -197,15 +200,20 @@ class GeshiFilterTest extends DrupalTestCase {
     // body material
     $source_code = "//C++ source code\nfor (int i=0; i<10; ++i) {\n  fun(i);\n  bar.foo(x, y);\n server->start(&pool); \n}";
 
-    $this->drupalVariableSet('geshifilter_brackets', GESHIFILTER_BRACKETS_BOTH);
+    $this->drupalVariableSet('geshifilter_tag_styles', array(
+      GESHIFILTER_BRACKETS_ANGLE => GESHIFILTER_BRACKETS_ANGLE,
+      GESHIFILTER_BRACKETS_SQUARE => GESHIFILTER_BRACKETS_SQUARE,
+    ));
     $this->assertGeshiFilterHighlighting('<code language="cpp">'. $source_code .'</code>',
       array(array($source_code, 'cpp', 0, 1, FALSE)),
-      t('Checking <foo> brackets style in GESHIFILTER_BRACKETS_BOTH mode'));
+      t('Checking <foo> brackets style in angle+square tag style mode'));
     $this->assertGeshiFilterHighlighting('[code language="cpp"]'. $source_code .'[/code]',
       array(array($source_code, 'cpp', 0, 1, FALSE)),
-      t('Checking [foo] brackets style in GESHIFILTER_BRACKETS_BOTH mode'));
+      t('Checking [foo] brackets style in angle+square tag style mode mode'));
 
-    $this->drupalVariableSet('geshifilter_brackets', GESHIFILTER_BRACKETS_ANGLE);
+    $this->drupalVariableSet('geshifilter_tag_styles', array(
+      GESHIFILTER_BRACKETS_ANGLE => GESHIFILTER_BRACKETS_ANGLE,
+    ));
     $this->assertGeshiFilterHighlighting('<code language="cpp">'. $source_code .'</code>',
       array(array($source_code, 'cpp', 0, 1, FALSE)),
       t('Checking <foo> brackets style in GESHIFILTER_BRACKETS_ANGLE mode'));
@@ -213,7 +221,9 @@ class GeshiFilterTest extends DrupalTestCase {
       array(array($source_code, NULL, 0, 1, FALSE)),
       t('Checking [foo] brackets style in GESHIFILTER_BRACKETS_ANGLE mode'));
 
-    $this->drupalVariableSet('geshifilter_brackets', GESHIFILTER_BRACKETS_SQUARE);
+    $this->drupalVariableSet('geshifilter_tag_styles', array(
+      GESHIFILTER_BRACKETS_SQUARE => GESHIFILTER_BRACKETS_SQUARE,
+    ));
     $this->assertGeshiFilterHighlighting('<code language="cpp">'. $source_code .'</code>',
       array(array($source_code, NULL, 0, 1, FALSE)),
       t('Checking <foo> brackets style in GESHIFILTER_BRACKETS_SQUARE mode'));

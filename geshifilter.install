@@ -32,10 +32,54 @@ function geshifilter_uninstall() {
 }
 
 /**
- * Implementation of hook_update_N()
+ * Implementation of hook_update_N().
  */
 function geshifilter_update_1() {
   // clear the cache of available languages
   variable_del('geshifilter_available_languages');
   return array();
+}
+
+/**
+ * Implementation of hook_update_N().
+ *
+ * Upgrade path from usage of geshifilter_brackets variable
+ * to geshifilter_tag_styles variable.
+ */
+function geshifilter_update_6001() {
+  _geshifilter_update_6001_brackets_to_tag_styles(NULL);
+  foreach (filter_formats() as $format => $input_format) {
+    _geshifilter_update_6001_brackets_to_tag_styles($format);
+  }
+  return array();
+}
+
+/**
+ * Helper function for updating the old geshifilter_brackets variables
+ * to geshifilter_tag_styles variables.
+ * @param $format NULL (for global variable) or input format id.
+ */
+function _geshifilter_update_6001_brackets_to_tag_styles($format) {
+  // Make $format a suffix for usage in variable name.
+  $format = isset($format) ? "_{$format}" : '';
+  // Try to fetch the variable value and convert it if found.
+  $geshifilter_brackets = variable_get('geshifilter_brackets'. $format, NULL);
+  if (isset($geshifilter_brackets)) {
+    switch ($geshifilter_brackets) {
+      case GESHIFILTER_BRACKETS_ANGLE:
+      case GESHIFILTER_BRACKETS_SQUARE:
+        variable_set('geshifilter_tag_styles'. $format, array(
+          $geshifilter_brackets => $geshifilter_brackets
+        ));
+        break;
+      case GESHIFILTER_BRACKETS_BOTH:
+        variable_set('geshifilter_tag_styles'. $format, array(
+          GESHIFILTER_BRACKETS_ANGLE => GESHIFILTER_BRACKETS_ANGLE,
+          GESHIFILTER_BRACKETS_SQUARE => GESHIFILTER_BRACKETS_SQUARE,
+        ));
+        break;
+    }
+    // Remove old variable.
+    variable_del('geshifilter_brackets'. $format);
+  }
 }

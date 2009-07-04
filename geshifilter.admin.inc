@@ -23,6 +23,7 @@ function _geshifilter_filter_settings($format) {
   if (geshifilter_use_format_specific_options()) {
     // tags and attributes
     $form['geshifilter']['general_tags'] = _geshifilter_general_highlight_tags_settings($format);
+    $form['#validate'][] = '_geshifilter_tag_styles_validate';
     // per language tags
     $form['geshifilter']['per_language_settings'] = array(
       '#type' => 'fieldset',
@@ -38,6 +39,22 @@ function _geshifilter_filter_settings($format) {
   }
   $form['#validate'][] = 'geshifilter_per_language_settings_validate';
   return $form;
+}
+
+/**
+ * Validation handler for the tag styles form element.
+ * Covers usage in the general form of geshifilter_admin_general_settings()
+ * and the format specific (sub)form of _geshifilter_filter_settings().
+ */
+function _geshifilter_tag_styles_validate($form, &$form_state) {
+  // If we're coming from the _geshifilter_filter_settings (sub)form, we should
+  // take the input format into account.
+  $f = isset($form_state['values']['format']) ? '_'. $form_state['values']['format'] : '';
+
+  // Check that at least one tag style is selected.
+  if (0 == count(array_filter($form_state['values']["geshifilter_tag_styles{$f}"]))) {
+    form_set_error("geshifilter_tag_styles{$f}", t('At least one tag style should be selected.'));
+  }
 }
 
 /**
@@ -93,16 +110,18 @@ function geshifilter_admin_general_settings(&$form_state) {
       '#title' => t('GeSHi filter tags and delimiters'),
       '#collapsible' => TRUE,
     );
-    // usage of format specific option
+    // Usage of format specific options.
     $form['geshifilter_tag_options']['geshifilter_format_specific_options'] = array(
       '#type' => 'checkbox',
       '#title' => t('Use input format specific tag settings.'),
       '#default_value' => geshifilter_use_format_specific_options(),
       '#description' => t('Enable seperate tag settings of the GeSHi filter for each <a href="!input_formats">input format</a> instead of global tag settings.', array('!input_formats' => url('admin/settings/filters'))),
     );
-    // generic tags
+    // Generic tags settings.
+    // @todo: do this conditional form part showing/hiding in jQuery instead of in the form builder.
     if (!geshifilter_use_format_specific_options()) {
       $form['geshifilter_tag_options']['geshifilter_general_tags'] = _geshifilter_general_highlight_tags_settings();
+      $form['#validate'][] = '_geshifilter_tag_styles_validate';
     }
 
     // GeSHi filter highlighting options
@@ -358,19 +377,20 @@ function _geshifilter_general_highlight_tags_settings($format=NULL) {
     '#default_value' => geshifilter_tags($format),
     '#description' => t('Tags that should activate the GeSHi syntax highlighting. Specify a space-separated list of tagnames.'),
   );
-  // tag style
-  $form["geshifilter_brackets$f"] = array(
-    '#type' => 'select',
-    '#title' => t('Tag style'),
+  // Container tag styles.
+  $form["geshifilter_tag_styles$f"] = array(
+    '#type' => 'checkboxes',
+    '#title' => t('Container tag style'),
     '#options' => array(
-      GESHIFILTER_BRACKETS_ANGLE => '<foo>',
-      GESHIFILTER_BRACKETS_SQUARE => '[foo]',
-      GESHIFILTER_BRACKETS_BOTH => t('!angle or !square', array('!angle' => '<foo>', '!square' => '[foo]')),
+      GESHIFILTER_BRACKETS_ANGLE => '<code>'. check_plain('<foo> ... </foo>') .'</code>',
+      GESHIFILTER_BRACKETS_SQUARE => '<code>'. check_plain('[foo] ... [/foo]') .'</code>',
+      GESHIFILTER_BRACKETS_DOUBLESQUARE => '<code>'. check_plain('[[foo]] ... [[/foo]]') .'</code>',
     ),
-    '#default_value' => _geshifilter_brackets($format),
-    '#description' => t('Select which brackets should be used for the source code container tags.'),
+    '#default_value' => _geshifilter_tag_styles($format),
+    '#description' => t('Select the container tag styles that should trigger GeSHi syntax highlighting.'),
   );
-  // PHP specific delimiters
+  // PHP specific delimiters.
+  // @todo: merge this option into geshifilter_tag_styles$f.
   $form['geshifilter']["geshifilter_enable_php_delimiters$f"] = array(
     '#type' => 'checkbox',
     '#title' => t('Also apply syntax highlighting to &lt;?php ... ?&gt; style PHP source code blocks.'),

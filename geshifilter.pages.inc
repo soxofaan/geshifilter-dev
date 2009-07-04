@@ -107,22 +107,25 @@ function _geshifilter_prepare($format, $text) {
   // Also matches "<code>...$"  where "$" refers to end of string, not end of
   // line (because PCRE_MULTILINE (modifier 'm') is not enabled), so matching
   // still works when teaser view trims inside the source code.
-  switch (_geshifilter_brackets($format)) {
-    case GESHIFILTER_BRACKETS_ANGLE:
-      $pattern = '#(<)('. $tags_string .')((\s+[^>]*)*)(>)(.*?)(</\2\s*>|$)#s';
-      break;
-    case GESHIFILTER_BRACKETS_SQUARE:
-      $pattern = '#(\[)('. $tags_string .')((\s+[^\]]*)*)(\])(.*?)(\[/\2\s*\]|$)#s';
-      break;
-    case GESHIFILTER_BRACKETS_BOTH:
-      $pattern = '#([<\[])('. $tags_string .')((\s+[^>\]]*)*)([>\]])(.*?)(\1/\2\s*\5|$)#s';
-      break;
+
+  // Replace the code container tag brackets
+  // and prepare the container content (newline and angle bracket protection).
+  // @todo: make sure that these replacements can be done in serie.
+  $tag_styles = array_filter(_geshifilter_tag_styles($format));
+  if (in_array(GESHIFILTER_BRACKETS_ANGLE, $tag_styles)) {
+    $pattern = '#(<)('. $tags_string .')((\s+[^>]*)*)(>)(.*?)(</\2\s*>|$)#s';
+    $text = preg_replace_callback($pattern, create_function('$match', "return _geshifilter_prepare_callback(\$match, $format);"), $text);
   }
-  // replace the code container tag brackets
-  // and prepare the container content (newline and angle bracket protection)
-  $text = preg_replace_callback($pattern, create_function('$match', "return _geshifilter_prepare_callback(\$match, $format);"), $text);
+  if (in_array(GESHIFILTER_BRACKETS_SQUARE, $tag_styles)) {
+    $pattern = '#((?<!\[)\[)('. $tags_string .')((\s+[^\]]*)*)(\](?!\[))(.*?)((?<!\[)\[/\2\s*\](?<!\[)|$)#s';
+    $text = preg_replace_callback($pattern, create_function('$match', "return _geshifilter_prepare_callback(\$match, $format);"), $text);
+  }
+  if (in_array(GESHIFILTER_BRACKETS_DOUBLESQUARE, $tag_styles)) {
+    $pattern = '#(\[\[)('. $tags_string .')((\s+[^\]]*)*)(\]\])(.*?)(\[\[/\2\s*\]\]|$)#s';
+    $text = preg_replace_callback($pattern, create_function('$match', "return _geshifilter_prepare_callback(\$match, $format);"), $text);
+  }
+  // Prepare < ?php ... ? > blocks.
   if (_geshifilter_php_delimeters($format)) {
-    // prepare < ?php ... ? > blocks
     $text = preg_replace_callback('#[\[<](\?php|\?PHP|%)(.+?)((\?|%)[\]>]|$)#s', '_geshifilter_prepare_php_callback', $text);
   }
   return $text;
