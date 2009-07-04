@@ -67,7 +67,7 @@ function _geshifilter_filter_tips($delta, $format, $long = FALSE) {
     }
     $items[] = t('Language specific syntax highlighting tags: !tags.', array('!tags' => implode(', ', $tags)));
     // PHP specific delimiters
-    if (_geshifilter_php_delimeters($format)) {
+    if (in_array(GESHIFILTER_BRACKETS_PHPBLOCK, $tag_styles)) {
       $items[] = t('PHP source code can also be enclosed in &lt;?php ... ?&gt; or &lt;% ... %&gt;, but additional options like line numbering are not possible here.');
     }
 
@@ -192,7 +192,7 @@ function _geshifilter_filter_tips($delta, $format, $long = FALSE) {
     if (count($tag_style_examples) > 1) {
       $output .= ' '. t('The supported tag styles are: !tag_styles.' , array('!tag_styles' => implode(', ', $tag_style_examples)));
     }
-    if (_geshifilter_php_delimeters($format)) {
+    if (in_array(GESHIFILTER_BRACKETS_PHPBLOCK, $tag_styles)) {
       $output .= ' '. t('PHP source code can also be enclosed in &lt;?php ... ?&gt; or &lt;% ... %&gt;.');
     }
     return $output;
