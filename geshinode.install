@@ -35,6 +35,7 @@ function geshinode_schema() {
       ),
     ),
     'primary key' => array('vid'),
+    'indexes' => array('nid' => array('nid')),
   );
   return $schema;
 }
@@ -79,5 +80,7 @@ function geshinode_update_6001() {
   db_drop_primary_key($ret, 'geshinode');
   // Add primary key on 'vid'.
   db_add_primary_key($ret, 'geshinode', array('vid'));
+  // Add an index on 'nid'.
+  db_add_index($ret, 'geshinode', 'nid', array('nid'));
   return $ret;
 }
