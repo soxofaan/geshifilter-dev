@@ -1,5 +1,5 @@
 <?php
-// $Id: geshinode.install,v 1.4 2008/07/21 17:44:23 soxofaan Exp $
+// $Id: geshinode.install,v 1.5 2009/07/06 22:45:53 soxofaan Exp $
 
 /**
  * @file
@@ -15,7 +15,7 @@ function geshinode_schema() {
     'fields' => array(
       'nid' => array(
         'description' => t('The primary identifier for a node.'),
-        'type' => 'serial',
+        'type' => 'int',
         'unsigned' => TRUE,
         'not null' => TRUE,
       ),
@@ -34,10 +34,8 @@ function geshinode_schema() {
         'default' => '',
       ),
     ),
-    'primary key' => array('nid'),
-    'unique keys' => array(
-      'vid' => array('vid'),
-    ),
+    'primary key' => array('vid'),
+    'indexes' => array('nid' => array('nid')),
   );
   return $schema;
 }
@@ -56,4 +54,33 @@ function geshinode_install() {
 function geshinode_uninstall() {
   // Drop geshinode tables.
   drupal_uninstall_schema('geshinode');
+}
+
+
+/**
+ * Implementation of hook_update_N().
+ *
+ * Fix the primary key and indices on the geshinode table.
+ * See http://drupal.org/node/363770 .
+ */
+function geshinode_update_6001() {
+  $ret = array();
+  // Drop unique key on 'vid'.
+  db_drop_unique_key($ret, 'geshinode', 'vid');
+  // Change the 'nid' field to 'int' (from 'serial').
+  db_change_field($ret, 'geshinode', 'nid', 'nid',
+    array(
+      'description' => t('The primary identifier for a node.'),
+      'type' => 'int',
+      'unsigned' => TRUE,
+      'not null' => TRUE,
+    )
+  );
+  // Drop primary key ('nid').
+  db_drop_primary_key($ret, 'geshinode');
+  // Add primary key on 'vid'.
+  db_add_primary_key($ret, 'geshinode', array('vid'));
+  // Add an index on 'nid'.
+  db_add_index($ret, 'geshinode', 'nid', array('nid'));
+  return $ret;
 }
