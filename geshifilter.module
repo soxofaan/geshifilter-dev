@@ -1,5 +1,5 @@
 <?php
-// $Id: geshifilter.module,v 1.45 2009/06/27 12:54:15 soxofaan Exp $
+// $Id: geshifilter.module,v 1.47 2009/07/04 11:05:56 soxofaan Exp $
 
 /**
  * @file
@@ -24,7 +24,10 @@ define('GESHIFILTER_ATTRIBUTE_FANCY_N', 'fancy');
 
 define('GESHIFILTER_BRACKETS_ANGLE', 1);
 define('GESHIFILTER_BRACKETS_SQUARE', 2);
-define('GESHIFILTER_BRACKETS_BOTH', 3);
+define('GESHIFILTER_BRACKETS_BOTH', 3); // Deprecated, only used in upgrade path.
+define('GESHIFILTER_BRACKETS_DOUBLESQUARE', 4);
+define('GESHIFILTER_BRACKETS_PHPBLOCK', 8);
+
 
 define('GESHIFILTER_LINE_NUMBERS_DEFAULT_NONE', 0);
 define('GESHIFILTER_LINE_NUMBERS_DEFAULT_NORMAL', 1);
