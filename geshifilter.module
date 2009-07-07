@@ -219,8 +219,8 @@ function geshifilter_requirements($phase) {
       $requirements[] = array(
         'title' => 'GeSHi filter',
         'value' => t('GeSHi library not found.'),
-        'description' => t('You should install the GeSHi library and set its path in the !geshisettings.',
-          array('!geshisettings' => l('GeSHi settings', 'admin/settings/geshifilter'))),
+        'description' => t('You should install the GeSHi library and set its path in the <a href="!geshisettings">GeSHi settings</a>.',
+          array('!geshisettings' => url('admin/settings/geshifilter'))),
         'severity' => REQUIREMENT_ERROR,
       );
     }
