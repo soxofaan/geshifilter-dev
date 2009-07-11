@@ -154,6 +154,7 @@ function geshifilter_init() {
     drupal_add_css(file_directory_path() .'/geshifilter-languages.css');
   }
   drupal_add_css(drupal_get_path('module', 'geshifilter') .'/geshifilter.css');
+  drupal_add_js(drupal_get_path('module', 'geshifilter') .'/geshifilter.js');
 }
 
 /**
