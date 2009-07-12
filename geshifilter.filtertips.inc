@@ -40,8 +40,8 @@ function _geshifilter_filter_tips($delta, $format, $long = FALSE) {
   }
   if (!$bracket_open) {
     drupal_set_message(t('Could not determine a valid tag style for GeSHi filtering.'), 'error');
-    $bracket_open = '&lt;';
-    $bracket_close = '&gt;';
+    $bracket_open = check_plain('<');
+    $bracket_close = check_plain('>');
   }
 
   if ($long) {
