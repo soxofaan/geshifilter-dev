@@ -1,9 +1,6 @@
+var geshifilter_collapse_height = 100;
 
-// jQuery magic for partial collapsing/showing GeSHi filter code blocks.
-Drupal.behaviors.geshifilterCollapsing = function(context) {
-  // Collapse height.
-  var geshifilter_collapse_height = 100;
-
+$(document).ready(function() {
   $('div.geshifilter').each(function() {
     // Get code container and its height.
     var code_container = $(this);
@@ -12,7 +9,7 @@ Drupal.behaviors.geshifilterCollapsing = function(context) {
     // Only do the collapsing where it makes sense.
     if (code_container_original_height > geshifilter_collapse_height) {
       // Add more/less link.
-      $(this).after('<div class="geshifilter-tools"><a href="#" class="geshifilter-tools-collapsetoggle">' + Drupal.t('Show more code') + '</a></div>');
+      $(this).after('<div class="geshifilter-tools"><a href="#" class="geshifilter-tools-toggle">' + Drupal.t('Show more code') + '</a></div>');
       // Store the original heights of the geshifilter divs.
       code_container.attr('original_height', code_container_original_height);
       // Collapse by default.
@@ -21,7 +18,7 @@ Drupal.behaviors.geshifilterCollapsing = function(context) {
   });
 
   // Add handler to read more/collapse link.
-  $("a.geshifilter-tools-collapsetoggle").click(function() {
+  $("a.geshifilter-tools-toggle").click(function() {
     // Get code container.
     var code_container = $(this).parent().prev();
 
@@ -40,4 +37,4 @@ Drupal.behaviors.geshifilterCollapsing = function(context) {
     return false;
   });
 
-};
+});
