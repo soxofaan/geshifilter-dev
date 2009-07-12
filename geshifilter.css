@@ -48,3 +48,7 @@ div.geshifilter-tools {
   background-color: #ccc;
   padding: 0.5ex 0.5em;
 }
+
+div.geshifilter-collapsed {
+  overflow: hidden;
+}
