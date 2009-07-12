@@ -50,7 +50,7 @@ function _geshifilter_check_geshi_library($use_cache=TRUE, $geshi_dir=NULL, $loa
     }
     else {
       $geshi_library['success'] = FALSE;
-      $geshi_library['message'] = t('GeSHi library error: Could not find a known version of the GeSHi library at %dir.' , array('%dir' => $geshi_dir));
+      $geshi_library['message'] = t('GeSHi library error: Could not find a known version of the GeSHi library in directory %dir.' , array('%dir' => $geshi_dir));
     }
     // store in cache if needed
     if ($use_cache) {
