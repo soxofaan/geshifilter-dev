@@ -81,7 +81,7 @@ function _geshifilter_htmlfilter_conflicts($format, $cfilter, $geshifilter) {
   // check tag escaping of html filter
   if (variable_get("filter_html_$format", FILTER_HTML_STRIP) == FILTER_HTML_ESCAPE) {
     $conflicts[] = array(
-      'description' => t('%cfilter is configured to "%escape", which is likely to cause propblems with %geshifilter.',
+      'description' => t('%cfilter is configured to "%escape", which is likely to cause problems with %geshifilter.',
         array('%cfilter' => $cfilter->name, '%geshifilter' => $geshifilter->name, '%escape' => t('Escape all tags'))),
       'solution' => l(t('Configure HTML filtering to "%strip"', array('%strip' => t('Strip disallowed tags'))), "admin/settings/filters/$format/configure", array('html' => TRUE)),
     );
