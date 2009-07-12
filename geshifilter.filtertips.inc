@@ -63,7 +63,10 @@ function _geshifilter_filter_tips($delta, $format, $long = FALSE) {
     // language tags
     $tags = array();
     foreach ($language_tags as $tag) {
-      $tags[] = '"<code>'. $bracket_open . $tag . $bracket_close .'</code>" '. t('for @lang source code', array('@lang' => $languages[$tag_to_lang[$tag]]));
+      $tags[] = t('"<code>!tag</code>" for @lang source code', array(
+        '!tag' => $bracket_open . $tag . $bracket_close,
+        '@lang' => $languages[$tag_to_lang[$tag]])
+      );
     }
     $items[] = t('Language specific syntax highlighting tags: !tags.', array('!tags' => implode(', ', $tags)));
     // PHP specific delimiters
