@@ -1,5 +1,5 @@
 
-if (Drupal.jsenabled) {
+if (Drupal.jsEnabled) {
 
   $(document).ready(function() {
     // The height to collapse to.
