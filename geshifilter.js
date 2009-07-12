@@ -26,12 +26,12 @@ $(document).ready(function() {
       // Show more (use original height).
       var original_height = code_container.attr('original_height') + 'px';
       code_container.removeClass('geshifilter-collapsed').animate({height: original_height}, 'slow');
-      $(this).html('Show less');
+      $(this).text('Show less');
     }
     else {
       // Collapse.
       code_container.addClass('geshifilter-collapsed').animate({height: geshifilter_collapse_height}, 'slow');
-      $(this).html('Read more');
+      $(this).text('Read more');
     }
     // Return false so that the link is no followed.
     return false;
