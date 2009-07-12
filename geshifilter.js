@@ -1,6 +1,7 @@
 
 if (Drupal.jsEnabled) {
 
+  // jQuery magic for partial collapsing/showing GeSHi filter code blocks.
   $(document).ready(function() {
     // The height to collapse to.
     var geshifilter_collapse_height = 100;
