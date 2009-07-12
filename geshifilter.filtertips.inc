@@ -1,5 +1,5 @@
 <?php
-// $Id: geshifilter.filtertips.inc,v 1.7 2009/07/04 11:05:56 soxofaan Exp $
+// $Id: geshifilter.filtertips.inc,v 1.8 2009/07/12 15:00:28 soxofaan Exp $
 
 /**
  * @file
@@ -40,8 +40,8 @@ function _geshifilter_filter_tips($delta, $format, $long = FALSE) {
   }
   if (!$bracket_open) {
     drupal_set_message(t('Could not determine a valid tag style for GeSHi filtering.'), 'error');
-    $bracket_open = '&lt;';
-    $bracket_close = '&gt;';
+    $bracket_open = check_plain('<');
+    $bracket_close = check_plain('>');
   }
 
   if ($long) {
@@ -63,7 +63,10 @@ function _geshifilter_filter_tips($delta, $format, $long = FALSE) {
     // language tags
     $tags = array();
     foreach ($language_tags as $tag) {
-      $tags[] = '"<code>'. $bracket_open . $tag . $bracket_close .'</code>" '. t('for @lang source code', array('@lang' => $languages[$tag_to_lang[$tag]]));
+      $tags[] = t('"<code>!tag</code>" for @lang source code', array(
+        '!tag' => $bracket_open . $tag . $bracket_close,
+        '@lang' => $languages[$tag_to_lang[$tag]])
+      );
     }
     $items[] = t('Language specific syntax highlighting tags: !tags.', array('!tags' => implode(', ', $tags)));
     // PHP specific delimiters
