@@ -3,13 +3,13 @@ var geshifilter_collapse_height = 100;
 $(document).ready(function() {
   $('div.geshifilter').each(function() {
     // Get code container and its height.
-    var code_container = $(this).children(':first');
+    var code_container = $(this);
     var code_container_original_height = code_container.height();
 
     // Only do the collapsing where it makes sense.
     if (code_container_original_height > geshifilter_collapse_height) {
       // Add more/less link.
-      $(this).append('<div class="geshifilter-tools"><a href="#" class="geshifilter-tools-toggle">Read more</a></div>');
+      $(this).after('<div class="geshifilter-tools"><a href="#" class="geshifilter-tools-toggle">Read more</a></div>');
       // Store the original heights of the geshifilter divs.
       code_container.attr('original_height', code_container_original_height);
       // Collapse by default.

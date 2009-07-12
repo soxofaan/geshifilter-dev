@@ -23,6 +23,7 @@ div.geshifilter {
   border: 1px solid #ccc;
   background-color: #f8f8f8;
   line-height: 1.3;
+  overflow: auto;
 }
 
 div.geshifilter > pre, div.geshifilter > div {
@@ -41,3 +42,8 @@ div.geshifilter > pre ol, div.geshifilter > div ol {
   line-height: 1.3;
 }
 
+div.geshifilter-tools {
+	margin: -0.5em 0.5em 0.5em 0.5em;
+  background-color: #cccccc;
+  padding: 0.5ex 0.5em;
+}
