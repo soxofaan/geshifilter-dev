@@ -9,7 +9,7 @@ $(document).ready(function() {
     // Only do the collapsing where it makes sense.
     if (code_container_original_height > geshifilter_collapse_height) {
       // Add more/less link.
-      $(this).after('<div class="geshifilter-tools"><a href="#" class="geshifilter-tools-toggle">Read more</a></div>');
+      $(this).after('<div class="geshifilter-tools"><a href="#" class="geshifilter-tools-toggle">' + Drupal.t('Show more code') + '</a></div>');
       // Store the original heights of the geshifilter divs.
       code_container.attr('original_height', code_container_original_height);
       // Collapse by default.
@@ -26,12 +26,12 @@ $(document).ready(function() {
       // Show more (use original height).
       var original_height = code_container.attr('original_height') + 'px';
       code_container.removeClass('geshifilter-collapsed').animate({height: original_height}, 'slow');
-      $(this).text('Show less');
+      $(this).text(Drupal.t('Show less code'));
     }
     else {
       // Collapse.
       code_container.addClass('geshifilter-collapsed').animate({height: geshifilter_collapse_height}, 'slow');
-      $(this).text('Read more');
+      $(this).text(Drupal.t('Show more code'));
     }
     // Return false so that the link is no followed.
     return false;
