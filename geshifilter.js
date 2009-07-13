@@ -5,6 +5,7 @@ if (Drupal.jsEnabled) {
   $(document).ready(function() {
     // The height to collapse to.
     var geshifilter_collapse_height = 100;
+    var geshifilter_collapse_height_threshold = 150;
 
     $('div.geshifilter').each(function() {
       // Get code container and its height.
@@ -12,7 +13,7 @@ if (Drupal.jsEnabled) {
       var code_container_original_height = code_container.height();
 
       // Only do the collapsing where it makes sense.
-      if (code_container_original_height > geshifilter_collapse_height) {
+      if (code_container_original_height > geshifilter_collapse_height_threshold) {
         // Add more/less link.
         $(this).after('<div class="geshifilter-tools"><a href="#" class="geshifilter-tools-collapsetoggle">' + Drupal.t('Show more code') + '</a></div>');
         // Store the original heights of the geshifilter divs.
