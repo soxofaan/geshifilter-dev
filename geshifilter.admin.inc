@@ -204,18 +204,18 @@ function geshifilter_admin_general_settings(&$form_state) {
 
     // Code container
     $container_options = array(
-      GESHI_HEADER_PRE => t('Use @cnt container (efficient whitespace coding, no automatic line wrapping)',
+      GESHI_HEADER_PRE => t('Use @cnt container (efficient whitespace coding, no automatic line wrapping).',
         array('@cnt' => '<pre>')),
-      GESHI_HEADER_DIV => t('Use @cnt container (enables automatic line wrapping)',
+      GESHI_HEADER_DIV => t('Use @cnt container (enables automatic line wrapping).',
         array('@cnt' => '<div>')),
     );
     if (version_compare(GESHI_VERSION, '1.0.8', '>=')) {
-      $container_options[GESHI_HEADER_PRE_VALID] = t('Use @pre container and ensure valid HTML when line numbering is enabled (generates more markup)',
+      $container_options[GESHI_HEADER_PRE_VALID] = t('Use @pre container and ensure valid HTML when line numbering is enabled (generates more markup).',
         array('@pre' => '<pre>', '@li' => '<li>'));
       $container_options[GESHI_HEADER_PRE_TABLE] = t('Use a table construction for adding line numbers.');
     }
     if (version_compare(GESHI_VERSION, '1.0.7.2', '>=')) {
-      $container_options[GESHI_HEADER_NONE] = t('Use no container');
+      $container_options[GESHI_HEADER_NONE] = t('Use no container.');
     }
 
     $form['geshifilter_styling']['geshifilter_code_container'] = array(
