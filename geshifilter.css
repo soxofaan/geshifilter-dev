@@ -32,12 +32,19 @@ div.geshifilter > pre, div.geshifilter > div {
   overflow: auto;
 }
 
-div.geshifilter > pre ol, div.geshifilter > div ol {
-  padding-left: 1em;
+/**
+ * Styling of <OL>-based line numbering.
+ * Reset some important rules (e.g. spacing, margins, paddings, list styles)
+ * for the  'ol' and 'li' elements.
+ */
+div.geshifilter > pre > ol, div.geshifilter > div > ol {
+  margin: 0;
+  padding: 0 0 0 4em;
+  list-style-position: outside;
+  list-style-type: decimal;
 }
 
-/* Set line-height for syntax highlighting with line numbers */
-.geshifilter ol {
+div.geshifilter > pre > ol > li, div.geshifilter > div > ol > li {
+  padding: 0;
   margin: 0;
-  line-height: 1.3;
 }
