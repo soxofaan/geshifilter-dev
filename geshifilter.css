@@ -24,27 +24,30 @@ div.geshifilter {
   background-color: #f8f8f8;
   color: #222;
   line-height: 1.3;
-}
-
-div.geshifilter > pre, div.geshifilter > div {
-  margin: 0;
-  padding: 0;
   overflow: auto;
 }
 
 /**
- * Styling of <OL>-based line numbering.
- * Reset some important rules (e.g. spacing, margins, paddings, list styles)
- * for the  'ol' and 'li' elements.
+ * Reset the 'pre' styling in a geshifilter block.
  */
-div.geshifilter > pre > ol, div.geshifilter > div > ol {
+div.geshifilter pre {
+  margin: 0;
+  padding: 0;
+}
+
+/**
+ * Styling of 'ol'-based line numbering.
+ * Reset some important rules (e.g. spacing, margins, paddings, list styles)
+ * for the 'ol' and 'li' elements.
+ */
+div.geshifilter ol {
   margin: 0;
   padding: 0 0 0 4em;
   list-style-position: outside;
   list-style-type: decimal;
 }
 
-div.geshifilter > pre > ol > li, div.geshifilter > div > ol > li {
-  padding: 0;
+div.geshifilter li {
   margin: 0;
+  padding: 0;
 }
