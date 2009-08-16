@@ -7,7 +7,7 @@
  */
 
 
-/* inline source code */
+/* Inline source code. */
 span.geshifilter {
   display: inline;
   padding: 0;
@@ -15,7 +15,7 @@ span.geshifilter {
   border: none;
 }
 
-/* block source code */
+/* Source code block. */
 div.geshifilter {
   display: block;
   padding: 0.5em;
@@ -27,16 +27,14 @@ div.geshifilter {
   overflow: auto;
 }
 
-/**
- * Reset the 'pre' styling in a geshifilter block.
- */
+/* Reset the 'pre' styling in a geshifilter block. */
 div.geshifilter pre {
   margin: 0;
   padding: 0;
 }
 
 /**
- * Styling of 'ol'-based line numbering.
+ * Styling for 'ol'-based line numbering.
  * Reset some important rules (e.g. spacing, margins, paddings, list styles)
  * for the 'ol' and 'li' elements.
  */
