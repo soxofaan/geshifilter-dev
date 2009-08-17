@@ -31,6 +31,7 @@ div.geshifilter {
 div.geshifilter pre {
   margin: 0;
   padding: 0;
+  line-height: 1.3;
 }
 
 /* CSS resets for 'ol'-based line numbering. */
@@ -40,11 +41,13 @@ div.geshifilter ol {
   padding: 0 0 0 4em;
   list-style-position: outside;
   list-style-type: decimal;
+  line-height: 1.3;
 }
 
 div.geshifilter li {
   margin: 0;
   padding: 0;
+  line-height: 1.3;
 }
 
 /* CSS resets for the table elements in GESHI_HEADER_PRE_TABLE mode. */
