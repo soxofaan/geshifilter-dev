@@ -3,7 +3,7 @@
 /**
  * CSS rules for the general GeSHi filter containers.
  * The language specific rules are generated automatically and written to a
- * CSS file in your files directory.
+ * CSS file in the files directory.
  */
 
 
@@ -27,19 +27,16 @@ div.geshifilter {
   overflow: auto;
 }
 
-/* Reset the 'pre' styling in a geshifilter block. */
+/* CSS reset for the 'pre' elements in the geshifilter code blocks. */
 div.geshifilter pre {
   margin: 0;
   padding: 0;
 }
 
-/**
- * Styling for 'ol'-based line numbering.
- * Reset some important rules (e.g. spacing, margins, paddings, list styles)
- * for the 'ol' and 'li' elements.
- */
+/* CSS resets for 'ol'-based line numbering. */
 div.geshifilter ol {
   margin: 0;
+  /* Left padding is for keeping space for the line numbers. */
   padding: 0 0 0 4em;
   list-style-position: outside;
   list-style-type: decimal;
