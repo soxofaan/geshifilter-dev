@@ -204,24 +204,26 @@ function geshifilter_admin_general_settings(&$form_state) {
 
     // Code container
     $container_options = array(
-      GESHI_HEADER_PRE => t('Use @cnt container (efficient whitespace coding, no automatic line wrapping).',
-        array('@cnt' => '<pre>')),
-      GESHI_HEADER_DIV => t('Use @cnt container (enables automatic line wrapping).',
-        array('@cnt' => '<div>')),
+      GESHI_HEADER_PRE => t('%val: uses a @cnt wrapper, efficient whitespace coding, no automatic line wrapping, generates invalid HTML with line numbering.',
+        array('%val' => 'GESHI_HEADER_PRE', '@cnt' => '<pre>')),
+      GESHI_HEADER_DIV => t('%val: uses a @cnt wrapper, enables automatic line wrapping.',
+        array('%val' => 'GESHI_HEADER_DIV', '@cnt' => '<div>')),
     );
     if (version_compare(GESHI_VERSION, '1.0.8', '>=')) {
-      $container_options[GESHI_HEADER_PRE_VALID] = t('Use @pre container and ensure valid HTML when line numbering is enabled (generates more markup).',
-        array('@pre' => '<pre>', '@li' => '<li>'));
-      $container_options[GESHI_HEADER_PRE_TABLE] = t('Use a table construction for adding line numbers.');
+      $container_options[GESHI_HEADER_PRE_VALID] = t('%val: uses @pre wrappers, ensures valid HTML with line numbering, but generates more markup.',
+        array('%val' => 'GESHI_HEADER_PRE_VALID', '@pre' => '<pre>', '@li' => '<li>'));
+      $container_options[GESHI_HEADER_PRE_TABLE] = t('%val: uses a @table construction for adding line numbers which avoids selection/copy/paste problems.',
+        array('%val' => 'GESHI_HEADER_PRE_TABLE', '@table' => '<table>'));
     }
     if (version_compare(GESHI_VERSION, '1.0.7.2', '>=')) {
-      $container_options[GESHI_HEADER_NONE] = t('Use no container.');
+      $container_options[GESHI_HEADER_NONE] = t('%val: uses no wrapper.',
+        array('%val' => 'GESHI_HEADER_NONE'));
     }
 
     $form['geshifilter_styling']['geshifilter_code_container'] = array(
       '#type' => 'radios',
-      '#title' => t('Code container'),
-      '#description' => t('Define the container element to use for code blocks. (GeSHi documentation: <a href="!link">The Code Container</a>).',
+      '#title' => t('Code container, wrapping technique'),
+      '#description' => t('Define the wrapping technique to use for code blocks. (GeSHi documentation: <a href="!link">The Code Container</a>).',
         array('!link' => 'http://qbnz.com/highlighter/geshi-doc.html#the-code-container')
       ),
       '#options' => $container_options,
