@@ -46,3 +46,10 @@ div.geshifilter li {
   margin: 0;
   padding: 0;
 }
+
+/* CSS resets for the table elements in GESHI_HEADER_PRE_TABLE mode. */
+div.geshifilter table, div.geshifilter tbody, div.geshifilter tr, div.geshifilter td {
+  margin: 0;
+  padding: 0;
+  border-style: none;
+}
