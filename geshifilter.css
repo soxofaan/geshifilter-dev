@@ -23,12 +23,19 @@ div.geshifilter {
   border: 1px solid #ccc;
   background-color: #f8f8f8;
   line-height: 1.3;
+  overflow: auto;
 }
 
-div.geshifilter > pre, div.geshifilter > div {
+div.geshifilter pre {
   margin: 0;
   padding: 0;
-  overflow: auto;
+}
+
+/* CSS resets for the table elements in GESHI_HEADER_PRE_TABLE mode. */
+div.geshifilter table, div.geshifilter tbody, div.geshifilter tr, div.geshifilter td {
+  margin: 0;
+  padding: 0;
+  border-style: none;
 }
 
 div.geshifilter > pre ol, div.geshifilter > div ol {
@@ -40,4 +47,3 @@ div.geshifilter > pre ol, div.geshifilter > div ol {
   margin: 0;
   line-height: 1.3;
 }
-
