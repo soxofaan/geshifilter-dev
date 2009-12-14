@@ -1,6 +1,8 @@
-****************************
+// $Id: README.txt,v 1.8 2009/12/14 22:47:56 soxofaan Exp $
+
+============================
 GeSHi Filter (Drupal Module)
-****************************
+============================
 
 
 DESCRIPTION
@@ -23,10 +25,10 @@ INSTALLATION
 1. Extract the GeSHi Filter module tarball and place the entire geshifilter
   directory into your Drupal setup (e.g. in sites/all/modules).
 
-2. Download the GeSHi library from 
+2. Download the GeSHi library from
   http://sourceforge.net/projects/geshi/files/geshi
   Make sure you download a version of the branch 1.0.x and not a version
-  from the branch 1.1.x (also described as geshi-dev), which is not yet 
+  from the branch 1.1.x (also described as geshi-dev), which is not yet
   supported by the GeSHi filter module.
   Place the entire extracted 'geshi' folder (which contains geshi.php)
   in the geshifilter directory (e.g. as /sites/all/modules/geshifilter/geshi)
@@ -41,7 +43,8 @@ CONFIGURATION
   administer > site configuration > geshifilter
 2. Further configuration instructions can be found by following the
   "more help..." link at the top of that general settings page, which leads
-  to www.example.com/?q=admin/help/geshifilter .
+  to www.example.com/?q=admin/help/geshifilter . This requires you have the
+  'help' module enabled.
 
 
 USAGE
