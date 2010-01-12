@@ -1,5 +1,5 @@
 <?php
-// $Id: geshifilter.admin.inc,v 1.22 2009/07/04 11:05:56 soxofaan Exp $
+// $Id: geshifilter.admin.inc,v 1.24 2009/08/17 21:00:16 soxofaan Exp $
 
 /**
  * @file
@@ -157,22 +157,23 @@ function geshifilter_admin_general_settings(&$form_state) {
         GESHIFILTER_LINE_NUMBERS_DEFAULT_FANCY10 => t('fancy line numbers (every @n lines)', array('@n' => GESHIFILTER_LINE_NUMBERS_DEFAULT_FANCY10)),
         GESHIFILTER_LINE_NUMBERS_DEFAULT_FANCY20 => t('fancy line numbers (every @n lines)', array('@n' => GESHIFILTER_LINE_NUMBERS_DEFAULT_FANCY20)),
       ),
-      '#description' => t('Select the default line numbering scheme: no line numbers, normal line numbers or fancy line numbers. With fancy line numbers every n<sup>th</sup> line number is highlighted. (GeSHi documentation: !link).',
-        array('!link' => l('Line numbers', 'http://qbnz.com/highlighter/geshi-doc.html#line-numbers'))),
+      '#description' => t('Select the default line numbering scheme: no line numbers, normal line numbers or fancy line numbers. With fancy line numbers every n<sup>th</sup> line number is highlighted. (GeSHi documentation: <a href="!link">Line numbers</a>).',
+        array('!link' => 'http://qbnz.com/highlighter/geshi-doc.html#line-numbers')),
     );
     // highlight_string usage option
     $form['geshifilter_highlighting_options']['geshifilter_use_highlight_string_for_php'] = array(
       '#type' => 'checkbox',
       '#title' => t('Use built-in PHP function <code>highlight_string()</code> for PHP source code.'),
-      '#description' => t('When enabled, PHP source code will be syntax highlighted with the built-in PHP function <code>!highlight_string</code> instead of with the GeSHi library. GeSHi features like for example line numbering and usage of an external CSS stylesheet are not available.', array('!highlight_string' => l('highlight_string()', 'http://php.net/manual/en/function.highlight-string.php'))),
+      '#description' => t('When enabled, PHP source code will be syntax highlighted with the built-in PHP function <code><a href="!highlight_string">highlight_string()</a></code> instead of with the GeSHi library. GeSHi features, like line numbering and usage of an external CSS stylesheet for example, are not available.',
+        array('!highlight_string' => 'http://php.net/manual/en/function.highlight-string.php')),
       '#default_value' => variable_get('geshifilter_use_highlight_string_for_php', FALSE),
     );
     // Option to disable Keyword URL's
     $form['geshifilter_highlighting_options']['geshifilter_enable_keyword_urls'] = array(
       '#type' => 'checkbox',
       '#title' => t('Enable GeSHi keyword URLs'),
-      '#description' => t('For some languages GeSHi can link language keywords (e.g. standard library functions) to their online documentation. (GeSHi documentation: !link)',
-        array('!link' => l('Keyword URLs', 'http://qbnz.com/highlighter/geshi-doc.html#keyword-urls'))),
+      '#description' => t('For some languages GeSHi can link language keywords (e.g. standard library functions) to their online documentation. (GeSHi documentation: <a href="!link">Keyword URLs</a>).',
+        array('!link' => 'http://qbnz.com/highlighter/geshi-doc.html#keyword-urls')),
       '#default_value' => variable_get('geshifilter_enable_keyword_urls', TRUE),
     );
 
@@ -193,26 +194,39 @@ function geshifilter_admin_general_settings(&$form_state) {
         GESHIFILTER_CSS_CLASSES_ONLY => t('Only add CSS classes to the markup.'),
       ),
       '#default_value' => variable_get('geshifilter_css_mode', GESHIFILTER_CSS_INLINE),
-      '#description' => t('Inline CSS is easier to set up, does not depend on an external style sheets and is consequently more robust to copy/paste operations like content aggregation. However, usage of CSS classes and an external stylesheet requires much less markup code and bandwidth. The external style sheet can be managed automatically by the GeSHi filter module, but this feature requires the public <a href="!filesystem">download method</a>. If the GeSHi filter is configured to only add the CSS classes to the markup, the administrator or themer is responsible for adding the appropriate CSS rules to the pages (e.g. based on <a href="!cssdefaults">these defaults</a>). (GeSHi documentation: !geshidoc).',
+      '#description' => t('Inline CSS is easier to set up, does not depend on an external style sheets and is consequently more robust to copy/paste operations like content aggregation. However, usage of CSS classes and an external stylesheet requires much less markup code and bandwidth. The external style sheet can be managed automatically by the GeSHi filter module, but this feature requires the public <a href="!filesystem">download method</a>. If the GeSHi filter is configured to only add the CSS classes to the markup, the administrator or themer is responsible for adding the appropriate CSS rules to the pages (e.g. based on <a href="!cssdefaults">these defaults</a>). (GeSHi documentation: <a href="!geshidoc">Using CSS Classes</a>).',
         array(
-          '!geshidoc' => l('Using CSS Classes', 'http://qbnz.com/highlighter/geshi-doc.html#using-css-classes'),
+          '!geshidoc' => 'http://qbnz.com/highlighter/geshi-doc.html#using-css-classes',
           '!filesystem' => url('admin/settings/file-system'),
           '!cssdefaults' => url('admin/settings/geshifilter/generate_css'),
         )),
     );
 
     // Code container
+    $container_options = array(
+      GESHI_HEADER_PRE => t('%val: uses a @cnt wrapper, efficient whitespace coding, no automatic line wrapping, generates invalid HTML with line numbering.',
+        array('%val' => 'GESHI_HEADER_PRE', '@cnt' => '<pre>')),
+      GESHI_HEADER_DIV => t('%val: uses a @cnt wrapper, enables automatic line wrapping.',
+        array('%val' => 'GESHI_HEADER_DIV', '@cnt' => '<div>')),
+    );
+    if (version_compare(GESHI_VERSION, '1.0.8', '>=')) {
+      $container_options[GESHI_HEADER_PRE_VALID] = t('%val: uses @pre wrappers, ensures valid HTML with line numbering, but generates more markup.',
+        array('%val' => 'GESHI_HEADER_PRE_VALID', '@pre' => '<pre>', '@li' => '<li>'));
+      $container_options[GESHI_HEADER_PRE_TABLE] = t('%val: uses a @table construction for adding line numbers which avoids selection/copy/paste problems.',
+        array('%val' => 'GESHI_HEADER_PRE_TABLE', '@table' => '<table>'));
+    }
+    if (version_compare(GESHI_VERSION, '1.0.7.2', '>=')) {
+      $container_options[GESHI_HEADER_NONE] = t('%val: uses no wrapper.',
+        array('%val' => 'GESHI_HEADER_NONE'));
+    }
+
     $form['geshifilter_styling']['geshifilter_code_container'] = array(
       '#type' => 'radios',
-      '#title' => t('Code container'),
-      '#description' => t('Define the container element to use for code blocks. (GeSHi documentation: !link).',
-        array('!link' => l('The Code Container', 'http://qbnz.com/highlighter/geshi-doc.html#the-code-container'))
+      '#title' => t('Code container, wrapping technique'),
+      '#description' => t('Define the wrapping technique to use for code blocks. (GeSHi documentation: <a href="!link">The Code Container</a>).',
+        array('!link' => 'http://qbnz.com/highlighter/geshi-doc.html#the-code-container')
       ),
-      '#options' => array(
-        GESHI_HEADER_PRE => t('Use @cnt container (efficient whitespace coding, no automatic line wrapping)', array('@cnt' => '<pre>')),
-        GESHI_HEADER_DIV => t('Use @cnt container (enables automatic line wrapping)', array('@cnt' => '<div>')),
-        GESHI_HEADER_NONE => t('Use no container'),
-      ),
+      '#options' => $container_options,
       '#default_value' => variable_get('geshifilter_code_container', GESHI_HEADER_PRE),
     );
   }
@@ -573,8 +587,8 @@ function _geshifilter_generate_languages_css_file($force=FALSE) {
       drupal_set_message(t('(Re)generated external CSS style sheet %file.', array('%file' => $ret)));
     }
     else {
-      drupal_set_message(t('Could not generate external CSS file. Check the settings of your !filesystem.',
-        array('!filesystem' => l(t('file system'), 'admin/settings/file-system'))), 'error');
+      drupal_set_message(t('Could not generate external CSS file. Check the settings of your <a href="!filesystem">file system</a>.',
+        array('!filesystem' => url('admin/settings/file-system'))), 'error');
     }
     // Remember for which list of languages the CSS file was generated
     variable_set('geshifilter_cssfile_languages', $languages_hash);

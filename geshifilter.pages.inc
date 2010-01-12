@@ -1,5 +1,5 @@
 <?php
-// $Id: geshifilter.pages.inc,v 1.12 2009/07/04 11:05:56 soxofaan Exp $
+// $Id: geshifilter.pages.inc,v 1.13 2009/08/17 11:54:38 soxofaan Exp $
 
 /**
  * @file
@@ -342,7 +342,13 @@ function geshifilter_geshi_process($source_code, $lang, $line_numbering=0, $line
   if ($inline_mode) {
     // inline source code mode
     $geshi->set_header_type(GESHI_HEADER_NONE);
-    $source_code = '<span class="geshifilter"><code class="'. $geshi->overall_class .'">'. $geshi->parse_code() .'</code></span>';
+    // To make highlighting work we have to manually set a class on the code
+    // element we will wrap the code in.
+    // To counter a change between GeSHi version 1.0.7.22 and 1.0.8 (svn
+    // commit 1610), we use both the language and overall_class for the class,
+    // to mimic the 1.0.8 behavior, which is backward compatible.
+    $code_class = "{$geshi->language} {$geshi->overall_class}";
+    $source_code = '<span class="geshifilter"><code class="'. $code_class .'">'. $geshi->parse_code() .'</code></span>';
   }
   else {
     // block source code mode
