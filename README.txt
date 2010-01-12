@@ -1,6 +1,8 @@
-****************************
+// $Id: README.txt,v 1.8 2009/12/14 22:47:56 soxofaan Exp $
+
+============================
 GeSHi Filter (Drupal Module)
-****************************
+============================
 
 
 DESCRIPTION
@@ -12,7 +14,7 @@ source code between for example <code>...</code>.
 
 DEPENDENCY
 ----------
-This module requires the third-party library: GeShi (Generic Syntax
+This module requires the third-party library GeShi 1.0.x (Generic Syntax
 Highlighter, written by Nigel McNie) which can be found at
   http://qbnz.com/highlighter
 See installation procedure below for more information.
@@ -23,8 +25,12 @@ INSTALLATION
 1. Extract the GeSHi Filter module tarball and place the entire geshifilter
   directory into your Drupal setup (e.g. in sites/all/modules).
 
-2. Download the GeSHi library (version 1.0.x) from  http://qbnz.com/highlighter
-  and place the entire extracted 'geshi' folder (which contains geshi.php)
+2. Download the GeSHi library from
+  http://sourceforge.net/projects/geshi/files/geshi
+  Make sure you download a version of the branch 1.0.x and not a version
+  from the branch 1.1.x (also described as geshi-dev), which is not yet
+  supported by the GeSHi filter module.
+  Place the entire extracted 'geshi' folder (which contains geshi.php)
   in the geshifilter directory (e.g. as /sites/all/modules/geshifilter/geshi)
 
 3. Enable this module as any other Drupal module by navigating to
@@ -37,7 +43,8 @@ CONFIGURATION
   administer > site configuration > geshifilter
 2. Further configuration instructions can be found by following the
   "more help..." link at the top of that general settings page, which leads
-  to www.example.com/?q=admin/help/geshifilter .
+  to www.example.com/?q=admin/help/geshifilter . This requires you have the
+  'help' module enabled.
 
 
 USAGE
