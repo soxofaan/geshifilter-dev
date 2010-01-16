@@ -127,3 +127,17 @@ function _geshifilter_update_6002_php_delimter_into_tag_styles($format) {
     variable_del('geshifilter_enable_php_delimiters'. $format);
   }
 }
+
+/**
+ * Implementation of hook_update_N().
+ *
+ * (Re)generate the languages CSS file to be sure it exists.
+ * (References: http://drupal.org/node/269140, http://drupal.org/node/682068)
+ */
+function geshifilter_update_6003() {
+  if (GESHIFILTER_CSS_CLASSES_AUTOMATIC == variable_get('geshifilter_css_mode', GESHIFILTER_CSS_INLINE)) {
+    _geshifilter_generate_languages_css_file();
+  }
+  return array();
+}
+
