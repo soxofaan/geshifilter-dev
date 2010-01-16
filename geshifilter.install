@@ -136,6 +136,7 @@ function _geshifilter_update_6002_php_delimter_into_tag_styles($format) {
  */
 function geshifilter_update_6003() {
   if (GESHIFILTER_CSS_CLASSES_AUTOMATIC == variable_get('geshifilter_css_mode', GESHIFILTER_CSS_INLINE)) {
+    require_once drupal_get_path('module', 'geshifilter') .'/geshifilter.admin.inc';
     _geshifilter_generate_languages_css_file();
   }
   return array();
