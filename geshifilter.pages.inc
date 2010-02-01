@@ -1,5 +1,5 @@
 <?php
-// $Id: geshifilter.pages.inc,v 1.13 2009/08/17 11:54:38 soxofaan Exp $
+// $Id: geshifilter.pages.inc,v 1.14 2010/02/01 00:31:45 soxofaan Exp $
 
 /**
  * @file
@@ -318,6 +318,15 @@ function geshifilter_geshi_process($source_code, $lang, $line_numbering=0, $line
     drupal_set_message($geshi_library['message'], 'error');
     return $source_code;
   }
+
+   // Check for a cached version of this source code and return it if available.
+   // @todo: Use a dedicated table instead of using cache_filter? If so,
+   // also take care of the flushing in _geshifilter_clear_filter_cache().
+  $cache_id = "geshifilter:$lang:$line_numbering:$line_numbering:$inline_mode" . md5($source_code);
+  if ($cached = cache_get($cache_id, 'cache_filter')) {
+    return $cached->data;
+  }
+
   // remove leading/trailing newlines
   $source_code = trim($source_code, "\n\r");
   // create GeSHi object
@@ -354,6 +363,11 @@ function geshifilter_geshi_process($source_code, $lang, $line_numbering=0, $line
     }
     $source_code = '<div class="geshifilter">'. $geshi->parse_code() .'</div>';
   }
+
+  // Store in cache with a minimum expiration time of 1 day.
+  cache_set($cache_id, $source_code, 'cache_filter', time() + (60 * 60 * 24));
+
+
   return $source_code;
 }
 
