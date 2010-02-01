@@ -279,6 +279,7 @@ function geshifilter_admin_general_settings_submit($form, &$form_state) {
   if (variable_get('geshifilter_css_mode', GESHIFILTER_CSS_INLINE) == GESHIFILTER_CSS_CLASSES_AUTOMATIC) {
     _geshifilter_generate_languages_css_file();
   }
+  // Always clear the filter cache.
   _geshifilter_clear_filter_cache();
 }
 
@@ -516,7 +517,8 @@ function _geshifilter_flush_language_definition_cache() {
  */
 function _geshifilter_clear_filter_cache() {
   $message = FALSE;
-  // iterate over input formats
+
+  // Iterate over input formats and clear the ones GeSHi filter is active in.
   foreach (filter_formats() as $format => $input_format) {
     // Get the filters in this input format
     $filters = filter_list_format($format);
@@ -526,7 +528,12 @@ function _geshifilter_clear_filter_cache() {
       $message = TRUE;
     }
   }
-  // show a message that the filter cache was cleared
+
+  // Clear the geshifilter entries in the cache_filter table,
+  // created by geshifilter_geshi_process().
+  cache_clear_all('geshifilter:', 'cache_filter', TRUE);
+
+  // Show a message that the filter cache was cleared.
   if ($message) {
     drupal_set_message(t('GeSHi filter cleared the filter cache for the appropriate input formats.'));
   }
