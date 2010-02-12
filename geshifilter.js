@@ -6,6 +6,7 @@ Drupal.behaviors.geshiFilterCodeCollapsing = function (context) {
   var geshifilter_collapse_height = 100;
   var geshifilter_collapse_height_threshold = 150;
 
+  // Add the expand/collapse toggle to geshifilter code blocks.
   $('div.geshifilter').each(function() {
     // Get code container and its height.
     var code_container = $(this);
@@ -30,12 +31,12 @@ Drupal.behaviors.geshiFilterCodeCollapsing = function (context) {
     if (code_container.hasClass('geshifilter-collapsed')) {
       // Show more (use original height).
       var original_height = code_container.attr('original_height') + 'px';
-      code_container.removeClass('geshifilter-collapsed').animate({height: original_height}, 'slow');
+      code_container.removeClass('geshifilter-collapsed').animate({height: original_height});
       $(this).text(Drupal.t('Show less code'));
     }
     else {
       // Collapse.
-      code_container.addClass('geshifilter-collapsed').animate({height: geshifilter_collapse_height}, 'slow');
+      code_container.addClass('geshifilter-collapsed').animate({height: geshifilter_collapse_height});
       $(this).text(Drupal.t('Show all code'));
     }
     // Return false so that the link is no followed.
