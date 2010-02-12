@@ -221,17 +221,28 @@ function geshifield_field_formatter_info() {
 
 
 function theme_geshifield_formatter_default($element) {
-  // @todo: These theme functions seem to be called more than expected for some reason.
+  $output = '';
   module_load_include('inc', 'geshifilter', 'geshifilter.pages');
-  return geshifilter_geshi_process($element['#item']['sourcecode'], $element['#item']['language']);
+  if (isset($element['#item']['sourcecode'])) {
+    $output .= geshifilter_geshi_process($element['#item']['sourcecode'], $element['#item']['language']);
+  }
+  return $output;
 }
 
 function theme_geshifield_formatter_nohighlighting($element) {
+  $output = '';
   module_load_include('inc', 'geshifilter', 'geshifilter.pages');
-  return geshifilter_geshi_process($element['#item']['sourcecode'], 'text');
+  if (isset($element['#item']['sourcecode'])) {
+    $output .= geshifilter_geshi_process($element['#item']['sourcecode'], 'text');
+  }
+  return $output;
 }
 
 function theme_geshifield_formatter_trimmed($element) {
+  $output = '';
   module_load_include('inc', 'geshifilter', 'geshifilter.pages');
-  return geshifilter_geshi_process(node_teaser($element['#item']['sourcecode']), $element['#item']['language']);
+  if (isset($element['#item']['sourcecode'])) {
+    $output .= geshifilter_geshi_process(node_teaser($element['#item']['sourcecode']), $element['#item']['language']);
+  }
+  return $output;
 }
