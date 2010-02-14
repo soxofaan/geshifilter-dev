@@ -25,6 +25,7 @@ function _geshifilter_parse_attributes($attributes, $format) {
   $lang = NULL;
   $line_numbering = NULL;
   $linenumbers_start = NULL;
+  $collapsible = FALSE;
 
   // Get the possible tags and languages.
   list($generic_code_tags, $language_tags, $tag_to_lang) = _geshifilter_get_tags($format);
@@ -32,7 +33,12 @@ function _geshifilter_parse_attributes($attributes, $format) {
   $language_attributes = _geshifilter_whitespace_explode(GESHIFILTER_ATTRIBUTES_LANGUAGE);
   $attributes_preg_string = implode('|', array_merge(
     $language_attributes,
-    array(GESHIFILTER_ATTRIBUTE_LINE_NUMBERING, GESHIFILTER_ATTRIBUTE_LINE_NUMBERING_START, GESHIFILTER_ATTRIBUTE_FANCY_N)
+    array(
+      GESHIFILTER_ATTRIBUTE_LINE_NUMBERING,
+      GESHIFILTER_ATTRIBUTE_LINE_NUMBERING_START,
+      GESHIFILTER_ATTRIBUTE_FANCY_N,
+      GESHIFILTER_ATTRIBUTE_COLLAPSIBLE,
+      )
   ));
   $enabled_languages = _geshifilter_get_enabled_languages();
 
@@ -88,9 +94,22 @@ function _geshifilter_parse_attributes($attributes, $format) {
       }
       $linenumbers_start = (int)($att_value);
     }
+    elseif ($att_name == GESHIFILTER_ATTRIBUTE_COLLAPSIBLE) {
+      if (strtolower($att_value) == 'true') {
+        $collapsible = TRUE;
+      }
+      else {
+        $collapsible = FALSE;
+      }
+    }
   }
   // Return parsed results.
-  return array('language' => $lang, 'line_numbering' => $line_numbering, 'linenumbers_start' => $linenumbers_start);
+  return array(
+    'language' => $lang,
+    'line_numbering' => $line_numbering,
+    'linenumbers_start' => $linenumbers_start,
+    'collapsible' => $collapsible,
+  );
 }
 
 /**
@@ -267,6 +286,7 @@ function _geshifilter_replace_callback($match, $format) {
   if (isset($settings['linenumbers_start'])) {
     $linenumbers_start = $settings['linenumbers_start'];
   }
+  $collapsible = $settings['collapsible'];
 
   if ($lang == GESHIFILTER_DEFAULT_DONOTHING) {
     // Do nothing, and return the original.
@@ -278,7 +298,7 @@ function _geshifilter_replace_callback($match, $format) {
   }
   $inline_mode = (strpos($source_code, "\n") === FALSE);
   // process and return
-  return geshifilter_process($source_code, $lang, $line_numbering, $linenumbers_start, $inline_mode);
+  return geshifilter_process($source_code, $lang, $line_numbering, $linenumbers_start, $inline_mode, $collapsible);
 }
 
 /**
@@ -297,21 +317,21 @@ function _geshifilter_override_geshi_defaults(&$geshi, $langcode) {
 /**
  * General geshifilter processing function
  */
-function geshifilter_process($source_code, $lang, $line_numbering=0, $linenumbers_start=1, $inline_mode=FALSE) {
+function geshifilter_process($source_code, $lang, $line_numbering=0, $linenumbers_start=1, $inline_mode=FALSE, $collapsible=FALSE) {
   // process
   if ($lang == 'php' && variable_get('geshifilter_use_highlight_string_for_php', FALSE)) {
     return geshifilter_highlight_string_process($source_code, $inline_mode);
   }
   else {
     // process with GeSHi
-    return geshifilter_geshi_process($source_code, $lang, $line_numbering, $linenumbers_start, $inline_mode);
+    return geshifilter_geshi_process($source_code, $lang, $line_numbering, $linenumbers_start, $inline_mode, $collapsible);
   }
 }
 
 /**
  * geshifilter wrapper for GeSHi processing.
  */
-function geshifilter_geshi_process($source_code, $lang, $line_numbering=0, $linenumbers_start=1, $inline_mode=FALSE) {
+function geshifilter_geshi_process($source_code, $lang, $line_numbering=0, $linenumbers_start=1, $inline_mode=FALSE, $collapsible=FALSE) {
   // load GeSHi library (if not already)
   $geshi_library = _geshifilter_check_geshi_library();
   if (!$geshi_library['loaded']) {
@@ -361,7 +381,7 @@ function geshifilter_geshi_process($source_code, $lang, $line_numbering=0, $line
       $geshi->enable_line_numbers(GESHI_FANCY_LINE_NUMBERS, $line_numbering);
       $geshi->start_line_numbers_at($linenumbers_start);
     }
-    $source_code = '<div class="geshifilter">'. $geshi->parse_code() .'</div>';
+    $source_code = '<div class="geshifilter'. ($collapsible ? ' collapsible' : '') .'">'. $geshi->parse_code() .'</div>';
   }
 
   // Store in cache with a minimum expiration time of 1 day.

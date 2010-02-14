@@ -7,7 +7,7 @@ Drupal.behaviors.geshiFilterCodeCollapsing = function (context) {
   var geshifilter_collapse_height_threshold = 150;
 
   // Add the expand/collapse toggle to geshifilter code blocks.
-  $('div.geshifilter').each(function() {
+  $('div.geshifilter.collapsible').each(function() {
     // Get code container and its height.
     var code_container = $(this);
     var code_container_original_height = code_container.height();
