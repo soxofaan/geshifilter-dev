@@ -1,3 +1,4 @@
+// $Id: geshifilter.js,v 1.1 2010/02/14 23:31:09 soxofaan Exp $
 
 // Define a Drupal behavior for with jQuery magic for
 // partial collapsing/showing GeSHi filter code blocks.
