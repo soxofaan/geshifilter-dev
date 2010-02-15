@@ -1,34 +1,37 @@
 <?php
-// $Id: geshifilter.pages.test,v 1.5 2009/07/04 11:05:56 soxofaan Exp $
+// $Id: geshifilter.test,v 1.2 2010/02/15 01:30:09 soxofaan Exp $
 
 /**
-* Unit tests for the GeSHi filter module.
+ * @file 
+ * Tests for the GeSHi filter module.
+ */
+
+
+// @todo: test the tag style widget, both on general settings form and format specific form:  at least one tag style should be selected.
+
+/**
+* Funcional tests for the GeSHi filter administration.
 */
-class GeshiFilterTest extends DrupalTestCase {
+class GeshiFilterAdministrationTest extends DrupalWebTestCase {
 
   /**
    * A global filter adminstrator
    */
-  var $filter_admin_user;
-
-  /**
-   * A global user for adding pages
-   */
-  var $normal_user;
+  protected $filter_admin_user;
 
   /**
    * The id of the input format with only GeSHi filter in it
    */
-  var $input_format_id;
+  protected $input_format_id;
 
   /**
    * Drupal SimpleTest method: return metadata about the test.
    */
-  function get_info() {
+  function getInfo() {
     return array(
-      'name'  => t('GeSHi input filter'),
-      'desc'  => t('Test the input filter capabilities of the GeSHi filter.'),
-      'group' => t('GeSHi module'),
+      'name'  => t('GeSHi filter administration'),
+      'description'  => t('Test the GeSHi filter administration.'),
+      'group' => t('GeSHi filter module'),
     );
   }
 
@@ -38,26 +41,17 @@ class GeshiFilterTest extends DrupalTestCase {
    * Optional. You only need this if you have setup tasks.
    */
   function setUp() {
-    // Always call the setUp() function from the parent class.
-    parent::setUp();
-
-    // Make sure that Geshi filter module is enabled.
-    $this->drupalModuleEnable('geshifilter');
+    // Make sure the GeSHi filter module is enabled.
+    parent::setUp('geshifilter');
+    // And set the path to the geshi library.
+    variable_set('geshifilter_geshi_dir','sites/all/libraries/geshi');
 
     // Create a filter admin user
-    $permissions = array(
-      'administer filters',
-    );
-    $this->filter_admin_user = $this->drupalCreateUserRolePerm($permissions);
-    // Create a normal user for page creation
-    $permissions = array(
-      'edit own page content',
-      'create page content'
-    );
-    $this->normal_user = $this->drupalCreateUserRolePerm($permissions);
+    $permissions = array('administer filters', 'administer site configuration');
+    $this->filter_admin_user = $this->drupalCreateUser($permissions);
 
     // log in with filter admin user
-    $this->drupalLoginUser($this->filter_admin_user);
+    $this->drupalLogin($this->filter_admin_user);
 
     // add an input format with only geshi filter
     $edit = array(
@@ -71,20 +65,166 @@ class GeshiFilterTest extends DrupalTestCase {
     $this->assertTrue($this->input_format_id, t('Input format id (%s)'));
 
     // set some default GeSHi filter admin settings
-        // Set default highlighting mode to "do nothing".
-    $this->drupalVariableSet('geshifilter_default_highlighting', GESHIFILTER_DEFAULT_PLAINTEXT);
-    $this->drupalVariableSet('geshifilter_format_specific_options', FALSE);
-    $this->drupalVariableSet('geshifilter_tag_styles', array(
+    variable_set('geshifilter_format_specific_options', FALSE);
+    variable_set('geshifilter_tag_styles', array(
       GESHIFILTER_BRACKETS_ANGLE => GESHIFILTER_BRACKETS_ANGLE,
       GESHIFILTER_BRACKETS_SQUARE => GESHIFILTER_BRACKETS_SQUARE,
     ));
-    $this->drupalVariableSet('geshifilter_default_line_numbering', GESHIFILTER_LINE_NUMBERS_DEFAULT_NONE);
+    variable_set('geshifilter_default_line_numbering', GESHIFILTER_LINE_NUMBERS_DEFAULT_NONE);
+
+  }
+
+  /**
+   * SimpleTest core method: code run after each and every test method.
+   *
+   * Optional. You only need this if you have setup tasks.
+   */
+  function tearDown() {
+    // Remove input format.
+    $this->drupalPost('admin/settings/filters/delete/'. $this->input_format_id, array(), t('Delete'));
+
+    // Always call the tearDown() function from the parent class.
+    parent::tearDown();
+  }
+
+  /**
+   * Check tag unicity: tags should differ between languages and from generic tags
+   */
+  function test_tag_unicity() {
+    // enable some languages first
+    variable_set('geshifilter_language_enabled_php', TRUE);
+    variable_set('geshifilter_language_enabled_python', TRUE);
+
+    // first round: without format specific tag options
+    variable_set('geshifilter_format_specific_options', FALSE);
+    variable_set('geshifilter_tags', 'code blockcode generictag');
+
+    // a language tag should differ from the generic tags
+    $form_values = array(
+      'geshifilter_language_tags_php' => 'php generictag',
+    );
+    $this->drupalPost('admin/settings/geshifilter/languages', $form_values, t('Save configuration'));
+    $this->assertText(t('The language tags should differ between languages and from the generic tags.'), t('Language tags should differ from generic tags (with generic tag options)'));
+
+    // language tags should differ between languages
+    $form_values = array(
+      'geshifilter_language_tags_php' => 'php languagetag',
+      'geshifilter_language_tags_python' => 'languagetag python',
+    );
+    $this->drupalPost('admin/settings/geshifilter/languages/all', $form_values, t('Save configuration'));
+    $this->assertText(t('The language tags should differ between languages and from the generic tags.'), t('Language tags should differ between languages (with generic tag options)'));
+
+    // second round: with format specific tag options
+    variable_set('geshifilter_format_specific_options', TRUE);
+    variable_set('geshifilter_tags_' . $this->input_format_id, 'code blockcode generictag');
+
+    // a language tag should differ from the generic tags
+    $form_values = array(
+      'geshifilter_language_tags_php_' . $this->input_format_id => 'php generictag',
+    );
+    $this->drupalPost('admin/settings/filters/' . $this->input_format_id . '/configure', $form_values, t('Save configuration'));
+    $this->assertText(t('The language tags should differ between languages and from the generic tags.'), t('Language tags should differ from generic tags (with format specific tag options)'));
+
+    // language tags should differ between languages
+    $form_values = array(
+      'geshifilter_language_tags_php_' . $this->input_format_id => 'php languagetag',
+      'geshifilter_language_tags_python_' . $this->input_format_id => 'languagetag python',
+    );
+    $this->drupalPost('admin/settings/filters/' . $this->input_format_id . '/configure', $form_values, t('Save configuration'));
+    $this->assertText(t('The language tags should differ between languages and from the generic tags.'), t('Language tags should differ between languages (with format specific tag options)'));
+
+  }
+
+}
+
+
+
+
+
+class GeshiFilterTest extends DrupalWebTestCase {
+
+  /**
+   * A global filter adminstrator
+   */
+  protected $filter_admin_user;
+
+  /**
+   * A global user for adding pages
+   */
+  protected $normal_user;
+
+  /**
+   * The id of the input format with only GeSHi filter in it
+   */
+  protected $input_format_id;
+
+  /**
+   * Drupal SimpleTest method: return metadata about the test.
+   */
+  function getInfo() {
+    return array(
+      'name'  => t('GeSHi input filter'),
+      'description'  => t('Test the input filter capabilities of the GeSHi filter.'),
+      'group' => t('GeSHi filter module'),
+    );
+  }
+
+  /**
+   * SimpleTest core method: code run before each and every test method.
+   *
+   * Optional. You only need this if you have setup tasks.
+   */
+  function setUp() {
+    // Make sure that Geshi filter module is enabled.
+    parent::setUp('geshifilter');
+    // And set the path to the geshi library.
+    variable_set('geshifilter_geshi_dir','sites/all/libraries/geshi');
+
+    // Create a filter admin user
+    $permissions = array(
+      'administer filters',
+    );
+    $this->filter_admin_user = $this->drupalCreateUser($permissions);
+    // Create a normal user for page creation
+    $permissions = array(
+      'edit own page content',
+      'create page content'
+    );
+    $this->normal_user = $this->drupalCreateUser($permissions);
+
+    // log in with filter admin user
+    $this->drupalLogin($this->filter_admin_user);
+
+    // add an input format with only geshi filter
+    $edit = array(
+      'name' => $this->randomName(10, 'inputformat_'),
+      'filters[geshifilter/0]' => TRUE,
+      'filters[filter/0]' => FALSE,
+      'filters[filter/1]' => FALSE,
+      'filters[filter/2]' => FALSE,
+      'filters[filter/3]' => FALSE,
+      'roles[2]' => TRUE,
+    );
+    $this->drupalPost('admin/settings/filters/add', $edit, t('Save configuration'));
+    // store the format id of the created input format
+    $this->input_format_id = db_result(db_query("SELECT format FROM {filter_formats} WHERE name = '%s'", $edit['name']));
+    $this->assertTrue($this->input_format_id, t('Valid input format id'));
+
+    // set some default GeSHi filter admin settings
+        // Set default highlighting mode to "do nothing".
+    variable_set('geshifilter_default_highlighting', GESHIFILTER_DEFAULT_PLAINTEXT);
+    variable_set('geshifilter_format_specific_options', FALSE);
+    variable_set('geshifilter_tag_styles', array(
+      GESHIFILTER_BRACKETS_ANGLE => GESHIFILTER_BRACKETS_ANGLE,
+      GESHIFILTER_BRACKETS_SQUARE => GESHIFILTER_BRACKETS_SQUARE,
+    ));
+    variable_set('geshifilter_default_line_numbering', GESHIFILTER_LINE_NUMBERS_DEFAULT_NONE);
 
     // log out as filter admin
     $this->drupalGet('logout');
 
     // log in as the normal user for adding pages
-    $this->drupalLoginUser($this->normal_user);
+    $this->drupalLogin($this->normal_user);
 
     // include GeSHi filtering functions
     require_once(drupal_get_path('module', 'geshifilter') .'/geshifilter.pages.inc');
@@ -99,7 +239,7 @@ class GeshiFilterTest extends DrupalTestCase {
   function tearDown() {
     // log in as filter admin
     $this->drupalGet('logout');
-    $this->drupalLoginUser($this->filter_admin_user);
+    $this->drupalLogin($this->filter_admin_user);
 
     // remove input format
     $this->drupalPost('admin/settings/filters/delete/'. $this->input_format_id, array(), t('Delete'));
@@ -111,7 +251,7 @@ class GeshiFilterTest extends DrupalTestCase {
   /**
    * Assert function for testing if GeSHi highlighting works
    * @param $body the body text of the node
-   * @param $check_list list of items that should be in rendered output (assertWantedRaw)
+   * @param $check_list list of items that should be in rendered output (assertRaw)
    *     an item is something like array($source_code, $lang, $line_numbering, $linenumbers_start, $inline_mode)
    *     if $lang is set, GeSHifilter syntax highlighting is applied to $sourcecode
    *     if $lang is false, $sourcecode is directly looked for
@@ -136,7 +276,7 @@ class GeshiFilterTest extends DrupalTestCase {
         // apply syntax highlighting
         $source_code = geshifilter_geshi_process($source_code, $lang, $line_numbering, $linenumbers_start, $inline_mode);
       }
-      $this->assertWantedRaw($source_code, $description);
+      $this->assertRaw($source_code, $description);
     }
   }
 
@@ -144,11 +284,11 @@ class GeshiFilterTest extends DrupalTestCase {
    * Test the standard functionality of the generic tags
    */
   function testGenericTags() {
-    $this->drupalVariableSet('geshifilter_tags', 'code');
-    $this->drupalVariableSet('geshifilter_language_enabled_c', TRUE);
-    $this->drupalVariableSet('geshifilter_language_enabled_cpp', TRUE);
-    $this->drupalVariableSet('geshifilter_language_enabled_csharp', TRUE);
-    $this->drupalVariableSet('geshifilter_language_enabled_java', TRUE);
+    variable_set('geshifilter_tags', 'code');
+    variable_set('geshifilter_language_enabled_c', TRUE);
+    variable_set('geshifilter_language_enabled_cpp', TRUE);
+    variable_set('geshifilter_language_enabled_csharp', TRUE);
+    variable_set('geshifilter_language_enabled_java', TRUE);
 
     // body material
     $source_code = "//C++-ish source code\nfor (int i=0; i<10; ++i) {\n  fun(i);\n  bar.foo(x, y);\n server->start(&pool); \n}";
@@ -194,13 +334,13 @@ class GeshiFilterTest extends DrupalTestCase {
    * Check if brackets work
    */
   function testBrackets() {
-    $this->drupalVariableSet('geshifilter_tags', 'code');
-    $this->drupalVariableSet('geshifilter_language_enabled_cpp', TRUE);
+    variable_set('geshifilter_tags', 'code');
+    variable_set('geshifilter_language_enabled_cpp', TRUE);
 
     // body material
     $source_code = "//C++ source code\nfor (int i=0; i<10; ++i) {\n  fun(i);\n  bar.foo(x, y);\n server->start(&pool); \n}";
 
-    $this->drupalVariableSet('geshifilter_tag_styles', array(
+    variable_set('geshifilter_tag_styles', array(
       GESHIFILTER_BRACKETS_ANGLE => GESHIFILTER_BRACKETS_ANGLE,
       GESHIFILTER_BRACKETS_SQUARE => GESHIFILTER_BRACKETS_SQUARE,
     ));
@@ -211,7 +351,7 @@ class GeshiFilterTest extends DrupalTestCase {
       array(array($source_code, 'cpp', 0, 1, FALSE)),
       t('Checking [foo] brackets style in angle+square tag style mode mode'));
 
-    $this->drupalVariableSet('geshifilter_tag_styles', array(
+    variable_set('geshifilter_tag_styles', array(
       GESHIFILTER_BRACKETS_ANGLE => GESHIFILTER_BRACKETS_ANGLE,
     ));
     $this->assertGeshiFilterHighlighting('<code language="cpp">'. $source_code .'</code>',
@@ -221,7 +361,7 @@ class GeshiFilterTest extends DrupalTestCase {
       array(array($source_code, NULL, 0, 1, FALSE)),
       t('Checking [foo] brackets style in GESHIFILTER_BRACKETS_ANGLE mode'));
 
-    $this->drupalVariableSet('geshifilter_tag_styles', array(
+    variable_set('geshifilter_tag_styles', array(
       GESHIFILTER_BRACKETS_SQUARE => GESHIFILTER_BRACKETS_SQUARE,
     ));
     $this->assertGeshiFilterHighlighting('<code language="cpp">'. $source_code .'</code>',
@@ -240,10 +380,10 @@ class GeshiFilterTest extends DrupalTestCase {
    */
   function testSpecialTags() {
     // Enabled the tags
-    $this->drupalVariableSet('geshifilter_language_enabled_cpp', TRUE);
-    $this->drupalVariableSet('geshifilter_language_tags_cpp', 'c++');
-    $this->drupalVariableSet('geshifilter_language_enabled_csharp', TRUE);
-    $this->drupalVariableSet('geshifilter_language_tags_csharp', 'c#');
+    variable_set('geshifilter_language_enabled_cpp', TRUE);
+    variable_set('geshifilter_language_tags_cpp', 'c++');
+    variable_set('geshifilter_language_enabled_csharp', TRUE);
+    variable_set('geshifilter_language_tags_csharp', 'c#');
     // body material
     $source_code = "//C++-ish source code\nfor (int i=0; i<10; ++i) {\n  fun(i);\n  bar.foo(x, y);\n server->start(&pool); \n}";
     // Test the tags
@@ -260,12 +400,12 @@ class GeshiFilterTest extends DrupalTestCase {
    */
   function testPrefixTags() {
     // enabled the tags
-    $this->drupalVariableSet('geshifilter_language_enabled_c', TRUE);
-    $this->drupalVariableSet('geshifilter_language_tags_c', 'c');
-    $this->drupalVariableSet('geshifilter_language_enabled_cpp', TRUE);
-    $this->drupalVariableSet('geshifilter_language_tags_cpp', 'cpp');
-    $this->drupalVariableSet('geshifilter_language_enabled_csharp', TRUE);
-    $this->drupalVariableSet('geshifilter_language_tags_csharp', 'csharp');
+    variable_set('geshifilter_language_enabled_c', TRUE);
+    variable_set('geshifilter_language_tags_c', 'c');
+    variable_set('geshifilter_language_enabled_cpp', TRUE);
+    variable_set('geshifilter_language_tags_cpp', 'cpp');
+    variable_set('geshifilter_language_enabled_csharp', TRUE);
+    variable_set('geshifilter_language_tags_csharp', 'csharp');
     // body material
     $source_code = "//C++-ish source code\nfor (int i=0; i<10; ++i) {\n  fun(i);\n  bar.foo(x, y);\n server->start(&pool); \n}";
     // Test the tags
@@ -279,10 +419,10 @@ class GeshiFilterTest extends DrupalTestCase {
 
   function testDoNothingMode() {
     // Enable C++.
-    $this->drupalVariableSet('geshifilter_language_enabled_cpp', TRUE);
-    $this->drupalVariableSet('geshifilter_language_tags_cpp', 'cpp');
+    variable_set('geshifilter_language_enabled_cpp', TRUE);
+    variable_set('geshifilter_language_tags_cpp', 'cpp');
     // Set default highlighting mode to "do nothing".
-    $this->drupalVariableSet('geshifilter_default_highlighting', GESHIFILTER_DEFAULT_DONOTHING);
+    variable_set('geshifilter_default_highlighting', GESHIFILTER_DEFAULT_DONOTHING);
     // Body material with some characters ('<' and '&') that would be escaped
     // except in "do nothing" mode
     $source_code = "//C++-ish source code\nfor (int i=0; i!=10; ++i) {\n  fun(i);\n  bar.foo(x, y);\n}";
@@ -302,3 +442,4 @@ class GeshiFilterTest extends DrupalTestCase {
   }
 
 }
+
