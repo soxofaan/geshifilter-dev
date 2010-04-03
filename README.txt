@@ -31,7 +31,8 @@ INSTALLATION
   from the branch 1.1.x (also described as geshi-dev), which is not yet
   supported by the GeSHi filter module.
   Place the entire extracted 'geshi' folder (which contains geshi.php)
-  in the geshifilter directory (e.g. as /sites/all/modules/geshifilter/geshi)
+  in the geshifilter directory (e.g. as sites/all/modules/geshifilter/geshi),
+  or better, in a libraries directory (e.g. as sites/all/libraries/geshi).
 
 3. Enable this module as any other Drupal module by navigating to
   administer > site building > modules
@@ -40,7 +41,9 @@ INSTALLATION
 CONFIGURATION
 -------------
 1. The general GeSHi Filter settings can be found by navigating to:
-  administer > site configuration > geshifilter
+  administer > site configuration > geshifilter.
+  Set the path to the GeSHi library on that page, if it is not detected
+  automatically already.
 2. Further configuration instructions can be found by following the
   "more help..." link at the top of that general settings page, which leads
   to www.example.com/?q=admin/help/geshifilter . This requires you have the
