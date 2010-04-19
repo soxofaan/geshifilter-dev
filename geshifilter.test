@@ -1,8 +1,8 @@
 <?php
-// $Id: geshifilter.test,v 1.2 2010/02/15 01:30:09 soxofaan Exp $
+// $Id: geshifilter.test,v 1.3 2010/04/04 00:34:13 soxofaan Exp $
 
 /**
- * @file 
+ * @file
  * Tests for the GeSHi filter module.
  */
 
@@ -330,49 +330,103 @@ class GeshiFilterTest extends DrupalWebTestCase {
       t('Checking fancy="3" argument'));
   }
 
-  /**
-   * Check if brackets work
-   */
-  function testBrackets() {
+
+  function testBracketsOnlyAngle() {
     variable_set('geshifilter_tags', 'code');
     variable_set('geshifilter_language_enabled_cpp', TRUE);
-
-    // body material
     $source_code = "//C++ source code\nfor (int i=0; i<10; ++i) {\n  fun(i);\n  bar.foo(x, y);\n server->start(&pool); \n}";
-
-    variable_set('geshifilter_tag_styles', array(
-      GESHIFILTER_BRACKETS_ANGLE => GESHIFILTER_BRACKETS_ANGLE,
-      GESHIFILTER_BRACKETS_SQUARE => GESHIFILTER_BRACKETS_SQUARE,
-    ));
-    $this->assertGeshiFilterHighlighting('<code language="cpp">'. $source_code .'</code>',
-      array(array($source_code, 'cpp', 0, 1, FALSE)),
-      t('Checking <foo> brackets style in angle+square tag style mode'));
-    $this->assertGeshiFilterHighlighting('[code language="cpp"]'. $source_code .'[/code]',
-      array(array($source_code, 'cpp', 0, 1, FALSE)),
-      t('Checking [foo] brackets style in angle+square tag style mode mode'));
-
+    // Enable only angle brackets
     variable_set('geshifilter_tag_styles', array(
       GESHIFILTER_BRACKETS_ANGLE => GESHIFILTER_BRACKETS_ANGLE,
     ));
+    // This should be filtered.
     $this->assertGeshiFilterHighlighting('<code language="cpp">'. $source_code .'</code>',
       array(array($source_code, 'cpp', 0, 1, FALSE)),
-      t('Checking <foo> brackets style in GESHIFILTER_BRACKETS_ANGLE mode'));
+      t('Checking angle brackets style in GESHIFILTER_BRACKETS_ANGLE mode'));
+    // This should not be filtered.
     $this->assertGeshiFilterHighlighting('[code language="cpp"]'. $source_code .'[/code]',
       array(array($source_code, NULL, 0, 1, FALSE)),
       t('Checking [foo] brackets style in GESHIFILTER_BRACKETS_ANGLE mode'));
+    $this->assertGeshiFilterHighlighting('[[code language="cpp"]]'. $source_code .'[[/code]]',
+      array(array($source_code, NULL, 0, 1, FALSE)),
+      t('Checking [[foo]] brackets style in GESHIFILTER_BRACKETS_ANGLE mode'));
+    $this->assertGeshiFilterHighlighting('<?php'. $source_code .'?>',
+      array(array($source_code, NULL, 0, 1, FALSE)),
+      t('Checking php code blocks in GESHIFILTER_BRACKETS_ANGLE mode'));
+  }
 
+  function testBracketsOnlySquare() {
+    variable_set('geshifilter_tags', 'code');
+    variable_set('geshifilter_language_enabled_cpp', TRUE);
+    $source_code = "//C++ source code\nfor (int i=0; i<10; ++i) {\n  fun(i);\n  bar.foo(x, y);\n server->start(&pool); \n}";
+    // Enable only square brackets
     variable_set('geshifilter_tag_styles', array(
       GESHIFILTER_BRACKETS_SQUARE => GESHIFILTER_BRACKETS_SQUARE,
     ));
-    $this->assertGeshiFilterHighlighting('<code language="cpp">'. $source_code .'</code>',
-      array(array($source_code, NULL, 0, 1, FALSE)),
-      t('Checking <foo> brackets style in GESHIFILTER_BRACKETS_SQUARE mode'));
+    // This should be filtered.
     $this->assertGeshiFilterHighlighting('[code language="cpp"]'. $source_code .'[/code]',
       array(array($source_code, 'cpp', 0, 1, FALSE)),
       t('Checking [foo] brackets style in GESHIFILTER_BRACKETS_SQUARE mode'));
-
-    // @todo: test php style code blocks.
+    // This should not be filtered.
+    $this->assertGeshiFilterHighlighting('<code language="cpp">'. $source_code .'</code>',
+      array(array($source_code, NULL, 0, 1, FALSE)),
+      t('Checking angle brackets style in GESHIFILTER_BRACKETS_SQUARE mode'));
+    $this->assertGeshiFilterHighlighting('[[code language="cpp"]]'. $source_code .'[[/code]]',
+      array(array($source_code, NULL, 0, 1, FALSE)),
+      t('Checking [[foo]] brackets style in GESHIFILTER_BRACKETS_SQUARE mode'));
+    $this->assertGeshiFilterHighlighting('<?php'. $source_code .'?>',
+      array(array($source_code, NULL, 0, 1, FALSE)),
+      t('Checking php code blocks in GESHIFILTER_BRACKETS_SQUARE mode'));
   }
+
+  function testBracketsOnlyDoubleSquare() {
+    variable_set('geshifilter_tags', 'code');
+    variable_set('geshifilter_language_enabled_cpp', TRUE);
+    $source_code = "//C++ source code\nfor (int i=0; i<10; ++i) {\n  fun(i);\n  bar.foo(x, y);\n server->start(&pool); \n}";
+    // Enable only double square brackets
+    variable_set('geshifilter_tag_styles', array(
+      GESHIFILTER_BRACKETS_DOUBLESQUARE => GESHIFILTER_BRACKETS_DOUBLESQUARE,
+    ));
+    // This should be filtered.
+    $this->assertGeshiFilterHighlighting('[[code language="cpp"]]'. $source_code .'[[/code]]',
+      array(array($source_code, 'cpp', 0, 1, FALSE)),
+      t('Checking [[foo]] brackets style in GESHIFILTER_BRACKETS_DOUBLESQUARE mode'));
+    // This should not be filtered.
+    $this->assertGeshiFilterHighlighting('<code language="cpp">'. $source_code .'</code>',
+      array(array($source_code, NULL, 0, 1, FALSE)),
+      t('Checking angle brackets style in GESHIFILTER_BRACKETS_DOUBLESQUARE mode'));
+    $this->assertGeshiFilterHighlighting('[code language="cpp"]'. $source_code .'[/code]',
+      array(array($source_code, NULL, 0, 1, FALSE)),
+      t('Checking [foo] brackets style in GESHIFILTER_BRACKETS_DOUBLESQUARE mode'));
+    $this->assertGeshiFilterHighlighting('<?php'. $source_code .'?>',
+      array(array($source_code, NULL, 0, 1, FALSE)),
+      t('Checking php code blocks in GESHIFILTER_BRACKETS_DOUBLESQUARE mode'));
+  }
+
+  function testBracketsOnlyPhpCodeBlock() {
+    variable_set('geshifilter_tags', 'code');
+    variable_set('geshifilter_language_enabled_cpp', TRUE);
+    $source_code = "//C++ source code\nfor (int i=0; i<10; ++i) {\n  fun(i);\n  bar.foo(x, y);\n server->start(&pool); \n}";
+    // Enable only double square brackets
+    variable_set('geshifilter_tag_styles', array(
+      GESHIFILTER_BRACKETS_PHPBLOCK => GESHIFILTER_BRACKETS_PHPBLOCK,
+    ));
+    // This should be filtered.
+    $this->assertGeshiFilterHighlighting('<?php'. $source_code .'?>',
+      array(array($source_code, 'php', 0, 1, FALSE)),
+      t('Checking php code blocks in GESHIFILTER_BRACKETS_PHPBLOCK mode'));
+    // This should not be filtered.
+    $this->assertGeshiFilterHighlighting('<code language="cpp">'. $source_code .'</code>',
+      array(array($source_code, NULL, 0, 1, FALSE)),
+      t('Checking angle brackets style in GESHIFILTER_BRACKETS_PHPBLOCK mode'));
+    $this->assertGeshiFilterHighlighting('[code language="cpp"]'. $source_code .'[/code]',
+      array(array($source_code, NULL, 0, 1, FALSE)),
+      t('Checking [foo] brackets style in GESHIFILTER_BRACKETS_PHPBLOCK mode'));
+    $this->assertGeshiFilterHighlighting('[[code language="cpp"]]'. $source_code .'[[/code]]',
+      array(array($source_code, NULL, 0, 1, FALSE)),
+      t('Checking [[foo]] brackets style in GESHIFILTER_BRACKETS_PHPBLOCK mode'));
+  }
+
 
   /**
    * Check if tags like [c++] and [c#] work
