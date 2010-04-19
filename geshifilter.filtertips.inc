@@ -106,6 +106,11 @@ function _geshifilter_filter_tips($delta, $format, $long = FALSE) {
     // block versus inline
     $items[] = t('If the source code between the tags contains a newline (e.g. immediatly after the opening tag), the highlighted source code will be displayed as a code block. Otherwise it will be displayed inline.');
 
+    // Code block title
+    $items[] = t('A title can be added to a code block with the attribute "%title".', array(
+      '%title' => GESHIFILTER_ATTRIBUTE_TITLE,
+    ));
+
 
     $output .= theme('item_list', $items);
 
