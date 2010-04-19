@@ -495,5 +495,21 @@ class GeshiFilterTest extends DrupalWebTestCase {
     );
   }
 
+  function testTitleAttributeOnCodeBlock(){
+    $source_code = "for (int i=0; i!=10; ++i) {\n  fun(i);\n  bar.foo(x, y);\n}";
+    $this->assertGeshiFilterHighlighting('<code language="cpp" title="Foo the bar!">'. $source_code .'</code>',
+      array(array('<div class="geshifilter-title">Foo the bar!</div>', False, 0, 0, 0)),
+      t('Setting the title attritbute on code block.')
+    );
+  }
+
+  function testTitleAttributeOnInlineCode(){
+    $source_code = "for (int i=0; i!=10; ++i) { fun(i); }";
+    $this->assertGeshiFilterHighlighting('<code language="cpp" title="Foo the bar!">'. $source_code .'</code>',
+      array(array('<span class="geshifilter" title="Foo the bar!">', False, 0, 0, 0)),
+      t('Setting the title attritbute on inline code.')
+    );
+  }
+
 }
 
