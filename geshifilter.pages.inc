@@ -356,7 +356,7 @@ function geshifilter_geshi_process($source_code, $lang, $line_numbering=0, $line
     // commit 1610), we use both the language and overall_class for the class,
     // to mimic the 1.0.8 behavior, which is backward compatible.
     $code_class = "{$geshi->language} {$geshi->overall_class}";
-    $source_code = '<span class="geshifilter" title="'. $title .'"><code class="'. $code_class .'">'. $geshi->parse_code() .'</code></span>';
+    $source_code = '<span class="geshifilter" title="'. check_plain($title) .'"><code class="'. $code_class .'">'. $geshi->parse_code() .'</code></span>';
   }
   else {
     // block source code mode
@@ -370,7 +370,7 @@ function geshifilter_geshi_process($source_code, $lang, $line_numbering=0, $line
       $geshi->start_line_numbers_at($linenumbers_start);
     }
     if (!empty($title)) {
-      $source_code = '<div class="geshifilter-title">'. $title .'</div>';
+      $source_code = '<div class="geshifilter-title">'. check_plain($title) .'</div>';
     }
     else {
       $source_code = '';
