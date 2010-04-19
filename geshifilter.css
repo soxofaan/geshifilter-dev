@@ -56,3 +56,9 @@ div.geshifilter table, div.geshifilter tbody, div.geshifilter tr, div.geshifilte
   padding: 0;
   border-style: none;
 }
+
+div.geshifilter-title {
+  padding: 0.5ex 0.5em;
+  margin: 0.5em 0.5em -0.5em 0.5em;
+  background-color: #ccc;
+}
