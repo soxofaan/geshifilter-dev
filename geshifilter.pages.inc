@@ -14,18 +14,18 @@ require_once drupal_get_path('module', 'geshifilter') .'/geshifilter.inc';
 
 /**
  * Helper function for parsing the attributes of GeSHi code tags
- * to get the settings for language and line numbers.
+ * to get the settings for language, line numbers, etc.
  *
  * @param $attributes string with the attributes
  * @param $format the concerning input format
- * @return array of settings with fields 'language', 'line_numbering', 'linenumbers_start'
+ * @return array of settings with fields 'language', 'line_numbering', 'linenumbers_start' and 'title'.
  */
 function _geshifilter_parse_attributes($attributes, $format) {
   // Initial values.
   $lang = NULL;
   $line_numbering = NULL;
   $linenumbers_start = NULL;
-  $title = "";
+  $title = NULL;
 
   // Get the possible tags and languages.
   list($generic_code_tags, $language_tags, $tag_to_lang) = _geshifilter_get_tags($format);
@@ -33,7 +33,12 @@ function _geshifilter_parse_attributes($attributes, $format) {
   $language_attributes = _geshifilter_whitespace_explode(GESHIFILTER_ATTRIBUTES_LANGUAGE);
   $attributes_preg_string = implode('|', array_merge(
     $language_attributes,
-    array(GESHIFILTER_ATTRIBUTE_LINE_NUMBERING, GESHIFILTER_ATTRIBUTE_LINE_NUMBERING_START, GESHIFILTER_ATTRIBUTE_FANCY_N, GESHIFILTER_ATTRIBUTE_TITLE)
+    array(
+      GESHIFILTER_ATTRIBUTE_LINE_NUMBERING,
+      GESHIFILTER_ATTRIBUTE_LINE_NUMBERING_START,
+      GESHIFILTER_ATTRIBUTE_FANCY_N,
+      GESHIFILTER_ATTRIBUTE_TITLE,
+    )
   ));
   $enabled_languages = _geshifilter_get_enabled_languages();
 
@@ -249,7 +254,7 @@ function _geshifilter_replace_callback($match, $format) {
   $lang = variable_get('geshifilter_default_highlighting', GESHIFILTER_DEFAULT_PLAINTEXT);
   $line_numbering = variable_get('geshifilter_default_line_numbering', GESHIFILTER_LINE_NUMBERS_DEFAULT_NONE);
   $linenumbers_start = 1;
-  $title = "";
+  $title = NULL;
 
   // Determine language based on tag name if possible.
   list($generic_code_tags, $language_tags, $tag_to_lang) = _geshifilter_get_tags($format);
@@ -305,7 +310,7 @@ function _geshifilter_override_geshi_defaults(&$geshi, $langcode) {
 /**
  * General geshifilter processing function
  */
-function geshifilter_process($source_code, $lang, $line_numbering=0, $linenumbers_start=1, $inline_mode=FALSE, $title = "") {
+function geshifilter_process($source_code, $lang, $line_numbering=0, $linenumbers_start=1, $inline_mode=FALSE, $title = NULL) {
   // process
   if ($lang == 'php' && variable_get('geshifilter_use_highlight_string_for_php', FALSE)) {
     return geshifilter_highlight_string_process($source_code, $inline_mode);
@@ -319,7 +324,7 @@ function geshifilter_process($source_code, $lang, $line_numbering=0, $linenumber
 /**
  * geshifilter wrapper for GeSHi processing.
  */
-function geshifilter_geshi_process($source_code, $lang, $line_numbering=0, $linenumbers_start=1, $inline_mode=FALSE, $title = "") {
+function geshifilter_geshi_process($source_code, $lang, $line_numbering=0, $linenumbers_start=1, $inline_mode=FALSE, $title = NULL) {
   // load GeSHi library (if not already)
   $geshi_library = _geshifilter_check_geshi_library();
   if (!$geshi_library['loaded']) {
@@ -356,7 +361,9 @@ function geshifilter_geshi_process($source_code, $lang, $line_numbering=0, $line
     // commit 1610), we use both the language and overall_class for the class,
     // to mimic the 1.0.8 behavior, which is backward compatible.
     $code_class = "{$geshi->language} {$geshi->overall_class}";
-    $source_code = '<span class="geshifilter" title="'. check_plain($title) .'"><code class="'. $code_class .'">'. $geshi->parse_code() .'</code></span>';
+    $source_code = '<span class="geshifilter"'
+      . (isset($title) ? ' title="'. check_plain($title) .'"' : '')
+      . '><code class="'. $code_class .'">'. $geshi->parse_code() .'</code></span>';
   }
   else {
     // block source code mode
@@ -369,7 +376,7 @@ function geshifilter_geshi_process($source_code, $lang, $line_numbering=0, $line
       $geshi->enable_line_numbers(GESHI_FANCY_LINE_NUMBERS, $line_numbering);
       $geshi->start_line_numbers_at($linenumbers_start);
     }
-    if (!empty($title)) {
+    if (isset($title)) {
       $source_code = '<div class="geshifilter-title">'. check_plain($title) .'</div>';
     }
     else {
