@@ -256,8 +256,9 @@ class GeshiFilterTest extends DrupalWebTestCase {
    *     if $lang is set, GeSHifilter syntax highlighting is applied to $sourcecode
    *     if $lang is false, $sourcecode is directly looked for
    * @param $description description of the assertion
+   * @param $invert if assertNoRaw should be used instead of assertRaw
    */
-  function assertGeshiFilterHighlighting($body, $check_list, $description) {
+  function assertGeshiFilterHighlighting($body, $check_list, $description, $invert=false) {
     // Create content.
     $edit = array(
       'title' => $this->randomName(32, 'simpletest_pagetitle_'),
@@ -276,7 +277,12 @@ class GeshiFilterTest extends DrupalWebTestCase {
         // apply syntax highlighting
         $source_code = geshifilter_geshi_process($source_code, $lang, $line_numbering, $linenumbers_start, $inline_mode);
       }
-      $this->assertRaw($source_code, $description);
+      if ($invert) {
+        $this->assertNoRaw($source_code, $description);
+      }
+      else {
+        $this->assertRaw($source_code, $description);
+      }
     }
   }
 
@@ -492,6 +498,35 @@ class GeshiFilterTest extends DrupalWebTestCase {
     $this->assertGeshiFilterHighlighting('<cpp>'. $source_code .'</cpp>',
       array(array($source_code, 'cpp', 0, 1, FALSE)),
       t('Highlighting with <cpp>...</cpp> should work when default is "do nothing"')
+    );
+  }
+
+  function testTitleAttributeOnCodeBlock(){
+    $source_code = "for (int i=0; i!=10; ++i) {\n  fun(i);\n  bar.foo(x, y);\n}";
+    // No title set
+    $this->assertGeshiFilterHighlighting('<code language="cpp">'. $source_code .'</code>',
+      array(array('geshifilter-title', False, 0, 0, 0)),
+      t('Setting the title attritbute on code block.'),
+      true
+    );
+    // Title set.
+    $this->assertGeshiFilterHighlighting('<code language="cpp" title="Foo the bar!">'. $source_code .'</code>',
+      array(array('<div class="geshifilter-title">Foo the bar!</div>', False, 0, 0, 0)),
+      t('Setting the title attritbute on code block.')
+    );
+  }
+
+  function testTitleAttributeOnInlineCode(){
+    $source_code = "for (int i=0; i!=10; ++i) { fun(i); }";
+    // No title set.
+    $this->assertGeshiFilterHighlighting('<code language="cpp">'. $source_code .'</code>',
+      array(array('<span class="geshifilter">', False, 0, 0, 0)),
+      t('Setting the title attritbute on inline code.')
+    );
+    // Title set.
+    $this->assertGeshiFilterHighlighting('<code language="cpp" title="Foo the bar!">'. $source_code .'</code>',
+      array(array('<span class="geshifilter" title="Foo the bar!">', False, 0, 0, 0)),
+      t('Setting the title attritbute on inline code.')
     );
   }
 
