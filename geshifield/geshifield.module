@@ -153,7 +153,7 @@ function geshifield_textarea_process($element, $edit, &$form_state, $form) {
 /**
  * Theming function for the geshifield_textarea widget
  */
-function theme_geshifield_textarea(&$element) {
+function theme_geshifield_textarea($element) {
   return theme( 'form_element', $element, $element['#children'] );
 }
 
