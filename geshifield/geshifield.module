@@ -1,5 +1,5 @@
 <?php
-// $Id: geshifield.module,v 1.2 2010/02/12 19:50:18 soxofaan Exp $
+// $Id: geshifield.module,v 1.3 2010/07/18 14:51:57 soxofaan Exp $
 
 /**
  * @file
@@ -153,7 +153,7 @@ function geshifield_textarea_process($element, $edit, &$form_state, $form) {
 /**
  * Theming function for the geshifield_textarea widget
  */
-function theme_geshifield_textarea(&$element) {
+function theme_geshifield_textarea($element) {
   return theme( 'form_element', $element, $element['#children'] );
 }
 
