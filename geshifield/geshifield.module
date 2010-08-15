@@ -87,6 +87,10 @@ function geshifield_content_is_empty($item, $field) {
 
 /**
  * Implementation of hook_content_diff_values().
+ *
+ * Provides support for viewing differences between node revisions.
+ * More info: diff module (diff/node.inc), cck module
+ * (cck/includes/content.diff.inc)
  */
 function geshifield_content_diff_values($node, $field, $items) {
   $result = array();
