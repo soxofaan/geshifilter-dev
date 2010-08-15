@@ -133,7 +133,7 @@ function geshifield_textarea_process($element, $edit, &$form_state, $form) {
   $element['sourcecode'] = array(
     '#type' => 'textarea',
     '#title' => t('Source code'),
-    '#default_value' => $defaults['sourcecode'],
+    '#default_value' => isset($defaults['sourcecode']) ? $defaults['sourcecode'] : '',
     '#required' => $field['required'],
     '#rows' => $field['widget']['rows'],
     '#description' => t($field['widget']['description']),
@@ -142,7 +142,7 @@ function geshifield_textarea_process($element, $edit, &$form_state, $form) {
   $element['language'] = array(
     '#type' => 'select',
     '#title' => t('Syntax highlighting mode'),
-    '#default_value' => $defaults['language'],
+    '#default_value' => isset($defaults['language']) ? $defaults['language'] : '',
     '#options' => $enabled_languages,
     '#description' => t('Select the syntax highlighting mode to use for the source code.'),
   );
