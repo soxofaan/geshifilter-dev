@@ -9,12 +9,11 @@
 require_once drupal_get_path('module', 'geshifilter') .'/geshifilter.inc';
 
 /**
- * Implementation for geshifilter_filter_tips()
+ * Provides filter tips.
  */
-function _geshifilter_filter_tips($delta, $format, $long = FALSE) {
-
+function _geshifilter_filter_tips($filter, $format, $long = FALSE) {
   // Get the supported tag styles.
-  $tag_styles = array_filter(_geshifilter_tag_styles($format));
+  $tag_styles = array_filter(_geshifilter_tag_styles($filter->format));
   $tag_style_examples = array();
   $bracket_open = NULL;
   if (in_array(GESHIFILTER_BRACKETS_ANGLE, $tag_styles)) {
@@ -46,7 +45,7 @@ function _geshifilter_filter_tips($delta, $format, $long = FALSE) {
 
   if ($long) {
     // get the available tags
-    list($generic_code_tags, $language_tags, $tag_to_lang) = _geshifilter_get_tags($format);
+    list($generic_code_tags, $language_tags, $tag_to_lang) = _geshifilter_get_tags($filter->format);
     // get the available languages
     $languages = _geshifilter_get_enabled_languages();
     $lang_attributes = _geshifilter_whitespace_explode(GESHIFILTER_ATTRIBUTES_LANGUAGE);
@@ -74,7 +73,7 @@ function _geshifilter_filter_tips($delta, $format, $long = FALSE) {
       $items[] = t('PHP source code can also be enclosed in &lt;?php ... ?&gt; or &lt;% ... %&gt;, but additional options like line numbering are not possible here.');
     }
 
-    $output .= theme('item_list', $items);
+    $output .= theme('item_list', array('items' => $items));
 
     // Options and tips
     $output .= '<p>'. t('Options and tips:') .'</p>';
@@ -112,7 +111,7 @@ function _geshifilter_filter_tips($delta, $format, $long = FALSE) {
     ));
 
 
-    $output .= theme('item_list', $items);
+    $output .= theme('item_list', array('items' => $items));
 
     // Defaults
     $output .= '<p>'. t('Defaults:') .'</p>';
@@ -143,7 +142,7 @@ function _geshifilter_filter_tips($delta, $format, $long = FALSE) {
         break;
     }
     $items[] = t('Default line numbering: !description.', array('!description' => $description));
-    $output .= theme('item_list', $items);
+    $output .= theme('item_list', array('items' => $items));
 
     // Examples
     $output .= '<p>'. t('Examples:') .'</p>';
@@ -182,12 +181,12 @@ function _geshifilter_filter_tips($delta, $format, $long = FALSE) {
         t('Code block with syntax highlighting for @lang source code,<br />line numbers starting from 23<br /> and highlighted line numbers every 7<sup>th</sup> line.', array('@lang' => $languages[$tag_to_lang[$language_tag]])),
       );
     }
-    $output .= theme('table', $header, $rows);
+    $output .= theme('table', array('header' => $header, 'rows' => $rows));
     return $output;
   }
   else {
     // get the available tags
-    list($generic_code_tags, $language_tags, $tag_to_lang) = _geshifilter_get_tags($format);
+    list($generic_code_tags, $language_tags, $tag_to_lang) = _geshifilter_get_tags($filter->format);
     $tags = array();
     foreach ($generic_code_tags as $tag) {
       $tags[] = '<code>'. $bracket_open . $tag . $bracket_close .'</code>';
