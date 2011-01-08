@@ -1,4 +1,4 @@
-// $Id: README.txt,v 1.9 2010/04/03 23:28:58 soxofaan Exp $
+// $Id$
 
 ============================
 GeSHi Filter (Drupal Module)

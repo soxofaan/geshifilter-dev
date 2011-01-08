@@ -5,7 +5,7 @@
  * Authors:
  *   Stefaan Lippens (http://drupal.org/user/41478)
  * Copyright: (c) 2007 Stefaan Lippens
- * Version: $Id: drupal6.php,v 1.3 2008/03/02 19:17:41 soxofaan Exp $
+ * Version: $Id$
  * Date Started: 2007/12/11
  *
  * Drupal 6 language definition file for GeSHi

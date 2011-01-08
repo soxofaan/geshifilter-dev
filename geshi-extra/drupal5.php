@@ -6,7 +6,7 @@
  *   Rob Loach (http://www.robloach.net)
  *   Stefaan Lippens (http://drupal.org/user/41478)
  * Copyright: (c) 2007 Rob Loach (http://www.robloach.net)
- * Version: $Id: drupal5.php,v 1.3 2008/03/02 19:17:41 soxofaan Exp $
+ * Version: $Id$
  * Date Started: 2007/09/27
  *
  * Drupal 5 language definition file for GeSHi
