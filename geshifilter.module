@@ -158,7 +158,7 @@ function geshifilter_init() {
 }
 
 /**
- * Implementation of hook_filter_tips().
+ * Filter-Tips callback.
  */
 function geshifilter_filter_tips($delta, $format, $long = FALSE) {
   require_once drupal_get_path('module', 'geshifilter') .'/geshifilter.filtertips.inc';
@@ -166,34 +166,48 @@ function geshifilter_filter_tips($delta, $format, $long = FALSE) {
 }
 
 /**
- * Implementation of hook_filter().
+ * Implements hook_filter_info().
  */
-function geshifilter_filter($op, $delta = 0, $format = -1, $text = '') {
-  switch ($op) {
-    case 'list':
-      return array('GeSHi filter');
+function geshifilter_filter_info() {
+  $filters = array();
+  $filters['geshifilter'] = array(
+    'title' => t('GeSHi filter'),
+    'description' => t('Enables syntax highlighting of inline/block source code using the GeSHi engine'),
+    'prepare callback' => 'geshifilter_prepare',
+    'process callback' => 'geshifilter_process',
+    'tips callback' => 'geshifilter_filter_tips',
+    'settings callback' => 'geshifilter_filter_settings',
+    'default settings' => array(
+      'allowed_html' => '<a> <em> <strong> <cite> <blockquote> <code> <ul> <ol> <li> <dl> <dt> <dd>',
+      'filter_html_help' => 1,
+      'filter_html_nofollow' => 0,
+    ),
+  );
+  return $filters;
+}
 
-    case 'description':
-      return t('Enables syntax highlighting of inline/block source code using the GeSHi engine');
+/**
+ * Prepare callback for the GeSHi filter.
+ */
+function geshifilter_prepare($format, $text) {
+  require_once drupal_get_path('module', 'geshifilter') .'/geshifilter.pages.inc';
+  return _geshifilter_prepare($format, $text);
+}
 
-    case 'prepare':
-      require_once drupal_get_path('module', 'geshifilter') .'/geshifilter.pages.inc';
-      return _geshifilter_prepare($format, $text);
+/**
+ * Process callback for the GeSHi filter.
+ */
+function geshifilter_process($format, $text) {
+  require_once drupal_get_path('module', 'geshifilter') .'/geshifilter.pages.inc';
+  return _geshifilter_process($format, $text);
+}
 
-    case 'process':
-      require_once drupal_get_path('module', 'geshifilter') .'/geshifilter.pages.inc';
-      return _geshifilter_process($format, $text);
-
-    case 'settings':
-      require_once drupal_get_path('module', 'geshifilter') .'/geshifilter.admin.inc';
-      return _geshifilter_filter_settings($format);
-
-    case 'no cache':
-      return FALSE;
-
-    default:
-      return $text;
-  }
+/**
+ * Settings callback for the GeSHi filter.
+ */
+function geshifilter_filter_settings($format, $text) {
+  require_once drupal_get_path('module', 'geshifilter') .'/geshifilter.admin.inc';
+  return _geshifilter_filter_settings($format, $text);
 }
 
 /**
