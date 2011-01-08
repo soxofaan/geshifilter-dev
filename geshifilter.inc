@@ -74,7 +74,7 @@ function _geshifilter_get_available_languages() {
     if ($geshi_library['success']) {
       $dirs = array(_geshifilter_get_geshi_dir() .'/geshi', drupal_get_path('module', 'geshifilter') .'/geshi-extra');
       foreach ($dirs as $dir) {
-        foreach (file_scan_directory($dir, '\.[pP][hH][pP]$') as $filename => $fileinfo) {
+        foreach (file_scan_directory($dir, '/.[pP][hH][pP]$/i') as $filename => $fileinfo) {
           // short name
           $name = $fileinfo->name;
           // get full name

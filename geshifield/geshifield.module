@@ -154,7 +154,7 @@ function geshifield_textarea_process($element, $edit, &$form_state, $form) {
     '#type' => 'textarea',
     '#title' => t('Source code'),
     '#default_value' => isset($defaults['sourcecode']) ? $defaults['sourcecode'] : '',
-    '#required' => $field['required'],
+    '#required' => $element['#required'],
     '#rows' => $field['widget']['rows'],
     '#description' => t($field['widget']['description']),
   );

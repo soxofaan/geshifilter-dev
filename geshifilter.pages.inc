@@ -17,7 +17,7 @@ require_once drupal_get_path('module', 'geshifilter') .'/geshifilter.inc';
  * to get the settings for language, line numbers, etc.
  *
  * @param $attributes string with the attributes
- * @param $format the concerning input format
+ * @param $format the concerning text format
  * @return array of settings with fields 'language', 'line_numbering', 'linenumbers_start' and 'title'.
  */
 function _geshifilter_parse_attributes($attributes, $format) {
