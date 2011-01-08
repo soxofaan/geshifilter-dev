@@ -41,7 +41,7 @@ define('GESHIFILTER_LINE_NUMBERS_DEFAULT_FANCY20', 20);
  */
 function geshifilter_help($path, $arg) {
   switch ($path) {
-    case 'admin/settings/geshifilter':
+    case 'admin/config/content/geshifilter':
     case 'admin/help#geshifilter':
       $output = '<p>'. t('The GeSHi filter module provides a filter for syntax highlighting of inline source code or blocks of source code based on the PHP library !GeSHi.', array('!GeSHi' => l('GeSHi (Generic Syntax Highlighter)', 'http://qbnz.com/highlighter/'))) .'</p>';
       if ($path == 'admin/help#geshifilter') {
@@ -50,19 +50,19 @@ function geshifilter_help($path, $arg) {
           '!geshi' => url('http://qbnz.com/highlighter/'),
         )) .'</p>';
         $output .= t('<p>Quick overview of how to set up and use the GeSHi filter:</p><ul><li>Install the GeSHi library and specify its path on the <a href="!geshifilter_settings">GeSHi filter administration page</a>.</li><li>Configure the <a href="!geshifilter_settings">general GeSHi filter settings</a>.</li><li><a href="!geshifilter_languages">Enable the relevant languages</a> for your site and set their language tags if needed.</li><li>Enable the GeSHi filter in the desired !inputformats.</li><li>Check for !filterconflicts and resolve them.</li><li>Use the input format during content submission as described in the !filtertips.</li></ul>', array(
-          '!geshifilter_settings' => url('admin/settings/geshifilter'),
-          '!geshifilter_languages' => url('admin/settings/geshifilter/languages/all'),
-          '!inputformats' => l(t('input formats'), 'admin/settings/filters'),
-          '!filterconflicts' => l(t('filter conflicts'), 'admin/settings/geshifilter/filterconflicts'),
+          '!geshifilter_settings' => url('admin/config/content/geshifilter'),
+          '!geshifilter_languages' => url('admin/config/content/geshifilter/languages/all'),
+          '!inputformats' => l(t('input formats'), 'admin/config/content/filters'),
+          '!filterconflicts' => l(t('filter conflicts'), 'admin/config/content/geshifilter/filterconflicts'),
           '!filtertips' => l(t('filter tips'), 'filter/tips'),
         ));
       }
       return $output;
       break;
-    case 'admin/settings/geshifilter/languages':
-    case 'admin/settings/geshifilter/languages/enabled':
-    case 'admin/settings/geshifilter/languages/all':
-    case 'admin/settings/geshifilter/languages/disabled':
+    case 'admin/config/content/geshifilter/languages':
+    case 'admin/config/content/geshifilter/languages/enabled':
+    case 'admin/config/content/geshifilter/languages/all':
+    case 'admin/config/content/geshifilter/languages/disabled':
       $output = '<p>'. t('Here you can enable/disable the desired languages to use. It is suggested to disable languages that are not relevant for you site not only to avoid unnecessary cluttering of the GeSHi filter configuration pages and the !filtertips, but also to make the GeSHi filter processing lighter.', array('!filtertips' => l(t('filter tips'), 'filter/tips'))) .'</p>';
       if (!geshifilter_use_format_specific_options()) {
         $output .= '<p>'. t('You can also define the language specific tags here.') .'</p>';
@@ -235,7 +235,7 @@ function geshifilter_requirements($phase) {
         'title' => 'GeSHi filter',
         'value' => t('GeSHi library not found.'),
         'description' => t('You should install the GeSHi library and set its path in the <a href="!geshisettings">GeSHi settings</a>.',
-          array('!geshisettings' => url('admin/settings/geshifilter'))),
+          array('!geshisettings' => url('admin/config/content/geshifilter'))),
         'severity' => REQUIREMENT_ERROR,
       );
     }
@@ -255,7 +255,7 @@ function geshifilter_requirements($phase) {
         'value' => t('GeSHi filter can not automatically manage an external style sheet when the download method is private.'),
         'severity' => REQUIREMENT_ERROR,
         'description' => t('Change the CSS mode of the <a href="!geshi">GeSHi filter</a> or change the <a href="!filesystem">download mode</a> to public.',
-          array('!geshi' => url('admin/settings/geshifilter'), '!filesystem' => url('admin/settings/file-system'))),
+          array('!geshi' => url('admin/config/content/geshifilter'), '!filesystem' => url('admin/config/content/file-system'))),
       );
     }
 
@@ -265,7 +265,7 @@ function geshifilter_requirements($phase) {
       $requirements[] = array(
         'title' => 'GeSHi filter',
         'value' => t('Some filter conflicts were detected.'),
-        'description' => l(t('View and resolve the detected filter conflicts'), 'admin/settings/geshifilter/filterconflicts'),
+        'description' => l(t('View and resolve the detected filter conflicts'), 'admin/config/content/geshifilter/filterconflicts'),
         'severity' => REQUIREMENT_ERROR,
       );
     }
