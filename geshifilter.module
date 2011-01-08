@@ -77,7 +77,7 @@ function geshifilter_help($path, $arg) {
  */
 function geshifilter_menu() {
   $items = array();
-  $items['admin/settings/geshifilter'] = array(
+  $items['admin/config/content/geshifilter'] = array(
     'title' => 'GeSHi Filter',
     'description' => 'Configure the GeSHi filter.',
     'file' => 'geshifilter.admin.inc',
@@ -86,13 +86,13 @@ function geshifilter_menu() {
     'access arguments' => array('administer site configuration'),
     'type' => MENU_NORMAL_ITEM,
   );
-  $items['admin/settings/geshifilter/general'] = array(
+  $items['admin/config/content/geshifilter/general'] = array(
     'title' => 'General settings',
     'description' => 'General GeSHi filter settings.',
     'access arguments' => array('administer site configuration'),
     'type' => MENU_DEFAULT_LOCAL_TASK,
   );
-  $items['admin/settings/geshifilter/filterconflicts'] = array(
+  $items['admin/config/content/geshifilter/filterconflicts'] = array(
     'title' => 'Filter conflicts',
     'description' => 'Information on possible conflicts with other filters.',
     'file' => 'geshifilter.conflicts.inc',
@@ -102,7 +102,7 @@ function geshifilter_menu() {
     'weight' => 10,
   );
   // language settings
-  $items['admin/settings/geshifilter/languages'] = array(
+  $items['admin/config/content/geshifilter/languages'] = array(
     'title' => 'Languages',
     'description' => 'Enable the desired languages and configure their settings.',
     'file' => 'geshifilter.admin.inc',
@@ -111,14 +111,14 @@ function geshifilter_menu() {
     'access arguments' => array('administer site configuration'),
     'type' => MENU_LOCAL_TASK,
   );
-  $items['admin/settings/geshifilter/languages/enabled'] = array(
+  $items['admin/config/content/geshifilter/languages/enabled'] = array(
     'title' => 'Enabled',
     'description' => 'Show the enabled languages',
     'access arguments' => array('administer site configuration'),
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => 3,
   );
-  $items['admin/settings/geshifilter/languages/all'] = array(
+  $items['admin/config/content/geshifilter/languages/all'] = array(
     'title' => 'All',
     'description' => 'Show all the available languages',
     'page arguments' => array('geshifilter_admin_per_language_settings', 4),
@@ -126,7 +126,7 @@ function geshifilter_menu() {
     'type' => MENU_LOCAL_TASK,
     'weight' => 1,
   );
-  $items['admin/settings/geshifilter/languages/disabled'] = array(
+  $items['admin/config/content/geshifilter/languages/disabled'] = array(
     'title' => 'Disabled',
     'description' => 'Show the disabled languages',
     'page arguments' => array('geshifilter_admin_per_language_settings', 4),
@@ -135,7 +135,7 @@ function geshifilter_menu() {
     'weight' => 6,
   );
   // Callback for generating CSS rules.
-  $items['admin/settings/geshifilter/generate_css'] = array(
+  $items['admin/config/content/geshifilter/generate_css'] = array(
     'page callback' => 'geshifilter_generate_language_css_rules',
     'access arguments' => array('administer site configuration'),
     'type' => MENU_CALLBACK,
@@ -202,7 +202,7 @@ function geshifilter_filter($op, $delta = 0, $format = -1, $text = '') {
 function geshifilter_theme() {
   return array(
     'geshifilter_per_language_settings' => array(
-      'arguments' => array('form' => NULL)
+      'variables' => array('form' => NULL)
     )
   );
 }
