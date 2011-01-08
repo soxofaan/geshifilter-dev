@@ -250,13 +250,13 @@ class GeshiFilterTest extends DrupalWebTestCase {
 
   /**
    * Assert function for testing if GeSHi highlighting works
-   * @param $body the body text of the node
-   * @param $check_list list of items that should be in rendered output (assertRaw)
+   * @param string $body the body text of the node
+   * @param array $check_list list of items that should be in rendered output (assertRaw)
    *     an item is something like array($source_code, $lang, $line_numbering, $linenumbers_start, $inline_mode)
    *     if $lang is set, GeSHifilter syntax highlighting is applied to $sourcecode
    *     if $lang is false, $sourcecode is directly looked for
-   * @param $description description of the assertion
-   * @param $invert if assertNoRaw should be used instead of assertRaw
+   * @param string $description description of the assertion
+   * @param boolean $invert if assertNoRaw should be used instead of assertRaw
    */
   function assertGeshiFilterHighlighting($body, $check_list, $description, $invert=false) {
     // Create content.
