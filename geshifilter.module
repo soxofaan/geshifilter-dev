@@ -36,9 +36,6 @@ define('GESHIFILTER_LINE_NUMBERS_DEFAULT_FANCY5', 5);
 define('GESHIFILTER_LINE_NUMBERS_DEFAULT_FANCY10', 10);
 define('GESHIFILTER_LINE_NUMBERS_DEFAULT_FANCY20', 20);
 
-// @TODO: Check whether this require_once is always needed.
-require_once drupal_get_path('module', 'geshifilter') .'/geshifilter.filtertips.inc';
-
 /**
  * Implementation of hook_help().
  */
