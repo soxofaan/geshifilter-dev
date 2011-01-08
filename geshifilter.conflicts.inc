@@ -43,7 +43,7 @@ function geshifilter_admin_filter_conflicts($check_only=FALSE) {
           $conflicts = $conflict_detector($format, $cfilter, $geshifilter);
           foreach ($conflicts as $conflict) {
             $alerts[] = array(
-              l(t($input_format->name), "admin/settings/filters/$format"),
+              l(t($input_format->name), "admin/config/content/formats/$format"),
               $cfilter->name,
               $conflict['description'],
               $conflict['solution'],
@@ -77,7 +77,7 @@ function _geshifilter_htmlfilter_conflicts($format, $cfilter, $geshifilter) {
     $conflicts[] = array(
       'description' => t('%cfilter should not come after %geshifilter to prevent loss of layout and highlighting.',
           array('%cfilter' => $cfilter->name, '%geshifilter' => $geshifilter->name)),
-      'solution' => l(t('Rearrange filters'), "admin/settings/filters/$format/order"),
+      'solution' => l(t('Rearrange filters'), "admin/config/content/formats/$format"),
     );
   }
   // check tag escaping of html filter
@@ -85,7 +85,7 @@ function _geshifilter_htmlfilter_conflicts($format, $cfilter, $geshifilter) {
     $conflicts[] = array(
       'description' => t('%cfilter is configured to "Escape all tags", which is likely to cause problems with %geshifilter.',
         array('%cfilter' => $cfilter->name, '%geshifilter' => $geshifilter->name)),
-      'solution' => l(t('Configure HTML filtering to "Strip disallowed tags"'), "admin/settings/filters/$format/configure", array('html' => TRUE)),
+      'solution' => l(t('Configure HTML filtering to "Strip disallowed tags"'), "admin/config/content/formats/$format", array('html' => TRUE)),
     );
   }
   return $conflicts;
