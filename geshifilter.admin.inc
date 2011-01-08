@@ -518,9 +518,10 @@ function _geshifilter_flush_language_definition_cache() {
  */
 function _geshifilter_clear_filter_cache() {
   $message = FALSE;
+  global $user;
 
   // Iterate over text formats and clear the ones GeSHi filter is active in.
-  foreach (filter_formats() as $format => $input_format) {
+  foreach (filter_formats($user) as $format => $input_format) {
     // Get the filters in this text format
     $filters = filter_list_format($format);
     // look if GeSHi is enabled in this text format
