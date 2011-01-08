@@ -1,5 +1,5 @@
 <?php
-// $Id: geshifield.module,v 1.2 2010/02/12 19:50:18 soxofaan Exp $
+// $Id: geshifield.module,v 1.5 2010/08/15 19:12:08 soxofaan Exp $
 
 /**
  * @file
@@ -86,6 +86,26 @@ function geshifield_content_is_empty($item, $field) {
 }
 
 /**
+ * Implementation of hook_content_diff_values().
+ *
+ * Provides support for viewing differences between node revisions.
+ * More info: diff module (diff/node.inc), cck module
+ * (cck/includes/content.diff.inc)
+ */
+function geshifield_content_diff_values($node, $field, $items) {
+  $result = array();
+  foreach ($items as $item) {
+    if (isset($item['sourcecode']) && isset($item['language'])) {
+      $result[] = t('[Language: !language]', array('!language' => $item['language']));
+      foreach (explode("\n", $item['sourcecode']) as $i) {
+        $result[] = $i;
+      }
+    }
+  }
+  return $result;
+}
+
+/**
  * Implementation of hook_widget_info().
  */
 function geshifield_widget_info() {
@@ -133,8 +153,8 @@ function geshifield_textarea_process($element, $edit, &$form_state, $form) {
   $element['sourcecode'] = array(
     '#type' => 'textarea',
     '#title' => t('Source code'),
-    '#default_value' => $defaults['sourcecode'],
-    '#required' => $field['required'],
+    '#default_value' => isset($defaults['sourcecode']) ? $defaults['sourcecode'] : '',
+    '#required' => $element['#required'],
     '#rows' => $field['widget']['rows'],
     '#description' => t($field['widget']['description']),
   );
@@ -142,7 +162,7 @@ function geshifield_textarea_process($element, $edit, &$form_state, $form) {
   $element['language'] = array(
     '#type' => 'select',
     '#title' => t('Syntax highlighting mode'),
-    '#default_value' => $defaults['language'],
+    '#default_value' => isset($defaults['language']) ? $defaults['language'] : '',
     '#options' => $enabled_languages,
     '#description' => t('Select the syntax highlighting mode to use for the source code.'),
   );
@@ -153,7 +173,7 @@ function geshifield_textarea_process($element, $edit, &$form_state, $form) {
 /**
  * Theming function for the geshifield_textarea widget
  */
-function theme_geshifield_textarea(&$element) {
+function theme_geshifield_textarea($element) {
   return theme( 'form_element', $element, $element['#children'] );
 }
 

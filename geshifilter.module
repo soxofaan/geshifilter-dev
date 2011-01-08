@@ -1,5 +1,5 @@
 <?php
-// $Id: geshifilter.module,v 1.48 2009/07/12 15:00:28 soxofaan Exp $
+// $Id: geshifilter.module,v 1.49 2010/04/20 00:15:13 soxofaan Exp $
 
 /**
  * @file
@@ -22,6 +22,7 @@ define('GESHIFILTER_ATTRIBUTE_LINE_NUMBERING', 'linenumbers');
 define('GESHIFILTER_ATTRIBUTE_LINE_NUMBERING_START', 'start');
 define('GESHIFILTER_ATTRIBUTE_FANCY_N', 'fancy');
 define('GESHIFILTER_ATTRIBUTE_COLLAPSIBLE', 'collapsible');
+define('GESHIFILTER_ATTRIBUTE_TITLE', 'title');
 
 define('GESHIFILTER_BRACKETS_ANGLE', 1);
 define('GESHIFILTER_BRACKETS_SQUARE', 2);

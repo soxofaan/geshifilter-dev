@@ -1,5 +1,5 @@
 <?php
-// $Id: geshifilter.pages.inc,v 1.14 2010/02/01 00:31:45 soxofaan Exp $
+// $Id: geshifilter.pages.inc,v 1.15 2010/04/20 00:15:13 soxofaan Exp $
 
 /**
  * @file
@@ -14,11 +14,11 @@ require_once drupal_get_path('module', 'geshifilter') .'/geshifilter.inc';
 
 /**
  * Helper function for parsing the attributes of GeSHi code tags
- * to get the settings for language and line numbers.
+ * to get the settings for language, line numbers, etc.
  *
  * @param $attributes string with the attributes
  * @param $format the concerning input format
- * @return array of settings with fields 'language', 'line_numbering', 'linenumbers_start'
+ * @return array of settings with fields 'language', 'line_numbering', 'linenumbers_start' and 'title'.
  */
 function _geshifilter_parse_attributes($attributes, $format) {
   // Initial values.
@@ -26,6 +26,7 @@ function _geshifilter_parse_attributes($attributes, $format) {
   $line_numbering = NULL;
   $linenumbers_start = NULL;
   $collapsible = FALSE;
+  $title = NULL;
 
   // Get the possible tags and languages.
   list($generic_code_tags, $language_tags, $tag_to_lang) = _geshifilter_get_tags($format);
@@ -38,7 +39,8 @@ function _geshifilter_parse_attributes($attributes, $format) {
       GESHIFILTER_ATTRIBUTE_LINE_NUMBERING_START,
       GESHIFILTER_ATTRIBUTE_FANCY_N,
       GESHIFILTER_ATTRIBUTE_COLLAPSIBLE,
-      )
+      GESHIFILTER_ATTRIBUTE_TITLE,
+    )
   ));
   $enabled_languages = _geshifilter_get_enabled_languages();
 
@@ -46,7 +48,7 @@ function _geshifilter_parse_attributes($attributes, $format) {
   // $attribute_matches[0][xx] .... fully matched string, e.g. 'language="python"'
   // $attribute_matches[1][xx] .... param name, e.g. 'language'
   // $attribute_matches[2][xx] .... param value, e.g. 'python'
-  preg_match_all('#('. $attributes_preg_string .')="?([^\s"]*)"?#', $attributes, $attribute_matches);
+  preg_match_all('#('. $attributes_preg_string .')="?([^"]*)"?#', $attributes, $attribute_matches);
 
   foreach ($attribute_matches[1] as $a_key => $att_name) {
     // get attribute value
@@ -95,12 +97,10 @@ function _geshifilter_parse_attributes($attributes, $format) {
       $linenumbers_start = (int)($att_value);
     }
     elseif ($att_name == GESHIFILTER_ATTRIBUTE_COLLAPSIBLE) {
-      if (strtolower($att_value) == 'true') {
-        $collapsible = TRUE;
-      }
-      else {
-        $collapsible = FALSE;
-      }
+      $collapsible = (strtolower($att_value) === 'true');
+    }
+    elseif ($att_name == GESHIFILTER_ATTRIBUTE_TITLE) {
+      $title = $att_value;
     }
   }
   // Return parsed results.
@@ -109,6 +109,7 @@ function _geshifilter_parse_attributes($attributes, $format) {
     'line_numbering' => $line_numbering,
     'linenumbers_start' => $linenumbers_start,
     'collapsible' => $collapsible,
+    'title' => $title,
   );
 }
 
@@ -264,6 +265,7 @@ function _geshifilter_replace_callback($match, $format) {
   $lang = variable_get('geshifilter_default_highlighting', GESHIFILTER_DEFAULT_PLAINTEXT);
   $line_numbering = variable_get('geshifilter_default_line_numbering', GESHIFILTER_LINE_NUMBERS_DEFAULT_NONE);
   $linenumbers_start = 1;
+  $title = NULL;
 
   // Determine language based on tag name if possible.
   list($generic_code_tags, $language_tags, $tag_to_lang) = _geshifilter_get_tags($format);
@@ -287,6 +289,9 @@ function _geshifilter_replace_callback($match, $format) {
     $linenumbers_start = $settings['linenumbers_start'];
   }
   $collapsible = $settings['collapsible'];
+  if (isset($settings['title'])) {
+    $title = $settings['title'];
+  }
 
   if ($lang == GESHIFILTER_DEFAULT_DONOTHING) {
     // Do nothing, and return the original.
@@ -298,7 +303,7 @@ function _geshifilter_replace_callback($match, $format) {
   }
   $inline_mode = (strpos($source_code, "\n") === FALSE);
   // process and return
-  return geshifilter_process($source_code, $lang, $line_numbering, $linenumbers_start, $inline_mode, $collapsible);
+  return geshifilter_process($source_code, $lang, $line_numbering, $linenumbers_start, $inline_mode, $title, $collapsible);
 }
 
 /**
@@ -317,21 +322,21 @@ function _geshifilter_override_geshi_defaults(&$geshi, $langcode) {
 /**
  * General geshifilter processing function
  */
-function geshifilter_process($source_code, $lang, $line_numbering=0, $linenumbers_start=1, $inline_mode=FALSE, $collapsible=FALSE) {
+function geshifilter_process($source_code, $lang, $line_numbering=0, $linenumbers_start=1, $inline_mode=FALSE, $title = NULL, $collapsible=FALSE) {
   // process
   if ($lang == 'php' && variable_get('geshifilter_use_highlight_string_for_php', FALSE)) {
     return geshifilter_highlight_string_process($source_code, $inline_mode);
   }
   else {
     // process with GeSHi
-    return geshifilter_geshi_process($source_code, $lang, $line_numbering, $linenumbers_start, $inline_mode, $collapsible);
+    return geshifilter_geshi_process($source_code, $lang, $line_numbering, $linenumbers_start, $inline_mode, $title, $collapsible);
   }
 }
 
 /**
  * geshifilter wrapper for GeSHi processing.
  */
-function geshifilter_geshi_process($source_code, $lang, $line_numbering=0, $linenumbers_start=1, $inline_mode=FALSE, $collapsible=FALSE) {
+function geshifilter_geshi_process($source_code, $lang, $line_numbering=0, $linenumbers_start=1, $inline_mode=FALSE, $title = NULL, $collapsible=FALSE) {
   // load GeSHi library (if not already)
   $geshi_library = _geshifilter_check_geshi_library();
   if (!$geshi_library['loaded']) {
@@ -342,7 +347,7 @@ function geshifilter_geshi_process($source_code, $lang, $line_numbering=0, $line
    // Check for a cached version of this source code and return it if available.
    // @todo: Use a dedicated table instead of using cache_filter? If so,
    // also take care of the flushing in _geshifilter_clear_filter_cache().
-  $cache_id = "geshifilter:$lang:$line_numbering:$line_numbering:$inline_mode" . md5($source_code);
+  $cache_id = "geshifilter:$lang:$line_numbering:$line_numbering:$inline_mode" . md5($title . $source_code);
   if ($cached = cache_get($cache_id, 'cache_filter')) {
     return $cached->data;
   }
@@ -368,7 +373,9 @@ function geshifilter_geshi_process($source_code, $lang, $line_numbering=0, $line
     // commit 1610), we use both the language and overall_class for the class,
     // to mimic the 1.0.8 behavior, which is backward compatible.
     $code_class = "{$geshi->language} {$geshi->overall_class}";
-    $source_code = '<span class="geshifilter"><code class="'. $code_class .'">'. $geshi->parse_code() .'</code></span>';
+    $source_code = '<span class="geshifilter"'
+      . (isset($title) ? ' title="'. check_plain($title) .'"' : '')
+      . '><code class="'. $code_class .'">'. $geshi->parse_code() .'</code></span>';
   }
   else {
     // block source code mode
@@ -381,7 +388,13 @@ function geshifilter_geshi_process($source_code, $lang, $line_numbering=0, $line
       $geshi->enable_line_numbers(GESHI_FANCY_LINE_NUMBERS, $line_numbering);
       $geshi->start_line_numbers_at($linenumbers_start);
     }
-    $source_code = '<div class="geshifilter'. ($collapsible ? ' collapsible' : '') .'">'. $geshi->parse_code() .'</div>';
+    if (isset($title)) {
+      $source_code = '<div class="geshifilter-title">'. check_plain($title) .'</div>';
+    }
+    else {
+      $source_code = '';
+    }
+    $source_code .= '<div class="geshifilter'. ($collapsible ? ' collapsible' : '') .'">'. $geshi->parse_code() .'</div>';
   }
 
   // Store in cache with a minimum expiration time of 1 day.

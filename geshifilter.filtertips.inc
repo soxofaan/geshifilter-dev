@@ -1,5 +1,5 @@
 <?php
-// $Id: geshifilter.filtertips.inc,v 1.8 2009/07/12 15:00:28 soxofaan Exp $
+// $Id: geshifilter.filtertips.inc,v 1.9 2010/04/20 00:15:13 soxofaan Exp $
 
 /**
  * @file
@@ -105,6 +105,11 @@ function _geshifilter_filter_tips($delta, $format, $long = FALSE) {
 
     // block versus inline
     $items[] = t('If the source code between the tags contains a newline (e.g. immediatly after the opening tag), the highlighted source code will be displayed as a code block. Otherwise it will be displayed inline.');
+
+    // Code block title
+    $items[] = t('A title can be added to a code block with the attribute "%title".', array(
+      '%title' => GESHIFILTER_ATTRIBUTE_TITLE,
+    ));
 
 
     $output .= theme('item_list', $items);
