@@ -12,6 +12,8 @@ require_once drupal_get_path('module', 'geshifilter') .'/geshifilter.inc';
  * Menu callback for filter conflicts page
  */
 function geshifilter_admin_filter_conflicts($check_only=FALSE) {
+  global $user;
+  
   // start
   $output = '';
   // check if GeSHi library is available
@@ -27,7 +29,7 @@ function geshifilter_admin_filter_conflicts($check_only=FALSE) {
     'filter/0' => '_geshifilter_htmlfilter_conflicts',
     'codefilter/0' => '_geshifilter_codefilter_conflicts',
   );
-  foreach (filter_formats() as $format => $input_format) {
+  foreach (filter_formats($user) as $format => $input_format) {
     // Get the filters in this text format
     $filters = filter_list_format($format);
     // look if GeSHi is enabled in this text format
