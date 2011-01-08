@@ -34,7 +34,7 @@ function _geshifilter_filter_settings($format) {
   }
   else {
     $form['geshifilter']['info'] = array(
-      '#value' => '<p>'. t('GeSHi filter is configured to use global tag settings. For separate settings per input format, enable this option in the <a href="!geshi_admin_url">general GeSHi filter settings</a>.', array('!geshi_admin_url' => url('admin/settings/geshifilter'))) .'</p>'
+      '#value' => '<p>'. t('GeSHi filter is configured to use global tag settings. For separate settings per input format, enable this option in the <a href="!geshi_admin_url">general GeSHi filter settings</a>.', array('!geshi_admin_url' => url('admin/config/geshifilter'))) .'</p>'
     );
   }
   $form['#validate'][] = 'geshifilter_per_language_settings_validate';
@@ -115,7 +115,7 @@ function geshifilter_admin_general_settings(&$form_state) {
       '#type' => 'checkbox',
       '#title' => t('Use input format specific tag settings.'),
       '#default_value' => geshifilter_use_format_specific_options(),
-      '#description' => t('Enable seperate tag settings of the GeSHi filter for each <a href="!input_formats">input format</a> instead of global tag settings.', array('!input_formats' => url('admin/settings/filters'))),
+      '#description' => t('Enable seperate tag settings of the GeSHi filter for each <a href="!input_formats">input format</a> instead of global tag settings.', array('!input_formats' => url('admin/config/content/formats'))),
     );
     // Generic tags settings.
     // @todo: do this conditional form part showing/hiding in jQuery instead of in the form builder.
@@ -197,8 +197,8 @@ function geshifilter_admin_general_settings(&$form_state) {
       '#description' => t('Inline CSS is easier to set up, does not depend on an external style sheets and is consequently more robust to copy/paste operations like content aggregation. However, usage of CSS classes and an external stylesheet requires much less markup code and bandwidth. The external style sheet can be managed automatically by the GeSHi filter module, but this feature requires the public <a href="!filesystem">download method</a>. If the GeSHi filter is configured to only add the CSS classes to the markup, the administrator or themer is responsible for adding the appropriate CSS rules to the pages (e.g. based on <a href="!cssdefaults">these defaults</a>). (GeSHi documentation: <a href="!geshidoc">Using CSS Classes</a>).',
         array(
           '!geshidoc' => 'http://qbnz.com/highlighter/geshi-doc.html#using-css-classes',
-          '!filesystem' => url('admin/settings/file-system'),
-          '!cssdefaults' => url('admin/settings/geshifilter/generate_css'),
+          '!filesystem' => url('admin/config/media/file-system'),
+          '!cssdefaults' => url('admin/config/geshifilter/generate_css'),
         )),
     );
 
