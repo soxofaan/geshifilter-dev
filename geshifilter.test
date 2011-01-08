@@ -27,7 +27,7 @@ class GeshiFilterAdministrationTest extends DrupalWebTestCase {
   /**
    * Drupal SimpleTest method: return metadata about the test.
    */
-  function getInfo() {
+  public static function getInfo() {
     return array(
       'name'  => t('GeSHi filter administration'),
       'description'  => t('Test the GeSHi filter administration.'),
