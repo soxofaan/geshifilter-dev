@@ -219,7 +219,7 @@ function geshifilter_filter_settings($format, $text) {
 function geshifilter_theme() {
   return array(
     'geshifilter_per_language_settings' => array(
-      'variables' => array('form' => NULL)
+      'render element' => 'form',
     )
   );
 }
