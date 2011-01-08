@@ -9,12 +9,11 @@
 require_once drupal_get_path('module', 'geshifilter') .'/geshifilter.inc';
 
 /**
- * Implementation for geshifilter_filter_tips()
+ * Provides filter tips.
  */
-function _geshifilter_filter_tips($delta, $format, $long = FALSE) {
-
+function _geshifilter_filter_tips($filter, $format, $long = FALSE) {
   // Get the supported tag styles.
-  $tag_styles = array_filter(_geshifilter_tag_styles($format));
+  $tag_styles = array_filter(_geshifilter_tag_styles($filter->format));
   $tag_style_examples = array();
   $bracket_open = NULL;
   if (in_array(GESHIFILTER_BRACKETS_ANGLE, $tag_styles)) {
@@ -46,7 +45,7 @@ function _geshifilter_filter_tips($delta, $format, $long = FALSE) {
 
   if ($long) {
     // get the available tags
-    list($generic_code_tags, $language_tags, $tag_to_lang) = _geshifilter_get_tags($format);
+    list($generic_code_tags, $language_tags, $tag_to_lang) = _geshifilter_get_tags($filter->format);
     // get the available languages
     $languages = _geshifilter_get_enabled_languages();
     $lang_attributes = _geshifilter_whitespace_explode(GESHIFILTER_ATTRIBUTES_LANGUAGE);
@@ -187,7 +186,7 @@ function _geshifilter_filter_tips($delta, $format, $long = FALSE) {
   }
   else {
     // get the available tags
-    list($generic_code_tags, $language_tags, $tag_to_lang) = _geshifilter_get_tags($format);
+    list($generic_code_tags, $language_tags, $tag_to_lang) = _geshifilter_get_tags($filter->format);
     $tags = array();
     foreach ($generic_code_tags as $tag) {
       $tags[] = '<code>'. $bracket_open . $tag . $bracket_close .'</code>';
