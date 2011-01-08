@@ -173,10 +173,10 @@ function geshifilter_filter_info() {
   $filters['geshifilter'] = array(
     'title' => t('GeSHi filter'),
     'description' => t('Enables syntax highlighting of inline/block source code using the GeSHi engine'),
-    'prepare callback' => 'geshifilter_prepare',
-    'process callback' => 'geshifilter_process',
+    'prepare callback' => 'geshifilter_prepare_callback',
+    'process callback' => 'geshifilter_process_callback',
     'tips callback' => 'geshifilter_filter_tips',
-    'settings callback' => 'geshifilter_filter_settings',
+    'settings callback' => 'geshifilter_filter_settings_callback',
     'default settings' => array(
       'allowed_html' => '<a> <em> <strong> <cite> <blockquote> <code> <ul> <ol> <li> <dl> <dt> <dd>',
       'filter_html_help' => 1,
@@ -189,25 +189,25 @@ function geshifilter_filter_info() {
 /**
  * Prepare callback for the GeSHi filter.
  */
-function geshifilter_prepare($format, $text) {
+function geshifilter_prepare_callback($text, $filter) {
   require_once drupal_get_path('module', 'geshifilter') .'/geshifilter.pages.inc';
-  return _geshifilter_prepare($format, $text);
+  return _geshifilter_prepare($filter->format, $text);
 }
 
 /**
  * Process callback for the GeSHi filter.
  */
-function geshifilter_process($format, $text) {
+function geshifilter_process_callback($text, $filter) {
   require_once drupal_get_path('module', 'geshifilter') .'/geshifilter.pages.inc';
-  return _geshifilter_process($format, $text);
+  return _geshifilter_process($filter->format, $text);
 }
 
 /**
  * Settings callback for the GeSHi filter.
  */
-function geshifilter_filter_settings($format, $text) {
+function geshifilter_filter_settings_callback($text, $filter) {
   require_once drupal_get_path('module', 'geshifilter') .'/geshifilter.admin.inc';
-  return _geshifilter_filter_settings($format, $text);
+  return _geshifilter_filter_settings($filter->format, $text);
 }
 
 /**
