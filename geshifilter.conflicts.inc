@@ -62,7 +62,7 @@ function geshifilter_admin_filter_conflicts($check_only=FALSE) {
       $alerts[] = array(array('data' => t('No known filter conflicts were detected.'), 'colspan' => 4));
     }
     $header = array(t('Input format'), t('Filter'), t('Description'), t('Possible solutions'));
-    $output .= theme('table', $header, $alerts);
+    $output .= theme('table', array('header' => $header, 'rows' => $alerts));
     return $output;
   }
 }
