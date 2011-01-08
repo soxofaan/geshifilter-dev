@@ -530,5 +530,26 @@ class GeshiFilterTest extends DrupalWebTestCase {
     );
   }
 
+
+  /**
+   * Issue http://drupal.org/node/1010216
+   */
+  function testSquareBracketConfusion() {
+    variable_set('geshifilter_tags', 'code');
+    variable_set('geshifilter_language_enabled_ini', TRUE);
+    $source_code = "[section]\nserver=192.0.2.62  ; IP address\nport=12345";
+    // Enable square brackets
+    variable_set('geshifilter_tag_styles', array(
+      GESHIFILTER_BRACKETS_SQUARE => GESHIFILTER_BRACKETS_SQUARE,
+    ));
+    // This should be filtered.
+    $this->assertGeshiFilterHighlighting('[code]'. $source_code .'[/code]',
+      array(array($source_code, 'text', 0, 1, FALSE)),
+      t('Checking if [code][section]...[/code] works'));
+    $this->assertGeshiFilterHighlighting('[code language="ini"]'. $source_code .'[/code]',
+      array(array($source_code, 'ini', 0, 1, FALSE)),
+      t('Checking if [code language="ini"][section]...[/code] works'));
+  }
+
 }
 
