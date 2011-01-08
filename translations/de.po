@@ -37,7 +37,7 @@ msgid "Per language tags"
 msgstr "Tags nach Sprache"
 
 #: geshifilter.admin.inc:34
-msgid "GeSHi filter is configured to use global tag settings. For separate settings per input format, enable this option in the <a href=\"!geshi_admin_url\">general GeSHi filter settings</a>."
+msgid "GeSHi filter is configured to use global tag settings. For separate settings per text format, enable this option in the <a href=\"!geshi_admin_url\">general GeSHi filter settings</a>."
 msgstr ""
 
 #: geshifilter.admin.inc:53
@@ -66,11 +66,11 @@ msgid "GeSHi filter tags and delimiters"
 msgstr "GeSHi-Filter-Tags und Trennzeichen"
 
 #: geshifilter.admin.inc:78
-msgid "Use input format specific tag settings."
+msgid "Use text format specific tag settings."
 msgstr "Eingabeformatspezifische Tag-Einstellungen verwenden."
 
 #: geshifilter.admin.inc:80
-msgid "Enable seperate tag settings of the GeSHi filter for each <a href=\"!input_formats\">input format</a> instead of global tag settings."
+msgid "Enable seperate tag settings of the GeSHi filter for each <a href=\"!input_formats\">text format</a> instead of global tag settings."
 msgstr ""
 
 #: geshifilter.admin.inc:90
@@ -248,7 +248,7 @@ msgid "Enabled"
 msgstr "Aktiviert"
 
 #: geshifilter.admin.inc:468
-msgid "GeSHi filter cleared the filter cache for the appropriate input formats."
+msgid "GeSHi filter cleared the filter cache for the appropriate text formats."
 msgstr "Der GeSHi-Filter hat den Filter-Cache für die entsprechenden Eingabeformate geleert."
 
 #: geshifilter.admin.inc:503
@@ -461,11 +461,11 @@ msgid "The GeSHi filter module for Drupal requires the GeSHi library (version 1.
 msgstr ""
 
 #: geshifilter.module:48
-msgid "<p>Quick overview of how to set up and use the GeSHi filter:</p><ul><li>Install the GeSHi library and specify its path on the <a href=\"!geshifilter_settings\">GeSHi filter administration page</a>.</li><li>Configure the <a href=\"!geshifilter_settings\">general GeSHi filter settings</a>.</li><li><a href=\"!geshifilter_languages\">Enable the relevant languages</a> for your site.</li><li>Enable the GeSHi filter in the desired !inputformats.</li><li>Check for !filterconflicts and resolve them.</li><li>Use the input format during content submission as described in the !filtertips.</li></ul>"
+msgid "<p>Quick overview of how to set up and use the GeSHi filter:</p><ul><li>Install the GeSHi library and specify its path on the <a href=\"!geshifilter_settings\">GeSHi filter administration page</a>.</li><li>Configure the <a href=\"!geshifilter_settings\">general GeSHi filter settings</a>.</li><li><a href=\"!geshifilter_languages\">Enable the relevant languages</a> for your site.</li><li>Enable the GeSHi filter in the desired !inputformats.</li><li>Check for !filterconflicts and resolve them.</li><li>Use the text format during content submission as described in the !filtertips.</li></ul>"
 msgstr ""
 
 #: geshifilter.module:51
-msgid "input formats"
+msgid "text formats"
 msgstr "Eingabeformate"
 
 #: geshifilter.module:52
@@ -632,7 +632,7 @@ msgid "geshinode"
 msgstr "geshinode"
 
 #: geshifilter.install:25
-msgid "GeSHi filter is installed. You should now <a href=\"!geshi_admin\">configure the GeSHi filter</a> and enable it in the desired <a href=\"!input_formats\">input formats</a>."
+msgid "GeSHi filter is installed. You should now <a href=\"!geshi_admin\">configure the GeSHi filter</a> and enable it in the desired <a href=\"!input_formats\">text formats</a>."
 msgstr "Der GeSHi-Filter ist installiert. Jetzt den <a href=\"!geshi_admin\">GeSHi-Filter konfigurieren</a> und in den gewünschten <a href=\"!input_formats\">Eingabeformaten</a> aktivieren."
 
 #: geshinode.install:14

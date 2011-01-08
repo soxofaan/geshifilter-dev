@@ -28,14 +28,14 @@ function geshifilter_admin_filter_conflicts($check_only=FALSE) {
     'codefilter/0' => '_geshifilter_codefilter_conflicts',
   );
   foreach (filter_formats() as $format => $input_format) {
-    // Get the filters in this input format
+    // Get the filters in this text format
     $filters = filter_list_format($format);
-    // look if GeSHi is enabled in this input format
+    // look if GeSHi is enabled in this text format
     if (isset($filters['geshifilter/0'])) {
       $geshifilter = $filters['geshifilter/0'];
-      // Check if possibly conflicting filters are also present in input format
+      // Check if possibly conflicting filters are also present in text format
       foreach ($conflict_detectors as $filter_key => $conflict_detector) {
-        // does this filter exist in the input format?
+        // does this filter exist in the text format?
         if (array_key_exists($filter_key, $filters)) {
           $cfilter = $filters[$filter_key];
           $conflicts = $conflict_detector($format, $cfilter, $geshifilter);

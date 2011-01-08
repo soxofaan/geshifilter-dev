@@ -64,7 +64,7 @@ When language tags are enabled (like "<java>" for Java) you can also do
     dothisdothat(i);
   }
   </java>
-More options and tricks can be found in the filter tips of the input format at
+More options and tricks can be found in the filter tips of the text format at
 www.example.com/?q=filter/tips .
 
 

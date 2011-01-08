@@ -35,7 +35,7 @@ msgid "Per language tags"
 msgstr "各言語のタグ"
 
 #: modules/geshifilter/geshifilter.admin.inc:29
-msgid "GeSHi filter is configured to use global tag settings. For separate settings per input format, enable this option in the <a href=\"!geshi_admin_url\">general GeSHi filter settings</a>."
+msgid "GeSHi filter is configured to use global tag settings. For separate settings per text format, enable this option in the <a href=\"!geshi_admin_url\">general GeSHi filter settings</a>."
 msgstr "GeSHi フィルタはグローバルタグ設定を利用するよう設定されています。 入力書式ごとに別の設定を行うためには <a href=\"!geshi_admin_url\">GeSHi フィルタの全般設定</a>で入力書式で特定のタグ設定を使用するためのオプションを有効にしてください。"
 
 #: modules/geshifilter/geshifilter.admin.inc:48
@@ -63,11 +63,11 @@ msgid "GeSHi filter tags and delimiters"
 msgstr "GeSHi フィルタ（タグと区切り記号）"
 
 #: modules/geshifilter/geshifilter.admin.inc:73
-msgid "Use input format specific tag settings."
+msgid "Use text format specific tag settings."
 msgstr "入力書式で特定のタグ設定を使用する。"
 
 #: modules/geshifilter/geshifilter.admin.inc:75
-msgid "Enable seperate tag settings of the GeSHi filter for each <a href=\"!input_formats\">input format</a> instead of global tag settings."
+msgid "Enable seperate tag settings of the GeSHi filter for each <a href=\"!input_formats\">text format</a> instead of global tag settings."
 msgstr "グローバルなタグの設定に代えて、それぞれの<a href=\"!input_formats\">入力書式</a>ごとに GeSHi フィルタのセパレートタグ設定を行ってください。"
 
 #: modules/geshifilter/geshifilter.admin.inc:85
@@ -235,7 +235,7 @@ msgid "Enabled"
 msgstr "有効"
 
 #: modules/geshifilter/geshifilter.admin.inc:449
-msgid "GeSHi filter cleared the filter cache for the appropriate input formats."
+msgid "GeSHi filter cleared the filter cache for the appropriate text formats."
 msgstr "入力書式を適切に動作させるため、フィルタのキャッシュをクリアしました。"
 
 #: modules/geshifilter/geshifilter.admin.inc:486
@@ -437,7 +437,7 @@ msgid "Filters"
 msgstr "フィルタ"
 
 #: modules/geshifilter/geshifilter.install:20
-msgid "GeSHi filter is installed. You should now <a href=\"!geshi_admin\">configure the GeSHi filter</a> and enable it in the desired <a href=\"!input_formats\">input formats</a>."
+msgid "GeSHi filter is installed. You should now <a href=\"!geshi_admin\">configure the GeSHi filter</a> and enable it in the desired <a href=\"!input_formats\">text formats</a>."
 msgstr "GeSHi フィルタがインストールされました。 <a href=\"!geshi_admin\">GeSHi フィルタの構成</a>を行い、適切な<a href=\"!input_formats\">入力書式</a>で有効化する必要があります。"
 
 #: modules/geshifilter/geshifilter.module:37
@@ -449,11 +449,11 @@ msgid "The GeSHi filter module for Drupal requires the GeSHi library (version 1.
 msgstr "GeSHi フィルタモジュールでは GeSHi ライブラリ（バージョン 1.0.x）が動作している環境が必要です。 GeSHi フィルタは実際には Drupal で GeSHi ライブラリを使用するためのモジュールです。 しかし、drupal.org のリポジトリポリシーによると GeSHi フィルタモジュールのパッケージに GeSHi ライブラリを含めることができないので、別途、GeSHi ライブラリをダウンロードし、インストールする必要があります。"
 
 #: modules/geshifilter/geshifilter.module:43
-msgid "<p>Quick overview of how to set up and use the GeSHi filter:</p><ul><li>Install the GeSHi library and specify its path on the <a href=\"!geshifilter_settings\">GeSHi filter administration page</a>.</li><li>Configure the <a href=\"!geshifilter_settings\">general GeSHi filter settings</a>.</li><li><a href=\"!geshifilter_languages\">Enable the relevant languages</a> for your site.</li><li>Enable the GeSHi filter in the desired !inputformats.</li><li>Check for !filterconflicts and resolve them.</li><li>Use the input format during content submission as described in the !filtertips.</li></ul>"
+msgid "<p>Quick overview of how to set up and use the GeSHi filter:</p><ul><li>Install the GeSHi library and specify its path on the <a href=\"!geshifilter_settings\">GeSHi filter administration page</a>.</li><li>Configure the <a href=\"!geshifilter_settings\">general GeSHi filter settings</a>.</li><li><a href=\"!geshifilter_languages\">Enable the relevant languages</a> for your site.</li><li>Enable the GeSHi filter in the desired !inputformats.</li><li>Check for !filterconflicts and resolve them.</li><li>Use the text format during content submission as described in the !filtertips.</li></ul>"
 msgstr "<p>GeSHi フィルタのセットアップと使用方法：</p><ul><li>GeSHi ライブラリをインストールし、<a href=\"!geshifilter_settings\">GeSHi フィルタの管理ページ</a>で GeSHi ライブラリのパスを指定します。</li><li><a href=\"!geshifilter_settings\">全般設定</a>で必要な設定を行います。</li><li>関連のあるまたは適切な<a href=\"!geshifilter_languages\">言語</a>を有効にします。</li><li>任意の !inputformats で GeSHi フィルタを有効にします。</li><li>!filterconflicts を確認し、問題があれば解決します。</li><li>コンテンツ作成時に !filtertips に記載されているようなフォーマットを使用して入力を行います。</li></ul>"
 
 #: modules/geshifilter/geshifilter.module:46
-msgid "input formats"
+msgid "text formats"
 msgstr "入力書式"
 
 #: modules/geshifilter/geshifilter.module:47
