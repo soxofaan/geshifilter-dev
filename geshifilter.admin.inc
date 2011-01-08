@@ -28,7 +28,7 @@ function _geshifilter_filter_settings($form, &$form_state, $filter, $format, $de
   }
   else {
     $settings['info'] = array(
-      '#markup' => '<p>'. t('GeSHi filter is configured to use global tag settings. For separate settings per text format, enable this option in the <a href="!geshi_admin_url">general GeSHi filter settings</a>.', array('!geshi_admin_url' => url('admin/config/geshifilter'))) .'</p>'
+      '#markup' => '<p>'. t('GeSHi filter is configured to use global tag settings. For separate settings per text format, enable this option in the <a href="!geshi_admin_url">general GeSHi filter settings</a>.', array('!geshi_admin_url' => url('admin/config/content/geshifilter'))) .'</p>'
     );
   }
   $settings['#validate'][] = 'geshifilter_per_language_settings_validate';
@@ -193,7 +193,7 @@ function geshifilter_admin_general_settings(&$form_state) {
         array(
           '!geshidoc' => 'http://qbnz.com/highlighter/geshi-doc.html#using-css-classes',
           '!filesystem' => url('admin/config/media/file-system'),
-          '!cssdefaults' => url('admin/config/geshifilter/generate_css'),
+          '!cssdefaults' => url('admin/config/content/geshifilter/generate_css'),
         )),
     );
 
