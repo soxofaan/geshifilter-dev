@@ -205,9 +205,9 @@ function geshifilter_process_callback($text, $filter) {
 /**
  * Settings callback for the GeSHi filter.
  */
-function geshifilter_filter_settings_callback($text, $filter) {
+function geshifilter_filter_settings_callback($form, &$form_state, $filter, $format, $defaults, $filters) {
   require_once drupal_get_path('module', 'geshifilter') .'/geshifilter.admin.inc';
-  return _geshifilter_filter_settings($filter->format, $text);
+  return _geshifilter_filter_settings($form, $form_state, $filter, $format, $defaults, $filters);
 }
 
 /**

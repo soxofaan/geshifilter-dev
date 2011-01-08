@@ -13,7 +13,7 @@ define('GESHIFILTER_FLUSH_LANGUAGE_DEFINITION_CACHE_TEXT', 'Flush the GeSHi lang
 /**
  * Form (items) for filter settings.
  */
-function _geshifilter_filter_settings($form, &$form_state, $filter, $format, $defaults) {
+function _geshifilter_filter_settings($form, &$form_state, $filter, $format, $defaults, $filters) {
   if (geshifilter_use_format_specific_options()) {
     // tags and attributes
     $settings['general_tags'] = _geshifilter_general_highlight_tags_settings($format);
@@ -55,7 +55,7 @@ function _geshifilter_tag_styles_validate($form, &$form_state) {
 /**
  * General settings form for the GeSHi filter.
  */
-function geshifilter_admin_general_settings(&$form_state) {
+function geshifilter_admin_general_settings($form, &$form_state) {
   $form = array();
 
   // Try to load GeSHi library and get version if successful.
