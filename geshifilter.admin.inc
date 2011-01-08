@@ -13,32 +13,27 @@ define('GESHIFILTER_FLUSH_LANGUAGE_DEFINITION_CACHE_TEXT', 'Flush the GeSHi lang
 /**
  * Form (items) for filter settings.
  */
-function _geshifilter_filter_settings($format) {
-  $form = array();
-  $form['geshifilter'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('GeSHi filter'),
-    '#collapsible' => TRUE,
-  );
+function _geshifilter_filter_settings($form, &$form_state, $filter, $format, $defaults) {
   if (geshifilter_use_format_specific_options()) {
     // tags and attributes
-    $form['geshifilter']['general_tags'] = _geshifilter_general_highlight_tags_settings($format);
-    $form['#validate'][] = '_geshifilter_tag_styles_validate';
+    $settings['general_tags'] = _geshifilter_general_highlight_tags_settings($format);
+    $settings['#validate'][] = '_geshifilter_tag_styles_validate';
     // per language tags
-    $form['geshifilter']['per_language_settings'] = array(
+    $settings['per_language_settings'] = array(
       '#type' => 'fieldset',
       '#title' => t('Per language tags'),
       '#collapsible' => TRUE,
-      'table' => geshifilter_per_language_settings($format, 'enabled', FALSE, TRUE),
+      'table' => geshifilter_per_language_settings($format->format, 'enabled', FALSE, TRUE),
     );
   }
   else {
-    $form['geshifilter']['info'] = array(
-      '#value' => '<p>'. t('GeSHi filter is configured to use global tag settings. For separate settings per input format, enable this option in the <a href="!geshi_admin_url">general GeSHi filter settings</a>.', array('!geshi_admin_url' => url('admin/config/geshifilter'))) .'</p>'
+    $settings['info'] = array(
+      '#markup' => '<p>'. t('GeSHi filter is configured to use global tag settings. For separate settings per input format, enable this option in the <a href="!geshi_admin_url">general GeSHi filter settings</a>.', array('!geshi_admin_url' => url('admin/config/geshifilter'))) .'</p>'
     );
   }
-  $form['#validate'][] = 'geshifilter_per_language_settings_validate';
-  return $form;
+  $settings['#validate'][] = 'geshifilter_per_language_settings_validate';
+
+  return $settings;
 }
 
 /**
@@ -382,14 +377,14 @@ function geshifilter_admin_per_language_settings_submit($form, &$form_state) {
 /**
  * Helper function for some settings form fields usable as general and specific settings
  */
-function _geshifilter_general_highlight_tags_settings($format=NULL) {
+function _geshifilter_general_highlight_tags_settings($format = NULL) {
   $form = array();
-  $f = ($format === NULL) ? '' : "_$format";
+  $f = ($format === NULL) ? '' : "_$format->format";
   // generic tags
   $form["geshifilter_tags$f"] = array(
     '#type' => 'textfield',
     '#title' => t('Generic syntax highlighting tags'),
-    '#default_value' => geshifilter_tags($format),
+    '#default_value' => geshifilter_tags($format->format),
     '#description' => t('Tags that should activate the GeSHi syntax highlighting. Specify a space-separated list of tagnames.'),
   );
   // Container tag styles.
@@ -474,7 +469,8 @@ function geshifilter_per_language_settings($format, $view, $add_checkbox, $add_t
 /**
  * theming function for the per language settings table
  */
-function theme_geshifilter_per_language_settings($form) {
+function theme_geshifilter_per_language_settings($variables) {
+  $form = $variables['form'];
   // build table body
   $rows = array();
   foreach (element_children($form['languages']) as $language) {
@@ -496,7 +492,10 @@ function theme_geshifilter_per_language_settings($form) {
     }
   }
   // return themed table
-  return theme('table', $header, $rows);
+  return theme('table', array(
+    'header' => $header,
+    'rows' => $rows
+  ));
 }
 
 /**
