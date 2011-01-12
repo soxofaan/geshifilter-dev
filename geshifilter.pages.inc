@@ -291,7 +291,7 @@ function _geshifilter_replace_callback($match, $format) {
   }
   $inline_mode = (strpos($source_code, "\n") === FALSE);
   // process and return
-  return geshifilter_process($source_code, $lang, $line_numbering, $linenumbers_start, $inline_mode, $title);
+  return geshifilter_process_sourcecode($source_code, $lang, $line_numbering, $linenumbers_start, $inline_mode, $title);
 }
 
 /**
@@ -308,9 +308,9 @@ function _geshifilter_override_geshi_defaults(&$geshi, $langcode) {
 }
 
 /**
- * General geshifilter processing function
+ * General geshifilter processing function for a chunk of source code.
  */
-function geshifilter_process($source_code, $lang, $line_numbering=0, $linenumbers_start=1, $inline_mode=FALSE, $title = NULL) {
+function geshifilter_process_sourcecode($source_code, $lang, $line_numbering=0, $linenumbers_start=1, $inline_mode=FALSE, $title = NULL) {
   // process
   if ($lang == 'php' && variable_get('geshifilter_use_highlight_string_for_php', FALSE)) {
     return geshifilter_highlight_string_process($source_code, $inline_mode);
