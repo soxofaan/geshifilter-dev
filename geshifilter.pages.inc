@@ -119,22 +119,22 @@ function _geshifilter_prepare($format, $text) {
 
   // Replace the code container tag brackets
   // and prepare the container content (newline and angle bracket protection).
-  // @todo: make sure that these replacements can be done in serie.
+  // @todo: make sure that these replacements can be done in series.
   $tag_styles = array_filter(_geshifilter_tag_styles($format));
   if (in_array(GESHIFILTER_BRACKETS_ANGLE, $tag_styles)) {
     // Prepare <foo>..</foo> blocks.
     $pattern = '#(<)('. $tags_string .')((\s+[^>]*)*)(>)(.*?)(</\2\s*>|$)#s';
-    $text = preg_replace_callback($pattern, create_function('$match', "return _geshifilter_prepare_callback(\$match, $format);"), $text);
+    $text = preg_replace_callback($pattern, create_function('$match', "return _geshifilter_prepare_callback(\$match, '$format');"), $text);
   }
   if (in_array(GESHIFILTER_BRACKETS_SQUARE, $tag_styles)) {
     // Prepare [foo]..[/foo] blocks.
     $pattern = '#((?<!\[)\[)('. $tags_string .')((\s+[^\]]*)*)(\](?!\[))(.*?)((?<!\[)\[/\2\s*\](?<!\[)|$)#s';
-    $text = preg_replace_callback($pattern, create_function('$match', "return _geshifilter_prepare_callback(\$match, $format);"), $text);
+    $text = preg_replace_callback($pattern, create_function('$match', "return _geshifilter_prepare_callback(\$match, '$format');"), $text);
   }
   if (in_array(GESHIFILTER_BRACKETS_DOUBLESQUARE, $tag_styles)) {
     // Prepare [[foo]]..[[/foo]] blocks.
     $pattern = '#(\[\[)('. $tags_string .')((\s+[^\]]*)*)(\]\])(.*?)(\[\[/\2\s*\]\]|$)#s';
-    $text = preg_replace_callback($pattern, create_function('$match', "return _geshifilter_prepare_callback(\$match, $format);"), $text);
+    $text = preg_replace_callback($pattern, create_function('$match', "return _geshifilter_prepare_callback(\$match, '$format');"), $text);
   }
   if (in_array(GESHIFILTER_BRACKETS_PHPBLOCK, $tag_styles)) {
     // Prepare < ?php ... ? > blocks.
@@ -229,7 +229,7 @@ function _geshifilter_process($format, $text) {
   $tags_string = implode('|', $tags);
   // Pattern for matching the prepared "<code>...</code>" stuff
   $pattern = '#\\[geshifilter-('. $tags_string .')([^\\]]*)\\](.*?)(\\[/geshifilter-\1\\])#s';
-  $text = preg_replace_callback($pattern, create_function('$match', "return _geshifilter_replace_callback(\$match, $format);"), $text);
+  $text = preg_replace_callback($pattern, create_function('$match', "return _geshifilter_replace_callback(\$match, '$format');"), $text);
   return $text;
 }
 
