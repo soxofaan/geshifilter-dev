@@ -1,4 +1,4 @@
-# $Id: ja.po,v 1.3 2008/09/04 09:13:15 soxofaan Exp $
+# $Id$
 #
 # Japanese translation of Drupal (geshifilter)
 # Copyright 2008 0829 <hixarg+0829@gmail.com>

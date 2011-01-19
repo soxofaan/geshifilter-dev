@@ -1,5 +1,5 @@
 <?php
-// $Id: geshifilter.admin.inc,v 1.25 2010/02/01 00:31:45 soxofaan Exp $
+// $Id$
 
 /**
  * @file

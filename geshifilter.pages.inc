@@ -1,5 +1,5 @@
 <?php
-// $Id: geshifilter.pages.inc,v 1.15 2010/04/20 00:15:13 soxofaan Exp $
+// $Id$
 
 /**
  * @file
@@ -119,7 +119,7 @@ function _geshifilter_prepare($format, $text) {
 
   // Replace the code container tag brackets
   // and prepare the container content (newline and angle bracket protection).
-  // @todo: make sure that these replacements can be done in serie.
+  // @todo: make sure that these replacements can be done in series.
   $tag_styles = array_filter(_geshifilter_tag_styles($format));
   if (in_array(GESHIFILTER_BRACKETS_ANGLE, $tag_styles)) {
     // Prepare <foo>..</foo> blocks.

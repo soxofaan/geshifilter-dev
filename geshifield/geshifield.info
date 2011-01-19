@@ -1,4 +1,4 @@
-; $Id: geshifield.info,v 1.1 2010/02/01 00:33:01 soxofaan Exp $
+; $Id$
 name = "GeSHi field"
 description = "Provides a CCK field for source code with GeSHI syntax highlighting."
 package = "Filters"
