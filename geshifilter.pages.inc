@@ -128,7 +128,7 @@ function _geshifilter_prepare($format, $text) {
   }
   if (in_array(GESHIFILTER_BRACKETS_SQUARE, $tag_styles)) {
     // Prepare [foo]..[/foo] blocks.
-    $pattern = '#((?<!\[)\[)('. $tags_string .')((\s+[^\]]*)*)(\](?!\[))(.*?)((?<!\[)\[/\2\s*\](?<!\[)|$)#s';
+    $pattern = '#((?<!\[)\[)('. $tags_string .')((\s+[^\]]*)*)(\])(.*?)((?<!\[)\[/\2\s*\]|$)#s';
     $text = preg_replace_callback($pattern, create_function('$match', "return _geshifilter_prepare_callback(\$match, '$format');"), $text);
   }
   if (in_array(GESHIFILTER_BRACKETS_DOUBLESQUARE, $tag_styles)) {
