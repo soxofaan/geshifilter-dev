@@ -249,7 +249,7 @@ function geshifilter_admin_general_settings_after_build($form, &$form_state) {
  */
 function geshifilter_admin_general_settings_validate($form, &$form_state) {
   // Check if automatically managed style sheet is posible
-  if ($form_state['values']['geshifilter_css_mode'] == GESHIFILTER_CSS_CLASSES_AUTOMATIC && !_geshifilter_managed_external_stylesheet_possible()) {
+  if (isset($form_state['values']['geshifilter_css_mode']) && $form_state['values']['geshifilter_css_mode'] == GESHIFILTER_CSS_CLASSES_AUTOMATIC && !_geshifilter_managed_external_stylesheet_possible()) {
     form_set_error('geshifilter_css_mode', t('GeSHi filter can not automatically manage an external CSS style sheet when the download method is private.'));
   }
 }
