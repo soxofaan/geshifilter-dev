@@ -7,6 +7,7 @@
  */
 
 function _geshifilter_get_geshi_dir() {
+  // TODO: change the default value to something like 'sites/all/libraries/geshi' (possibly using the Libraries API module)
   return variable_get('geshifilter_geshi_dir', drupal_get_path('module', 'geshifilter') .'/geshi');
 }
 
