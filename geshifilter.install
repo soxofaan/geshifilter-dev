@@ -19,7 +19,7 @@ function geshifilter_install() {
 
   // what to do next?
   drupal_set_message(t('GeSHi filter is installed. You should now <a href="!geshi_admin">configure the GeSHi filter</a> and enable it in the desired <a href="!input_formats">text formats</a>.',
-    array('!geshi_admin' => url('admin/config/geshifilter'), '!input_formats' => url('admin/config/content/formats'))
+    array('!geshi_admin' => url('admin/config/content/geshifilter'), '!input_formats' => url('admin/config/content/formats'))
   ));
 }
 
